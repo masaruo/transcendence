@@ -37,10 +37,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'app',
+    'user',
+    # 3rd party apps
     'rest_framework',
     'rest_framework.authtoken',
+    'rest_framework_simplejwt',
     'drf_spectacular',
-    'user',
 ]
 
 MIDDLEWARE = [
@@ -131,5 +134,14 @@ AUTH_USER_MODEL = 'user.User'
 
 # for auto API docs
 REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
     "DEFAULT_SCHEMA_CLASS": 'drf_spectacular.openapi.AutoSchema',
 }
+
+# SPECTACULAR_SETTINGS = {
+#     # list of authentication/permission classes for spectacular's views.
+#     'SERVE_PERMISSIONS': ['rest_framework.permissions.IsAdminUser'],
+#     # Auth with session only in docs without effect to api
+#     'SERVE_AUTHENTICATION': ["rest_framework.authentication.SessionAuthentication"]}

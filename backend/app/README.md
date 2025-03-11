@@ -3,6 +3,9 @@
 email = admin@example.com
 password = pass
 
+# pip
+pip install -r requirements.txt
+
 # run server
 python manage.py runserver
 
