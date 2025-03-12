@@ -10,7 +10,7 @@ WORKDIR /app
 
 EXPOSE 8000
 
-RUN	apt-get update && apt-get upgrade -y && apt-get install -y postgresql-client && \
+RUN	apt-get update && apt-get upgrade -y && apt-get install -y postgresql-client tree curl lsof && \
 	pip install --upgrade pip && pip install --no-cache-dir -r /tmp/requirements.txt && \
 	rm -rf /tmp/requirements.txt
 
