@@ -7,6 +7,7 @@ password = pass
 pip install -r requirements.txt
 
 # run server
+in app dir
 python manage.py runserver
 
 # flake8 : norm check
