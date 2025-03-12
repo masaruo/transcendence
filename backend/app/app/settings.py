@@ -139,9 +139,3 @@ REST_FRAMEWORK = {
     ),
     "DEFAULT_SCHEMA_CLASS": 'drf_spectacular.openapi.AutoSchema',
 }
-
-# SPECTACULAR_SETTINGS = {
-#     # list of authentication/permission classes for spectacular's views.
-#     'SERVE_PERMISSIONS': ['rest_framework.permissions.IsAdminUser'],
-#     # Auth with session only in docs without effect to api
-#     'SERVE_AUTHENTICATION': ["rest_framework.authentication.SessionAuthentication"]}

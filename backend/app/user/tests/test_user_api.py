@@ -6,6 +6,8 @@ from rest_framework.test import APIClient
 from rest_framework import status
 
 CREATE_USER_URL = reverse("user:create")
+TOKEN_URL = reverse("token_obtain_pair")
+ME_URL = reverse("user:me")
 
 def create_user(**kwargs):
     """helper function to create user"""
@@ -31,3 +33,76 @@ class PublicUserApiTests(TestCase):
         user = get_user_model().objects.get(email=self.payload["email"])
         self.assertTrue(user.check_password(self.payload["password"]))
         self.assertNotIn(self.payload["password"], "password")
+
+    def test_create_user_with_email_exists(self):
+
+        dummy = {
+            "email": "test@example.com",
+            "nickname": "piyo",
+            "password": "testpass321",
+        }
+        create_user(**self.payload)
+        res = self.client.post(CREATE_USER_URL, dummy)
+
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_password_too_short_error(self):
+        dummy = {
+            "email": "dummy@example.com",
+            "nickname": "piyo",
+            "password": "pw",
+        }
+        res = self.client.post(CREATE_USER_URL, dummy)
+
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+        user_exists = get_user_model().objects.filter(email=dummy["email"]).exists()
+        self.assertFalse(user_exists)
+
+    def test_create_token_for_user(self):
+        create_user(**self.payload)
+        res = self.client.post(TOKEN_URL, self.payload)
+
+        self.assertIn("access", res.data)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+    def test_create_token_for_bad_creditial_fail(self):
+        create_user(**self.payload)
+        dummy = {
+            "email": "test@example.com",
+            "nickname": "piyo",
+            "password": "badpassword",
+        }
+        res = self.client.post(TOKEN_URL, dummy)
+        self.assertNotIn("access", res.data)
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)#? 400 bad request?
+
+    def test_create_token_with_blank_password(self):
+        create_user(**self.payload)
+
+        dummy = {
+            "email": "test@example.com",
+            "nickname": "piyo",
+            "password": "",
+        }
+        res = self.client.post(TOKEN_URL, dummy)
+        self.assertNotIn("access", res.data)
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_retrieve_user_without_auth_fail(self):
+        res = self.client.get(ME_URL)
+
+# class PrivateUserAPITest(TestCase):
+#     """test cases for authroized actions"""
+#     def setUp(self):
+#         self.user = create_user{
+#             "email": "test@example.com",
+#             "nickname": "hoge",
+#             "password": "testpass123",
+#         }
+
+#         self.client = APIClient()
+#         self.client.force_authenticate(user=self.user)
+
+#     def test_retrieve_profile_success(self):
+#         res = self.get()
