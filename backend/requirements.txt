@@ -5,3 +5,4 @@ drf-spectacular
 Pillow
 flake8
 djangorestframework-simplejwt
+psycopg[binary]
