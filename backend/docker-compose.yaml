@@ -3,14 +3,43 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    ports:
+    ports: #open for https?
       - "8000:8000"
-    volumes:
+    restart:
+      always
+    volumes: #? need to change
       - ./app:/app
-    environment:
-      - DB_HOST=db
-      - DB_NAME=devdb
-      - DB_USER=devuser
-      - DB_PASSWORD=changeme
-    command:
-      bash -c "python manage.py runserver 0.0.0.0:8000"
+    env_file:
+      - .env
+    networks:
+      - backend
+    depends_on:
+      db:
+        condition: service_healthy
+    command: >
+        /bin/bash -c " python manage.py migrate && \
+        python manage.py runserver 0.0.0.0:8000"
+
+  db:
+    image: postgres:15
+    restart: always
+    shm_size: 128mb #shared memory
+    env_file:
+      - .env
+    volumes:
+      - postgres_volume:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - backend
+
+volumes:
+  postgres_volume:
+    name: transcendence
+
+networks:
+  backend:
+    name: transcendence
