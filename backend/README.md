@@ -1,3 +1,6 @@
+# start
+docker compose up
+then check localhost:8000/admin
 
 # django db super user
 email = admin@example.com
