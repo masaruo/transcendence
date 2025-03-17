@@ -25,14 +25,6 @@ class UserModelTest(TestCase):
             user = get_user_model().objects.create_user(email=input, nickname="dummy", password="sample123")
             self.assertEqual(user.email, expected)
 
-    # def test_creating_new_user_with_wrong_email_formats_fail(self):
-    #     emails = [
-    #         "test@", "test@example", "test@exmaple.", "test"
-    #     ]
-    #     for email in emails:
-    #         with self.assertRaises(ValueError):
-    #             get_user_model().objects.create_user(email=email, nickname="hoge", password="sample123")
-
     def test_creating_new_user_without_nickname_fail(self):
         with self.assertRaises(ValueError):
             get_user_model().objects.create_user(email="test@email.com", nickname="", password="sample123")
