@@ -13,6 +13,10 @@
     "moduleDetection": "force",
     "noEmit": true,
 
+    // location
+    "rootDir": "./src",
+    "outDir": "./dist",
+
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,
