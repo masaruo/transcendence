@@ -20,4 +20,6 @@ RUN	apt-get update && apt-get upgrade -y && apt-get install -y postgresql-client
 	chown -R django-user:django-user /vol && \
 	chmod -R 755 /vol
 
+COPY ./default_avatar.jpeg /vol/web/media/default_avatar.jpeg
+
 ENV PATH="/venv/bin:$PATH"

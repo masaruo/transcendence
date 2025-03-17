@@ -6,8 +6,9 @@ from rest_framework import serializers
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
-        fields = ["email", "nickname", "avatar", "password"]
-        extra_kwargs = {"password": {"write_only": True, "min_length": 5}}#todo need validation more
+        fields = ["id", "email", "nickname", "avatar", "password"]
+        extra_kwargs = {"password": {"write_only": True, "min_length": 5}}  # todo need validation more
+        read_only_fields = ['id']
 
     def create(self, validated_data):
         user = get_user_model().objects.create_user(**validated_data)
