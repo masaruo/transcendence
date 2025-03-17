@@ -1,4 +1,8 @@
-const canvas = document.getElementById("canvas");
+const canvas = document.getElementById("canvas") as HTMLCanvasElement | null;
+if (!canvas)
+{
+	throw new Error("Canvas element not found");
+}
 const ctx = canvas.getContext("2d");
 const x_center = canvas.width / 2;
 const y_center = canvas.height / 2;
