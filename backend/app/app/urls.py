@@ -6,11 +6,13 @@ from drf_spectacular.views import (
     SpectacularSwaggerView,
     )
 
-from rest_framework_simplejwt.views  import (
+from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
     TokenVerifyView,
 )
+
+from debug_toolbar.toolbar import debug_toolbar_urls
 
 
 urlpatterns = [
@@ -21,4 +23,4 @@ urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/token/verify/', TokenVerifyView.as_view(), name="token_verfify"),
     path('api/user/', include("user.urls")),
-]
+] + debug_toolbar_urls()
