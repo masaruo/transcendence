@@ -4,10 +4,13 @@ Custom model for user
 import os
 import uuid
 
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
 AVATAR_DEFAULT = "defalt"
+
+User = get_user_model
 
 class UserManager(BaseUserManager):
     """manager for User model"""
@@ -57,6 +60,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_online = models.BooleanField(verbose_name="Online Status", default=True)
     is_active = models.BooleanField(verbose_name="Active User", default=True)
     is_staff = models.BooleanField(default=False)
+    friends = models.ManyToManyField('self', symmetrical=True)
 
     # register UserManager class for this User model
     objects = UserManager()
@@ -67,3 +71,18 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.email
 
+    def make_friend(self, friend):
+        if self == friend:
+            raise ValueError("You cannot make friend with yourself.")
+        if self.friends.filter(id=friend.id).exists():
+            raise ValueError("You guys are already friends.")
+
+        self.friends.add(friend)
+
+    def delete_friend(self, friend):
+        if self == friend:
+            raise ValueError("You cannot delete yourself.")
+        if not self.friends.filter(id=friend.id).exists():
+            raise ValueError("You guys are not friends.")
+
+        self.friends.delete(friend)
