@@ -40,7 +40,9 @@
 				"python.defaultInterpreterPath": "/venv/bin/python"
 			},
 			"extensions": [
-				"donjayamanne.python-extension-pack",
+				"ms-python.python",
+				"ms-python.vscode-pylance",
+				"ms-python.debugpy",
 				"ms-python.flake8",
 				"redhat.vscode-yaml"
 			]
