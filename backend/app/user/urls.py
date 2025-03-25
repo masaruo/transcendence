@@ -13,6 +13,6 @@ urlpatterns = [
     path('me/', ManageUserView.as_view(), name="me"),
     # path('friends/', include(router.urls))
     path('friends/', FriendListView.as_view(), name="friends"),
-    path('friends/create/', FriendAddView.as_view(), name="friends_create"),
+    path('friends/create', FriendAddView.as_view(), name="friends_create"),
     path('friends/remove/<int:pk>/', FriendRemoveView.as_view(), name="friends_remove"),
 ]

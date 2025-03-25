@@ -10,3 +10,6 @@
 
 ### initial set up
 inside the container, npm install
+
+# CONNECT network
+docker network connect transcendence <container name:frontend-node-1>

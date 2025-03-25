@@ -9,6 +9,8 @@ class UserAdmin(BaseUserAdmin):
     """Define the admin pages for users."""
     ordering = ['id']
     list_display = ['email', 'nickname', 'is_online', 'is_active', 'is_staff', 'is_superuser']
+    filter_horizontal = ('friends',)
+    search_fields = ['email', 'nickname']
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
         (_('Personal Info'), {'fields': ('nickname', 'avatar')}),
@@ -23,6 +25,7 @@ class UserAdmin(BaseUserAdmin):
                 )
             }
         ),
+        (_('Relationships'), {'fields': ('friends',)}),
         (_('Important dates'), {'fields': ('last_login',)}),
     )
     readonly_fields = ['last_login']
@@ -38,6 +41,10 @@ class UserAdmin(BaseUserAdmin):
                 'is_staff',
                 'is_superuser',
             ),
+        }),
+        (_('Relationships'), {
+            'classes': ('wide',),
+            'fields': ('friends',),
         }),
     )
 

@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure--=pij7phva!t*6#6^-9=a8a+wb%t#%_-&&vgarmmd6ccg81kl!
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['django', 'localhost']
 
 INTERNAL_IPS = [
     "127.0.0.1",
@@ -50,9 +50,11 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'django_extensions',
     'debug_toolbar',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -159,3 +161,9 @@ REST_FRAMEWORK = {
 SPECTACULAR_SETTINGS = {
     'COMPONENT_SPLIT_REQUEST': True,
 }
+
+# cors - only true for dev
+CORS_ALLOW_ALL_ORIGINS = True
+
+# use cookie for credentials
+CORS_ALLOW_CREDENTIALS = True

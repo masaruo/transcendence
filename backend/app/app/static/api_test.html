@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API テスト</title>
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .endpoint { margin-bottom: 30px; border: 1px solid #ddd; padding: 15px; border-radius: 5px; }
+        button { padding: 8px 12px; background: #4CAF50; color: white; border: none; cursor: pointer; }
+        pre { background: #f5f5f5; padding: 10px; overflow: auto; }
+        input, select { padding: 8px; margin: 5px 0; width: 100%; box-sizing: border-box; }
+    </style>
+</head>
+<body>
+    <h1>APIテストページ</h1>
+
+    <!-- GETリクエスト -->
+    <div class="endpoint">
+        <h2>GETリクエスト</h2>
+        <div>
+            <label for="getUrl">エンドポイント:</label>
+            <input type="text" id="getUrl" value="/api/resource/">
+        </div>
+        <button onclick="sendGetRequest()">送信</button>
+        <h3>レスポンス:</h3>
+        <pre id="getResponse">ここにレスポンスが表示されます</pre>
+    </div>
+
+    <!-- POSTリクエスト -->
+    <div class="endpoint">
+        <h2>POSTリクエスト</h2>
+        <div>
+            <label for="postUrl">エンドポイント:</label>
+            <input type="text" id="postUrl" value="/api/resource/">
+            <label for="postData">リクエストデータ (JSON):</label>
+            <textarea id="postData" rows="5">{
+  "name": "テスト",
+  "description": "テストデータ"
+}</textarea>
+        </div>
+        <button onclick="sendPostRequest()">送信</button>
+        <h3>レスポンス:</h3>
+        <pre id="postResponse">ここにレスポンスが表示されます</pre>
+    </div>
+
+    <script>
+        const BASE_URL = 'http://localhost:8000'; // バックエンドサーバーのURL
+
+        async function sendGetRequest() {
+            const url = document.getElementById('getUrl').value;
+            const responseElement = document.getElementById('getResponse');
+
+            try {
+                const response = await fetch(`${BASE_URL}${url}`);
+                const data = await response.json();
+                responseElement.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                responseElement.textContent = `エラー: ${error.message}`;
+            }
+        }
+
+        async function sendPostRequest() {
+            const url = document.getElementById('postUrl').value;
+            const data = document.getElementById('postData').value;
+            const responseElement = document.getElementById('postResponse');
+
+            try {
+                const response = await fetch(`${BASE_URL}${url}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: data
+                });
+
+                const responseData = await response.json();
+                responseElement.textContent = JSON.stringify(responseData, null, 2);
+            } catch (error) {
+                responseElement.textContent = `エラー: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>
