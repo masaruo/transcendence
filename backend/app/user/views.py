@@ -1,4 +1,5 @@
 from rest_framework import generics, permissions, viewsets, mixins
+from rest_framework.views import APIView
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
@@ -10,6 +11,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from user.serializers import UserSerializer, FriendshipSerializer
 
+User = get_user_model()
 
 class CreateUserView(generics.CreateAPIView):
     serializer_class = UserSerializer
@@ -24,31 +26,73 @@ class ManageUserView(generics.RetrieveUpdateAPIView):
         return self.request.user
 
 
-class FriendViewSet(viewsets.ModelViewSet):
+# class FriendsListView(APIView):
+#     serializer_class = FriendshipSerializer
+#     authentication_classes = [JWTAuthentication]
+#     permission_classes = [permissions.IsAuthenticated]
+
+#     def get(self, request):
+#         try:
+#             user = request.user
+#             friends = user.friends.all().order_by("nickname")
+#             serializer = self.serializer_class(friends, many=True)
+#             return Response(serializer.data, status=status.HTTP_200_OK)
+#         except Exception as e:
+#             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+# class FriendCreateView(APIView):
+#     serializer_class = FriendshipSerializer
+#     authentication_classes = [JWTAuthentication]
+#     permission_classes = [permissions.IsAuthenticated]
+
+#     def post(self, request):
+#         try:
+#             friend_id = request.data.get("user_id")
+#             friend = User.objects.get(pk=friend_id)
+#             request.user.make_friend(friend)
+#             return Response(status=status.HTTP_201_CREATED)
+#         except Exception as e:
+#             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class FriendListView(APIView):
     serializer_class = FriendshipSerializer
     authentication_classes = [JWTAuthentication]
     permission_classes = [permissions.IsAuthenticated]
 
-    def get_queryset(self):
-        user = self.request.user
-        return user.friends.all().order_by("-nickname")
+    def get(self, request):
+        user = request.user
+        friends = user.friends.all().order_by("-nickname")
+        serializer = self.serializer_class(friends, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def create(self, request, *args, **kwargs):
+
+class FriendAddView(APIView):
+    serializer_class = FriendshipSerializer
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
         try:
-            friend_id = request.data.get('id')
-            friend = get_user_model().objects.get(id=friend_id)
-            self.request.user.make_friend(friend)
-            serializer = self.get_serializer(friend)
+            friend_id = request.data.get("id")
+            friend = User.objects.get(id=friend_id)
+            request.user.make_friend(friend)
+            serializer = self.serializer_class(friend)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        except ValueError as e:
-            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-    def destroy(self, request, *args, **kwargs):
+
+class FriendRemoveView(APIView):
+    serializer_class = FriendshipSerializer
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def delete(self, request, pk):
         try:
-            friend_id = kwargs.get('pk')
-            friend = get_user_model().objects.get(id=friend_id)
-            self.request.user.delete_friend(friend)
-            serializer = self.get_serializer(friend)
+            friend = User.objects.get(id=pk)
+            request.user.delete_friend(friend)
+            serializer = self.serializer_class(friend)
             return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
-        except ValueError as e:
-            return Response({'detail': str(e)}, status=status.HTTP_400_OK)
+        except Exception as e:
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)

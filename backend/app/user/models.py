@@ -60,7 +60,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_online = models.BooleanField(verbose_name="Online Status", default=True)
     is_active = models.BooleanField(verbose_name="Active User", default=True)
     is_staff = models.BooleanField(default=False)
-    friends = models.ManyToManyField('self', symmetrical=True)
+    friends = models.ManyToManyField('self', symmetrical=True, blank=True)
 
     # register UserManager class for this User model
     objects = UserManager()
@@ -85,4 +85,4 @@ class User(AbstractBaseUser, PermissionsMixin):
         if not self.friends.filter(id=friend.id).exists():
             raise ValueError("You guys are not friends.")
 
-        self.friends.delete(friend)
+        self.friends.remove(friend)
