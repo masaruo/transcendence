@@ -16,6 +16,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     command: >
         /bin/bash -c " python /app/app/manage.py migrate && \
         python /app/app/manage.py runserver 0.0.0.0:8000"
@@ -23,7 +25,7 @@ services:
   db:
     image: postgres:15
     restart: always
-    shm_size: 128mb #shared memory
+    # shm_size: 128mb #shared memory
     env_file:
       - .env
     volumes:
@@ -36,9 +38,25 @@ services:
     networks:
       - backend
 
+  redis:
+    image: redis:7.4-alpine
+    restart: always
+    volumes:
+      - redis_channel_layer:/data
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+
 volumes:
   postgres_volume:
-    name: transcendence
+    name: transcendence_db_volume
+  redis_channel_layer:
+    name: transcendence_channle_layer_volume
 
 networks:
   backend:
