@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     # own apps
     'app',
     'user',
-    'pong',
+    'game',
     # 3rd party apps
     'rest_framework',
     'rest_framework.authtoken',
