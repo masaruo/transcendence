@@ -4,12 +4,12 @@ from django.urls import reverse
 from rest_framework.test import APIClient
 from rest_framework import status
 
-FRIENDS_URL = reverse('user:friend-list')  # Using the basename we defined in urls.py
-
+FRIENDS_URL = reverse('user:friends')  # Using the basename we defined in urls.py
+FRIENDS_CREATE_URL = reverse('user:friends_create')
 
 def detail_url(friend_id):
     """Return friend detail URL"""
-    return reverse('user:friend-detail', args=[friend_id])
+    return reverse('user:friends-remove', args=[friend_id])
 
 
 def sample_user(email='test@example.com', password='testpass', nickname='Test User'):
@@ -66,7 +66,7 @@ class PrivateFriendsApiTests(TestCase):
     def test_add_friend_successful(self):
         """Test adding a new friend"""
         payload = {'id': self.user4.id}
-        res = self.client.post(FRIENDS_URL, payload)
+        res = self.client.post(FRIENDS_CREATE_URL, payload)
 
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
 
