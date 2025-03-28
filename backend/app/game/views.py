@@ -51,7 +51,8 @@ class GameViewSet(
 
 
 class TournamentViewSet(
-                mixins.ListModelMixin,
+                # mixins.ListModelMixin,
+                mixins.RetrieveModelMixin,
                 mixins.CreateModelMixin,
                 mixins.UpdateModelMixin,
                 mixins.DestroyModelMixin,
@@ -62,7 +63,7 @@ class TournamentViewSet(
     authentication_classes = [JWTAuthentication]
 
     def create(self, request, *args, **kwargs):
-        size = request.data.get('size', 4)
+        size = int(request.data.get('size', 4))
         users = list(User.objects.filter(is_online=True))
         if len(users) < size:
             return Response({"error": "Not enough users to fill the tournament"}, status=status.HTTP_400_BAD_REQUEST)
@@ -71,6 +72,7 @@ class TournamentViewSet(
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         tournament = serializer.save()
+        # super().create(request, *args, **kwargs)
 
         for i in range(0, len(random_users), 2):
             if i + 1 < len(random_users):
@@ -80,4 +82,4 @@ class TournamentViewSet(
                 )
                 tournament.games.add(game)
 
-        return super().create(request, *args, **kwargs)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)

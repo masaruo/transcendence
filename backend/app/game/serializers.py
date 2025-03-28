@@ -9,6 +9,7 @@ class GameSerializer(serializers.ModelSerializer):
 
 
 class TournamentSerializer(serializers.ModelSerializer):
+    games = GameSerializer(many=True, read_only=True)
     class Meta:
         model = models.Tournament
         fields = '__all__'
