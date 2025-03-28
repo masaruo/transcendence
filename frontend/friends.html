@@ -1,0 +1,32 @@
+<div id="friends-list"></div>
+<button id="get-friends">Get Friends</button>
+
+<script>
+	document.getElementById("get-friends").addEventListener("click", async function(e){
+		e.preventDefault();
+		const list = document.getElementById("friends-list");
+		const token = localStorage.getItem('token');
+		try
+		{
+			const response = await fetch('http://localhost:8000/api/user/friends/', {
+				method: "GET",
+				headers:{
+					"Accept": "application/json",
+					"Authorization": "Bearer " + token,
+				}
+			})
+			if (response)
+			{
+				list.innerHTML = await response.json()
+			}
+		}
+		catch
+		{
+			console.error("friends retrieve failed");
+		}
+		finally
+		{
+
+		}
+	})
+</script>

@@ -15,3 +15,6 @@ python manage.py runserver
 
 # flake8 : norm check
 flake8
+
+# access to api test
+http://localhost:8000/static/static/api_test.html

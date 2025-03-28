@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 import os
+from datetime import timedelta
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -26,7 +27,7 @@ SECRET_KEY = 'django-insecure--=pij7phva!t*6#6^-9=a8a+wb%t#%_-&&vgarmmd6ccg81kl!
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['django', 'localhost']
 
 INTERNAL_IPS = [
     "127.0.0.1",
@@ -41,8 +42,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # own apps
     'app',
     'user',
+    'game',
     # 3rd party apps
     'rest_framework',
     'rest_framework.authtoken',
@@ -50,9 +53,11 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'django_extensions',
     'debug_toolbar',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -158,4 +163,16 @@ REST_FRAMEWORK = {
 # for spectacular
 SPECTACULAR_SETTINGS = {
     'COMPONENT_SPLIT_REQUEST': True,
+}
+
+# cors - only true for dev
+CORS_ALLOW_ALL_ORIGINS = True
+
+# use cookie for credentials
+CORS_ALLOW_CREDENTIALS = True
+
+# JWT settings
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=300),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 }
