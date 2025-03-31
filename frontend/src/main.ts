@@ -1,3 +1,5 @@
+import { Ball } from "./classes/ball";
+
 const canvas = document.getElementById("canvas") as HTMLCanvasElement | null;
 if (!canvas)
 {
@@ -9,7 +11,9 @@ const y_center = canvas.height / 2;
 const x = canvas.width;
 const y = canvas.height;
 
-let ball = { x: x_center, y: y_center, dx: 5, dy: -5, radius: 10};
+let ball = new Ball(x_center, y_center, 10, -5, 5);
+
+// let ball = { x: x_center, y: y_center, dx: 5, dy: -5, radius: 10};
 let left_paddle = { x: 0, y: y_center, width: 20, height: 80};
 let right_paddle = { x: x - 20, y: y_center - 40, width: 20, height: 80};
 
@@ -69,13 +73,13 @@ function drawBackGround(){
 	ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
 
-function drawBall(){
-	ctx.fillStyle = "white";
-	ctx.beginPath();
-	ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-	ctx.fill();
-	ctx.closePath();
-}
+// function drawBall(){
+// 	ctx.fillStyle = "white";
+// 	ctx.beginPath();
+// 	ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+// 	ctx.fill();
+// 	ctx.closePath();
+// }
 
 function drawPaddle(){
 	ctx.beginPath();
@@ -86,50 +90,55 @@ function drawPaddle(){
 	ctx.closePath();
 }
 
+
 function draw(){
 	ball.x += ball.dx;
 	ball.y += ball.dy;
 
-	// ボールが壁に当たった時
-	if (ball.y - ball.radius < 0 || ball.y + ball.radius > canvas.height){
-		ball.dy = ball.dy * -1;
-	}else if (ball.x - ball.radius < 0 || ball.x - ball.radius > canvas.width){
-		alert("GameOver");
-		document.location.reload();
-	}
+	// // ボールが壁に当たった時
+	// if (ball.y - ball.radius < 0 || ball.y + ball.radius > canvas.height){
+	// 	ball.dy = ball.dy * -1;
+	// }else if (ball.x - ball.radius < 0 || ball.x - ball.radius > canvas.width){
+	// 	alert("GameOver");
+	// 	document.location.reload();
+	// }
 
 
 	// パドルとの接触
 	// right paddle
-	if (ball.x - ball.radius > canvas.width - 40 && ball.y - ball.radius > right_paddle.y && ball.y - ball.radius < right_paddle.y + right_paddle.height)
-	{
-		ball.dx = -Math.abs(ball.dx);
-	}
-	else if (ball.x - ball.radius < 20 && ball.y - ball.radius > left_paddle.y && ball.y - ball.radius < left_paddle.y + left_paddle.height)
-	{
-		ball.dx = Math.abs(ball.dx);
-	}
+	// if (ball.x - ball.radius > canvas.width - 40 && ball.y - ball.radius > right_paddle.y && ball.y - ball.radius < right_paddle.y + right_paddle.height)
+	// {
+	// 	ball.dx = -Math.abs(ball.dx);
+	// }
+	// else if (ball.x - ball.radius < 20 && ball.y - ball.radius > left_paddle.y && ball.y - ball.radius < left_paddle.y + left_paddle.height)
+	// {
+	// 	ball.dx = Math.abs(ball.dx);
+	// }
 
 	//右のパドルの上下
-	if (r_up_pressed && right_paddle.y > 0){
-		right_paddle.y -= 10;
-	}
-	else if (r_down_pressed && right_paddle.y + right_paddle.height < canvas.height){
-		right_paddle.y += 10;
-	}
+	// if (r_up_pressed && right_paddle.y > 0){
+	// 	right_paddle.y -= 10;
+	// }
+	// else if (r_down_pressed && right_paddle.y + right_paddle.height < canvas.height){
+	// 	right_paddle.y += 10;
+	// }
 
 	//左のパドルの上下
-	if (l_up_pressed && left_paddle.y > 0){
-		left_paddle.y -= 10;
-	}
-	else if (l_down_pressed && left_paddle.y + left_paddle.height < canvas.height){
-		left_paddle.y += 10;
-	}
+	// if (l_up_pressed && left_paddle.y > 0){
+	// 	left_paddle.y -= 10;
+	// }
+	// else if (l_down_pressed && left_paddle.y + left_paddle.height < canvas.height){
+	// 	left_paddle.y += 10;
+	// }
 
-	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	// ctx.clearRect(0, 0, canvas.width, canvas.height);
 	drawBackGround();
-	drawBall();
-	drawPaddle();
+	if (ctx) {
+		ball.draw(ctx);
+	} else {
+		throw new Error("Canvas context is not available.");
+	}
+	// drawPaddle();
 }
 
 
