@@ -1,21 +1,26 @@
 import { Ball } from "./classes/ball";
+import { Paddle } from "./classes/paddle";
+import { Pong } from "./classes/pong";
+
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement | null;
-if (!canvas)
-{
-	throw new Error("Canvas element not found");
-}
-const ctx = canvas.getContext("2d");
-const x_center = canvas.width / 2;
-const y_center = canvas.height / 2;
-const x = canvas.width;
-const y = canvas.height;
+const pong = new Pong(canvas);
+// if (!canvas)
+// {
+// 	throw new Error("Canvas element not found");
+// // }
+// const ctx = canvas.getContext("2d");
+// const x_center = canvas.width / 2;
+// const y_center = canvas.height / 2;
+// const x = canvas.width;
+// const y = canvas.height;
 
-let ball = new Ball(x_center, y_center, 10, -5, 5);
-
+// let ball = new Ball(x_center, y_center, 10);
+// let left_paddle = new Paddle(0, y_center, 20, 80);
+// let right_paddle = new Paddle(x - 20, y_center - 40, 20, 80);
 // let ball = { x: x_center, y: y_center, dx: 5, dy: -5, radius: 10};
-let left_paddle = { x: 0, y: y_center, width: 20, height: 80};
-let right_paddle = { x: x - 20, y: y_center - 40, width: 20, height: 80};
+// let left_paddle = { x: 0, y: y_center, width: 20, height: 80};
+// let right_paddle = { x: x - 20, y: y_center - 40, width: 20, height: 80};
 
 let r_up_pressed = false;
 let r_down_pressed = false;
@@ -68,10 +73,10 @@ function keyUpHandler(e){
 		l_down_pressed = false;
 }
 
-function drawBackGround(){
-	ctx.fillStyle = '#000000';
-	ctx.fillRect(0, 0, canvas.width, canvas.height);
-}
+// function drawBackGround(){
+// 	ctx.fillStyle = '#000000';
+// 	ctx.fillRect(0, 0, canvas.width, canvas.height);
+// }
 
 // function drawBall(){
 // 	ctx.fillStyle = "white";
@@ -81,19 +86,20 @@ function drawBackGround(){
 // 	ctx.closePath();
 // }
 
-function drawPaddle(){
-	ctx.beginPath();
-	ctx.fillStyle = "green";
-	ctx.fillRect(right_paddle.x, right_paddle.y, right_paddle.width, right_paddle.height);
-	ctx.fillStyle = "blue";
-	ctx.fillRect(left_paddle.x, left_paddle.y, left_paddle.width, left_paddle.height);
-	ctx.closePath();
-}
+// function drawPaddle(){
+// 	ctx.beginPath();
+// 	ctx.fillStyle = "green";
+// 	ctx.fillRect(right_paddle.x, right_paddle.y, right_paddle.width, right_paddle.height);
+// 	ctx.fillStyle = "blue";
+// 	ctx.fillRect(left_paddle.x, left_paddle.y, left_paddle.width, left_paddle.height);
+// 	ctx.closePath();
+// }
 
 
 function draw(){
-	ball.x += ball.dx;
-	ball.y += ball.dy;
+	// ball.x += ball.dx;
+	// ball.y += ball.dy;
+	// ball = ball.move(5, 5);
 
 	// // ボールが壁に当たった時
 	// if (ball.y - ball.radius < 0 || ball.y + ball.radius > canvas.height){
@@ -130,11 +136,22 @@ function draw(){
 	// else if (l_down_pressed && left_paddle.y + left_paddle.height < canvas.height){
 	// 	left_paddle.y += 10;
 	// }
+	if (r_up_pressed)
+
+		right_paddle = right_paddle.move(-10, canvas.height);
+	else if (r_down_pressed)
+		right_paddle = right_paddle.move(10, canvas?.height);
+	else if (l_up_pressed)
+		left_paddle = left_paddle.move(-10, canvas!.height);
+	else if (l_down_pressed)
+		left_paddle = left_paddle.move(10, canvas!.height);
 
 	// ctx.clearRect(0, 0, canvas.width, canvas.height);
-	drawBackGround();
+	// drawBackGround();
 	if (ctx) {
 		ball.draw(ctx);
+		left_paddle.draw(ctx, "green");
+		right_paddle.draw(ctx, "blue");
 	} else {
 		throw new Error("Canvas context is not available.");
 	}
