@@ -5,6 +5,7 @@ import { Pong } from "./classes/pong";
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement | null;
 const pong = new Pong(canvas);
+pong.start();
 // if (!canvas)
 // {
 // 	throw new Error("Canvas element not found");
@@ -22,56 +23,56 @@ const pong = new Pong(canvas);
 // let left_paddle = { x: 0, y: y_center, width: 20, height: 80};
 // let right_paddle = { x: x - 20, y: y_center - 40, width: 20, height: 80};
 
-let r_up_pressed = false;
-let r_down_pressed = false;
-let l_up_pressed = false;
-let l_down_pressed = false;
+// let r_up_pressed = false;
+// let r_down_pressed = false;
+// let l_up_pressed = false;
+// let l_down_pressed = false;
 
-let intervalId = null;
+// // let intervalId = null;
 
-document.addEventListener("keydown", keyDownHandler, false);
-document.addEventListener("keyup", keyUpHandler, false);
+// document.addEventListener("keydown", keyDownHandler, false);
+// document.addEventListener("keyup", keyUpHandler, false);
 
-document.getElementById("start").addEventListener('click', function(){
-	startGame();
-});
+// document.getElementById("start").addEventListener('click', function(){
+// 	startGame();
+// });
 
-document.getElementById("end").addEventListener('click', function(){
-	stopGame();
-});
+// document.getElementById("end").addEventListener('click', function(){
+// 	stopGame();
+// });
 
-function startGame(){
-	if (!intervalId){
-		intervalId = setInterval(draw, 20);
-	}
-}
+// function startGame(){
+// 	if (!intervalId){
+// 		intervalId = setInterval(draw, 20);
+// 	}
+// }
 
-function stopGame(){
-	clearInterval(intervalId);
-	intervalId = null;
-}
+// function stopGame(){
+// 	clearInterval(intervalId);
+// 	intervalId = null;
+// }
 
-function keyDownHandler(e){
-	if (e.key == "ArrowUp")
-		r_up_pressed = true;
-	else if (e.key == "ArrowDown")
-		r_down_pressed = true;
-	else if (e.key == "a")
-		l_up_pressed = true;
-	else if (e.key == "z")
-		l_down_pressed = true;
-}
+// function keyDownHandler(e){
+// 	if (e.key == "ArrowUp")
+// 		r_up_pressed = true;
+// 	else if (e.key == "ArrowDown")
+// 		r_down_pressed = true;
+// 	else if (e.key == "a")
+// 		l_up_pressed = true;
+// 	else if (e.key == "z")
+// 		l_down_pressed = true;
+// }
 
-function keyUpHandler(e){
-	if (e.key == "ArrowUp")
-		r_up_pressed = false;
-	else if (e.key == "ArrowDown")
-		r_down_pressed = false;
-	else if (e.key == "a")
-		l_up_pressed = false;
-	else if (e.key == "z")
-		l_down_pressed = false;
-}
+// function keyUpHandler(e){
+// 	if (e.key == "ArrowUp")
+// 		r_up_pressed = false;
+// 	else if (e.key == "ArrowDown")
+// 		r_down_pressed = false;
+// 	else if (e.key == "a")
+// 		l_up_pressed = false;
+// 	else if (e.key == "z")
+// 		l_down_pressed = false;
+// }
 
 // function drawBackGround(){
 // 	ctx.fillStyle = '#000000';
@@ -96,7 +97,7 @@ function keyUpHandler(e){
 // }
 
 
-function draw(){
+// function draw(){
 	// ball.x += ball.dx;
 	// ball.y += ball.dy;
 	// ball = ball.move(5, 5);
@@ -134,29 +135,23 @@ function draw(){
 	// 	left_paddle.y -= 10;
 	// }
 	// else if (l_down_pressed && left_paddle.y + left_paddle.height < canvas.height){
-	// 	left_paddle.y += 10;
-	// }
-	if (r_up_pressed)
+// 	// 	left_paddle.y += 10;
+// 	// }
+// 	if (r_up_pressed)
 
-		right_paddle = right_paddle.move(-10, canvas.height);
-	else if (r_down_pressed)
-		right_paddle = right_paddle.move(10, canvas?.height);
-	else if (l_up_pressed)
-		left_paddle = left_paddle.move(-10, canvas!.height);
-	else if (l_down_pressed)
-		left_paddle = left_paddle.move(10, canvas!.height);
+// 		right_paddle = right_paddle.move(-10, canvas.height);
+// 	else if (r_down_pressed)
+// 		right_paddle = right_paddle.move(10, canvas?.height);
+// 	else if (l_up_pressed)
+// 		left_paddle = left_paddle.move(-10, canvas!.height);
+// 	else if (l_down_pressed)
+// 		left_paddle = left_paddle.move(10, canvas!.height);
 
-	// ctx.clearRect(0, 0, canvas.width, canvas.height);
-	// drawBackGround();
-	if (ctx) {
-		ball.draw(ctx);
-		left_paddle.draw(ctx, "green");
-		right_paddle.draw(ctx, "blue");
-	} else {
-		throw new Error("Canvas context is not available.");
-	}
-	// drawPaddle();
-}
+// 	// ctx.clearRect(0, 0, canvas.width, canvas.height);
+// 	// drawBackGround();
+// 	pong.draw();
+// 	// drawPaddle();
+// }
 
 
 // make shape AClass -> paddle, ball

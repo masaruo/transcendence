@@ -1,46 +1,29 @@
-import { Coord } from "./coord";
-
 export class Paddle {
-	readonly position: Coord;
-	readonly width: number;
-	readonly height: number;
+	readonly x_: number;
+	private y_: number;
+	readonly width_: number;
+	readonly height_: number;
+	readonly distance_: number;
 
-	constructor(x: number, y:number, width: number, height: number) {
-		this.position = new Coord(x, y);
-		this.width = width;
-		this.height = height;
+	constructor(x: number, y:number, width: number, height: number, distance: number = 10) {
+		this.x_ = x;
+		this.y_ = y;
+		this.width_ = width;
+		this.height_ = height;
+		this.distance_ = distance;
 	}
 
 	draw(ctx: CanvasRenderingContext2D, color: string): void {
 		ctx.beginPath();
 		ctx.fillStyle = color;
-		ctx.fillRect(this.position.x, this.position.y, this.width, this.height);
+		ctx.fillRect(this.x_, this.y_, this.width_, this.height_);
 		ctx.closePath();
 	}
-
-	// move(span: number, canvas_height: number): void {
-	// 	if (span < 0 && this.position.y + span >= 0)
-	// 	{
-	// 		this.position.y += span;
-	// 	}
-	// 	else if (span > 0 && this.position.y + this.height + span <= canvas_height)
-	// 	{
-	// 		this.position.y += span;
-	// 	}
-	// }
-	move(span: number, canvas_height: number): Paddle {
-		if (span < 0 && this.position.y + span >= 0)
-		{
-			// this.position.y += span;
-			return new Paddle(this.position.x, this.position.y + span, this.width, this.height);
-		}
-		else if(span > 0 && this.position.y + this.height + span <= canvas_height)
-		{
-			return new Paddle(this.position.x, this.position.y + span, this.width, this.height);
-			// this.position.y += span;
-		}
-		else
-			return this;
-
-	}
+    move(canvas_height: number, upKey: boolean, downKey: boolean): void {
+        if (downKey && this.y_ + this.height_ + this.distance_ <= canvas_height) {
+            this.y_ += this.distance_;
+        } else if (upKey && this.y_ - this.distance_ >= 0) {
+            this.y_ -= this.distance_;
+        }
+    }
 }

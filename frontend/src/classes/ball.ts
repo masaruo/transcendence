@@ -1,10 +1,8 @@
 
 export class Ball {
-	readonly x: number;
-	readonly y: number;
+	private x: number;
+	private y: number;
 	readonly radious: number;
-	// readonly dx: number;
-	// readonly dy: number;
 
 	constructor(x: number, y: number, radious: number) {
 		this.x = x;
@@ -12,10 +10,13 @@ export class Ball {
 		this.radious = radious;
 	}
 
-	move(dx: number, dy:number): Ball {
-		// this.x += this.dx;
-		// this.y += this.dy;
-		return new Ball(this.x + dx, this.y + dy, this.radious);
+	// move(dx: number, dy:number): Ball {
+	// 	return new Ball(this.x + dx, this.y + dy, this.radious);
+	// }
+	move(dx: number, dy:number): void
+	{
+		this.x += dx;
+		this.y += dy;
 	}
 
 	draw(ctx: CanvasRenderingContext2D): void {
