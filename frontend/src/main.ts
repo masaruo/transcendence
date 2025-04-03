@@ -1,5 +1,3 @@
-import { Ball } from "./classes/ball";
-import { Paddle } from "./classes/paddle";
 import { Pong } from "./classes/pong";
 
 

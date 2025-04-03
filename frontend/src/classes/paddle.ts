@@ -1,3 +1,5 @@
+import { Ball } from "./ball";
+
 export class Paddle {
 	readonly x_: number;
 	private y_: number;
@@ -26,4 +28,7 @@ export class Paddle {
             this.y_ -= this.distance_;
         }
     }
+	getY(): number {
+		return (this.y_);
+	}
 }
