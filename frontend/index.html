@@ -3,15 +3,28 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" href="./src/style.css">
-	<title>Document</title>
-	<script type="module" src="./src/main.ts"></script>
+	<!-- <link rel="stylesheet" href="./src/style.css"> -->
+	<title>42 Transcendence Pong</title>
 </head>
-<div id="head"></div>
 <body>
-	<canvas id="canvas" width="1000" height="600"></canvas>
-	<br>
-	<button id="start">Start</button>
-	<button id="end">End</button>
+	<!-- <nav class="nav">
+		<a href="/" class="nav__link" data-link>Dashboard</a>
+		<a href="/posts" class="nav__link" data-link>Posts</a>
+		<a href="/settings" class="nav__link" data-link>Settings</a>
+	</nav> -->
+	<nav class="navbar bg-body-tertiary">
+		<form class="container-fluid justify-content-start">
+		  <button class="btn btn-outline-success me-2" type="button">Main button</button>
+		  <button class="btn btn-sm btn-outline-secondary" type="button">Smaller button</button>
+		</form>
+	  </nav>
+
+	<div id="app"></div>
+	<script type="module" src="./src/main.ts"></script>
 </body>
 </html>
+
+<!-- <canvas id="canvas" width="1000" height="600"></canvas>
+<br>
+<button id="start">Start</button>
+<button id="end">End</button> -->
