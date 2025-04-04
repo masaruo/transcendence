@@ -1,4 +1,7 @@
 import './style.css'
+import './scss/styles.scss'
+import * as bootstrap from 'bootstrap'
+
 import { navigateTo, router } from './services/router'
 
 window.addEventListener("popstate", router);
