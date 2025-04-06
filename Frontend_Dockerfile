@@ -1,0 +1,12 @@
+FROM node:lts-slim
+
+WORKDIR /node
+
+COPY package*.json ./
+
+RUN npm install
+
+COPY ./frontend .
+
+EXPOSE 3000
+

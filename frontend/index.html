@@ -7,17 +7,34 @@
 	<title>42 Transcendence Pong</title>
 </head>
 <body>
+	<nav class="navbar navbar-expand-lg bg-body-tertiary">
+		<div class="container-fluid">
+		  <div class="collapse navbar-collapse" id="navbarNav">
+			<ul class="navbar-nav">
+			  <li class="nav-item">
+				<a class="nav-link active nav__link" aria-current="page" href="/login" data-link>Login</a>
+			  </li>
+			  <li class="nav-item">
+				<a class="nav-link active nav__link" aria-current="page" href="/friends" data-link>Friends</a>
+			  </li>
+			  <!-- <li class="nav-item">
+				<a class="nav-link" href="#">Features</a>
+			  </li>
+			  <li class="nav-item">
+				<a class="nav-link" href="#">Pricing</a>
+			  </li>
+			  <li class="nav-item">
+				<a class="nav-link disabled">Disabled</a>
+			  </li> -->
+			</ul>
+		  </div>
+	</nav>
+
 	<!-- <nav class="nav">
 		<a href="/" class="nav__link" data-link>Dashboard</a>
 		<a href="/posts" class="nav__link" data-link>Posts</a>
 		<a href="/settings" class="nav__link" data-link>Settings</a>
 	</nav> -->
-	<nav class="navbar bg-body-tertiary">
-		<form class="container-fluid justify-content-start">
-		  <button class="btn btn-outline-success me-2" type="button">Main button</button>
-		  <button class="btn btn-sm btn-outline-secondary" type="button">Smaller button</button>
-		</form>
-	  </nav>
 
 	<div id="app"></div>
 	<script type="module" src="./src/main.ts"></script>

@@ -1,4 +1,4 @@
-export default class {
+export default abstract class View {
 	protected params: string;
 	constructor(params: string) {
 		this.params = params;
@@ -8,7 +8,11 @@ export default class {
 		document.title = title;
 	}
 
-	async getHtml() {
+	async getHtml(): Promise<string> {
 		return "";
+	}
+
+	async loadScripts(): Promise<void> {
+
 	}
 }

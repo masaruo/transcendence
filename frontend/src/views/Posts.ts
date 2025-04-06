@@ -1,7 +1,7 @@
 import AbstractView from "./AbstractView";
 
 
-export default class extends AbstractView {
+export default class Posts extends AbstractView {
 	constructor (params: string) {
 		super(params);
 		this.setTitle("Posts");

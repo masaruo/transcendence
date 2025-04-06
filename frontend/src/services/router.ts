@@ -1,7 +1,5 @@
-import Dashboard from "../views/Dashboard";
-import Posts from "../views/Posts";
-import PostView from "../views/PostView";
-import Settings from "../views/Settings";
+import IndexView from "../views/IndexView";
+import LoginView from "../views/LoginView";
 
 const pathToRegex = (path: string) => new RegExp("^" + path.replace(/\//g, "\\/").replace(/:\w+/g, "(.+)") + "$");
 
@@ -21,10 +19,11 @@ export const navigateTo = (url: string) => {
 
 export const router = async() => {
 	const routes = [
-		{path: "/", view: Dashboard },
-		{path: "/posts", view: Posts },
-		{path: "/posts/:id", view: PostView },
-		{path: "/settings", view: Settings }
+		{path: "/", view: IndexView},
+		{path: "/login", view: LoginView },
+		// {path: "/posts", view: Posts },
+		// {path: "/posts/:id", view: PostView },
+		// {path: "/settings", view: Settings }
 	];
 
 	const potentialMatches = routes.map(route => {
@@ -45,9 +44,8 @@ export const router = async() => {
 	const view = new match.route.view(getParams(match));
 
 	const app = document.getElementById("app");
-	if (!app)
-		throw new Error("element app not found");
+	if (!app) throw new Error("element app not found");
 	app.innerHTML = await view.getHtml();
 
-	// console.log(match.route.view());
+	await view.loadScripts();
 };
