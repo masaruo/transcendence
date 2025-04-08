@@ -17,6 +17,7 @@ User = get_user_model()
 
 class GameViewSet(
         mixins.ListModelMixin,
+        mixins.RetrieveModelMixin,
         mixins.CreateModelMixin,
         mixins.UpdateModelMixin,
         viewsets.GenericViewSet

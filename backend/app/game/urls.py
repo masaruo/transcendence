@@ -6,7 +6,7 @@ from rest_framework.routers import DefaultRouter
 from game import views
 
 router = DefaultRouter()
-# router.register(r'game', views.GameViewSet, basename="game")
+router.register(r'game', views.GameViewSet, basename="game")
 router.register(r'', views.TournamentViewSet, basename="tournament")
 # router.register(r'games', GameViewSet, basename='game')
 # router.register(r'tournaments', TournamentViewSet, basename='tournament')

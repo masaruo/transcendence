@@ -4,7 +4,7 @@ from game import views
 
 
 admin.site.register(views.GameModel)
-admin.site.register(views.Tournament)
+# admin.site.register(views.Tournament)
 
 # admin.site.register(views.GameModel)
 
