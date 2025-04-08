@@ -1,3 +1,4 @@
+import FriendsView from "../views/FriendsView";
 import IndexView from "../views/IndexView";
 import LoginView from "../views/LoginView";
 
@@ -21,6 +22,7 @@ export const router = async() => {
 	const routes = [
 		{path: "/", view: IndexView},
 		{path: "/login", view: LoginView },
+		{path: "/friends", view: FriendsView},
 		// {path: "/posts", view: Posts },
 		// {path: "/posts/:id", view: PostView },
 		// {path: "/settings", view: Settings }
