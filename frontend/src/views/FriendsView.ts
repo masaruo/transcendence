@@ -30,10 +30,13 @@ export default class FriendsView extends AbstractView {
 			const friends = await response.json();
 			friends.forEach(friend => {
 				const friendItem = document.createElement('div');
+				friendItem.setAttribute("class", "card");
 				friendItem.innerHTML = `
-					<p>ID: ${friend.id}</p>
-					<p>Nickname: ${friend.nickname}</p>
-					<p>Online: ${friend.is_online ? 'Yes' : 'No'}</p>
+					<div class="card-body">
+						<p class="card-title">Nickname: ${friend.nickname}</p>
+						<p class="card-text">ID: ${friend.id}</p>
+						<p class="card-text">Online: ${friend.is_online ? 'Yes' : 'No'}</p>
+					</div>
 				`; // Display id, nickname, and is_online
 				friendsList.appendChild(friendItem);
 			});
