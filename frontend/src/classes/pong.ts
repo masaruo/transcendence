@@ -12,7 +12,21 @@ document.addEventListener("keyup", (e) => {
 	keyState[e.key] = false;
 })
 
+enum GameState {
+	DISCONNECTED,
+	WAITING,
+	PLAYING,
+	FINISHED
+}
+
 export class Pong {
+	private gameState: GameState = GameState.DISCONNECTED;
+	private gameId: string | null = null;
+	private _playerId: number | null = null;
+	private _socket: WebSocket | null = null;
+	private _waitingMessage: string = "Waiting for an opponent";
+	private _score: {[key: number]: number} = {1: 0, 2: 0};
+
 	readonly _canvas: HTMLCanvasElement;
 	readonly _ctx: CanvasRenderingContext2D;
 	readonly _width: number;
@@ -23,6 +37,7 @@ export class Pong {
 	readonly r_paddle: Paddle;
 	readonly l_paddle:Paddle;
 	private intervalID: number = 0;
+	private join_: IdEvent;
 	private start_: IdEvent;
 	private stop_: IdEvent;
 
@@ -41,6 +56,13 @@ export class Pong {
 		this.ball = new Ball(this._x_center, this._y_center, 10);
 		this.l_paddle = new Paddle(0,this._y_center, 20, 80);
 		this.r_paddle = new Paddle(this._width - 20, this._y_center, 20, 80);
+
+		this.join_ = new IdEvent("join", "click", async () => {
+			this.showWaitingScreen();
+			this.gameState = GameState.WAITING;
+			this.connectWebSocket();
+		})
+
 		this.start_ = new IdEvent("start", "click", () => {
 			if (this.intervalID == 0)
 				this.intervalID = setInterval(() => this.draw(), 20); // アロー関数で修正
@@ -51,21 +73,148 @@ export class Pong {
 		})
 	}
 
-	moveElems(): void {
-    // 必要なデバッグ情報だけを残す
-    // if (keyState["w"] || keyState["s"] || keyState["ArrowUp"] || keyState["ArrowDown"]) {
-    //     console.log("KeyState:", keyState);
-    //     console.log("Left Paddle Position:", this.l_paddle);
-    //     console.log("Right Paddle Position:", this.r_paddle);
-    // }
+	connectWebSocket(): void {
+		this._socket = new WebSocket(`wss://${window.location.host}/ws/game/`);
 
-		this.ball.move();
-		this.l_paddle.move(this._canvas.height, keyState["w"], keyState["s"]);
-		this.r_paddle.move(this._canvas.height, keyState["ArrowUp"], keyState["ArrowDown"]);
+		this._socket.onopen = () => {
+			console.log("Websocket Connected");
+		}
+
+		this._socket.onmessage = (event) => {
+			const data = JSON.parse(event.data);
+			this.handleGameMessage(data);
+		}
+
+		this._socket.onclose = () => {
+			this.gameState = GameState.DISCONNECTED;
+			setTimeout(() => this.connectWebSocket(), 3000);
+		}
+
+		this._socket.onerror = (error) => {
+			console.error("Websocket Error", error);
+		}
+	}
+
+	handleGameMessage(data: any): void {
+		switch (data.type) {
+			case 'game_start':
+				this.gameId = data.game_id;
+				this._playerId = data.player_id;
+				this.gameState = GameState.PLAYING;
+				this.hideWaitingScreen();
+				this.start();
+				break;
+
+			case 'game_state':
+				if (this.gameState !== GameState.PLAYING) return ;
+				this.updateGameState(data);
+				break ;
+
+			case 'game_over':
+				this.gameState = GameState.FINISHED;
+				this.showGameOver(data.winner, data.score);
+				break ;
+		}
+	}
+
+	updateGameState(data: any): void {
+		if (data.ball) {
+			this.ball.setX(data.ball.x);
+			this.ball.setY(data.ball.y);
+			this.ball.setDX(data.ball.dx);
+			this.ball.setDY(data.ball.dy);
+		}
+
+		if (data.players) {
+			this.l_paddle.setY(data.players[1]);
+			this.r_paddle.setY(data.players[2]);
+		}
+
+		if (data.score) {
+			this._score = data.score;
+		}
+		// if (data.players) {
+		// 	if (data.players[1]) {
+		// 		this.l_paddle.setY(data.players[1]);
+		// 	}
+		// 	if (data.players[2]) {
+		// 		this.r_paddle.setY(data.players[2]);
+		// 	}
+		// }
+		// if (this._playerId === 1) {
+		// 	if (data.players && data.players[2]) {
+		// 		this.r_paddle.setY(data.players[2].y);
+		// 	}
+		// } else {
+		// 	if (data.players && data.players[1]) {
+		// 		this.l_paddle.setY(data.players[1].y);
+		// 	}
+		// }
+
+
+	}
+
+	showWaitingScreen() {
+		// キャンバスに待機メッセージを表示
+		this._ctx.clearRect(0, 0, this._width, this._height);
+		this._ctx.fillStyle = "black";
+		this._ctx.fillRect(0, 0, this._width, this._height);
+		this._ctx.fillStyle = "white";
+		this._ctx.font = "20px Arial";
+		this._ctx.textAlign = "center";
+		this._ctx.fillText(this._waitingMessage, this._x_center, this._y_center);
+	}
+
+    showGameOver(winner: number, score: {[key: number]: number}): void {
+        this._ctx.clearRect(0, 0, this._width, this._height);
+        this._ctx.fillStyle = "black";
+        this._ctx.fillRect(0, 0, this._width, this._height);
+        this._ctx.fillStyle = "white";
+        this._ctx.font = "30px Arial";
+        this._ctx.textAlign = "center";
+        this._ctx.fillText(`Game Over! Player ${winner} wins!`, this._x_center, this._y_center - 40);
+        this._ctx.font = "24px Arial";
+        this._ctx.fillText(`Score: ${score[1]} - ${score[2]}`, this._x_center, this._y_center + 20);
+
+        // 再開ボタン表示など、必要に応じて追加
+    }
+
+	hideWaitingScreen(): void {
+		this._ctx.clearRect(0, 0, this._width, this._height);
+	}
+
+	moveElems(): void {
+		if (this.gameState != GameState.PLAYING) return;
+
+		// this.ball.move();
+
+		if (this._playerId === 1)
+			this.l_paddle.move(this._canvas.height, keyState["w"], keyState["s"]);
+		else if (this._playerId === 2)
+			this.r_paddle.move(this._canvas.height, keyState["ArrowUp"], keyState["ArrowDown"]);
+
+		if (this._socket && this._socket.readyState === WebSocket.OPEN) {
+			const paddleY = this._playerId === 1 ? this.l_paddle.getY() : this.r_paddle.getY();
+			this._socket.send(JSON.stringify({
+				type: "paddle_move",
+				game_id: this.gameId,
+				player_id: this._playerId,
+				y: paddleY,
+			}))
+		}
 	}
 
 	draw(): void {
-		this.ball.checkCollision(this._height, this._width, this.l_paddle, this.r_paddle);
+		if (this.gameState === GameState.WAITING) {
+			this.showWaitingScreen();
+			return ;
+		}
+
+		if (this.gameState !== GameState.PLAYING) {
+			return ;
+		}
+
+		// this.ball.checkCollision(this._height, this._width, this.l_paddle, this.r_paddle);
 
 		if (!this.ball.checkGameContinue())
 			this.stop();
@@ -77,6 +226,13 @@ export class Pong {
 		this.ball.draw(this._ctx);
 		this.r_paddle.draw(this._ctx, "green");
 		this.l_paddle.draw(this._ctx, "blue");
+
+		// 追加: スコア表示
+		this._ctx.fillStyle = "white";
+		this._ctx.font = "24px Arial";
+		this._ctx.textAlign = "center";
+		this._ctx.fillText(`${this._score[1]}`, this._width / 4, 30);
+		this._ctx.fillText(`${this._score[2]}`, (this._width / 4) * 3, 30);
 	}
 
 	start(): void

@@ -28,6 +28,11 @@ export class Paddle {
             this.y_ -= this.distance_;
         }
     }
+
+	setY(new_y: number): void {
+		this.y_ = new_y;
+	}
+
 	getY(): number {
 		return (this.y_);
 	}

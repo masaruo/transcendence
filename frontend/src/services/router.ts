@@ -1,6 +1,7 @@
 import FriendsView from "../views/FriendsView";
 import IndexView from "../views/IndexView";
 import LoginView from "../views/LoginView";
+import PongView from "../views/PongView";
 
 const pathToRegex = (path: string) => new RegExp("^" + path.replace(/\//g, "\\/").replace(/:\w+/g, "(.+)") + "$");
 
@@ -23,6 +24,7 @@ export const router = async() => {
 		{path: "/", view: IndexView},
 		{path: "/login", view: LoginView },
 		{path: "/friends", view: FriendsView},
+		{path: "/pong", view: PongView},
 		// {path: "/posts", view: Posts },
 		// {path: "/posts/:id", view: PostView },
 		// {path: "/settings", view: Settings }

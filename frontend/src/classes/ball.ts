@@ -26,6 +26,22 @@ export class Ball {
 		this.y += this.dy;
 	}
 
+	setX(new_x: number): void {
+		this.x = new_x;
+	}
+
+	setY(new_y: number): void {
+		this.y = new_y;
+	}
+
+	setDX(new_dx: number): void {
+		this.dx = new_dx;
+	}
+
+	setDY(new_dy: number): void {
+		this.dy = new_dy;
+	}
+
 	draw(ctx: CanvasRenderingContext2D): void {
 		ctx.fillStyle = "white";
 		ctx.beginPath();
