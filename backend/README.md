@@ -4,7 +4,7 @@ then check localhost:8000/admin
 
 # django db super user
 email = admin@example.com
-password = pass
+password = password
 
 # pip
 pip install -r requirements.txt
