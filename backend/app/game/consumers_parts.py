@@ -7,21 +7,24 @@ class PlayerType(Enum):
     PLAYER2 = 2
     OBSERVER = 3
 
-class Canvas:
-    width: int
-    height: int
+    def __str__(self):
+        return self.name
 
-    def __init__(self, width=800, height=600):
-        self.width = width
-        self.height = height
+class Screen:
+    _width: int
+    _height: int
+
+    def __init__(self, width=600, height=300):
+        self._width = width
+        self._height = height
 
     @property
     def width(self):
-        return self.width
+        return self._width
 
     @property
     def height(self):
-        return self.height
+        return self._height
 
 class Score:
     player1: int
@@ -91,7 +94,7 @@ class Ball:
         self.x = kwargs.get('x', 20)
         self.y = kwargs.get('y', 30)
         self.dx = kwargs.get('dx', 5)
-        self.dy = kwargs.get('dy', 0)
+        self.dy = kwargs.get('dy', 10)
         self.radius = kwargs.get('radius', 10)
 
     def assign(self, **kwargs):
@@ -138,6 +141,12 @@ class Ball:
 
     def setDy(self, new_dy):
         self.dy = new_dy
+
+    def getDx(self)-> int:
+        return self.dx
+
+    def getDy(self)-> int:
+        return self.dy
 
     def reset(self, width=800, height=600):
         self.x = width // 2

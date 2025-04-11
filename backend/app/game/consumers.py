@@ -1,6 +1,6 @@
 import json
 import asyncio
-from typing import Tuple
+from typing import Tuple, Coroutine
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from channels.db import database_sync_to_async
 from game.models import GameRoom, GameStatus
@@ -20,6 +20,7 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
     manager: GameManager
     status: GameStatus
     game_room: GameRoom
+    _coroutine: Coroutine
 
     async def connect(self):
         self.user = self.scope['user']
@@ -37,7 +38,6 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
 
         # if self.manager.status() == GameStatus.PLAYING:
         if self.player_type == PlayerType.PLAYER2:
-            #! game loop logic
             await self.channel_layer.group_send(
                 self.manager.group_name,
                 {
@@ -45,7 +45,18 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
                     'message': "hello world",
                 }
             )
+            self._coroutine = asyncio.create_task(self.game_loop())
 
+    async def game_loop(self):
+        try:
+            while True:
+                self.manager.update()
+                await self.channel_layer.group_send(
+                    self.manager.group_name,
+                    self.manager.to_dict()
+                )
+        except ValueError as e:
+            pass
         # game state intialization
         # self.game_states = self.initialize_game_state(game_room)
 
@@ -113,13 +124,13 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
     #         }
     #     )
 
-    # async def game_state(self, event):
-    #     event_copy = event.copy()
-    #     event_copy.pop('type', None)  # typeキーを削除
-    #     await self.send_json({
-    #         'type': 'game_state',
-    #         **event_copy  # 残りのデータを展開
-    #     })
+    async def game_state(self, event):
+        event_copy = event.copy()
+        event_copy.pop('type', None)  # typeキーを削除
+        await self.send_json({
+            'type': 'game_state',
+            **event_copy  # 残りのデータを展開
+        })
 
     async def game_over(self, event):
         await self.send_json({
@@ -128,7 +139,7 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
             'score': event['score']
         })
 
-    async def game_loop(self, game_id):
+    async def x_game_loop(self, game_id):
         """
         dealing with loop and check collision
         """
@@ -207,35 +218,6 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
             pass
         except Exception as e:
             print(f"Game loop error: {e}")
-
-    # def initialize_game_state(self, game_room):
-    #     width = 800
-    #     height = 600
-    #     paddle_height = 80
-    #     paddle_width = 20
-
-    #     return {
-    #         'status': 'playing' if game_room.status == 'playing' else 'waiting',
-    #         'ball': {
-    #             'x': width / 2,
-    #             'y': height / 2,
-    #             'dx': 5,
-    #             'dy': 0,
-    #             'radius': 10
-    #         },
-    #         'paddles': {
-    #             1: height / 2,
-    #             2: height / 2,
-    #         },
-    #         'score': {
-    #             '1': 0,
-    #             '2': 0
-    #         },
-    #         'width': width,
-    #         'height': height,
-    #         'paddle_height': paddle_height,
-    #         'paddle_width': paddle_width
-    #     }
 
     def reset_ball(self,game_state):
         import random
