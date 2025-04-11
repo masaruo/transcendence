@@ -1,77 +1,86 @@
 import json
 import asyncio
+from typing import Tuple
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from channels.db import database_sync_to_async
-from game.models import GameRoom
+from game.models import GameRoom, GameStatus
 from asgiref.sync import sync_to_async
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User as UserType
+
+from game.consumers_parts import PlayerType
+from game.consumers_manager import GameManager
+
+User = get_user_model()
 
 class GameConsumer(AsyncJsonWebsocketConsumer):
-    game_states = {}
-    game_loops = {}
 
-    # @database_sync_to_async
-    # def check_if_player1(self, game_room):
-    #     print(f"Checking player1: game_room.player1_id={game_room.player1_id}, self.user_id={self.user_id}")
-    #     return game_room.player1_id == self.user_id
-
-    @database_sync_to_async
-    def get_player_role(self, game_room):
-        print(f"Game room: player1_id={game_room.player1_id}, player2_id={game_room.player2_id}, user_id={self.user_id}")
-        if game_room.player1_id == self.user_id:
-            return 1
-        else:
-            # 必ずplayer2として返す
-            return 2
+    user: UserType
+    player_type: PlayerType
+    manager: GameManager
+    status: GameStatus
+    game_room: GameRoom
 
     async def connect(self):
         self.user = self.scope['user']
         if not self.user.is_authenticated:
             await self.close()
             return
-        self.user_id = self.user.id
-        print(f"User {self.user.id} connected with ID: {self.user_id}")
         await self.accept()
 
-        game_room = await self.find_or_create_game()
-        self.game_id = game_room.id
-        # self.player_id = 1 if await self.check_if_player1(game_room) else 2
-        self.player_id = await self.get_player_role(game_room)
-        print(f"Assigned player_id: {self.player_id} for user {self.user.id}")
-        self.game_group_name = f"game_{self.game_id}"
+        game_room, self.player_type = await self.find_or_create_game_and_get_usertype()
+        self.manager = GameManager(f"room_{str(game_room.id)}")
 
         await self.channel_layer.group_add(
-            self.game_group_name, self.channel_name
+            self.manager.group_name, self.channel_name
         )
 
-        # game state intialization
-        if self.game_id not in self.game_states:
-            self.game_states[self.game_id] = self.initialize_game_state(game_room)
-
-        if game_room.status == 'playing':
-            if self.player_id == 2:
-                self.game_loops[self.game_id] = asyncio.create_task(
-                    self.game_loop(self.game_id)
-                )
-
+        # if self.manager.status() == GameStatus.PLAYING:
+        if self.player_type == PlayerType.PLAYER2:
+            #! game loop logic
             await self.channel_layer.group_send(
-                self.game_group_name,
+                self.manager.group_name,
                 {
                     'type': 'game_start',
-                    'game_id': self.game_id,
-                    'player_id': self.player_id
+                    'message': "hello world",
                 }
             )
 
+        # game state intialization
+        # self.game_states = self.initialize_game_state(game_room)
+
+        # if game_room.status == 'playing':
+        #     if self.player_id == 2:
+        #         self.game_loops[self.game_id] = asyncio.create_task(
+        #             self.game_loop(self.game_id)
+        #         )
+
+        #     await self.channel_layer.group_send(
+        #         self.game_room.id,
+        #         {
+        #             'type': 'game_start',
+        #             'game_id': self.game_id,
+        #             'player_id': self.player_id
+        #         }
+        #     )
+
+    async def game_start(self, event):
+        await self.send_json({
+            'type': 'game_start',
+            'message': event['message']
+            })
+
     async def disconnect(self, code):
-        if hasattr(self, 'game_group_name'):
-            await self.channel_layer.group_discard(self.game_group_name, self.channel_name)
+        pass
+        # if hasattr(self, 'game_group_name'):
+        #     await self.channel_layer.group_discard(self.game_room.id, self.channel_name)
 
-        if self.game_id in self.game_loops and self.game_loops[self.game_id]:
-            self.game_loops[self.game_id].cancel()
+        # if self.game_id in self.game_loops and self.game_loops[self.game_id]:
+        #     self.game_loops[self.game_id].cancel()
 
-        if self.game_id in self.game_states:
-            self.game_states[self.game_id]['status'] = 'finished'
-            await database_sync_to_async(self.update_game_status)('finished')
+        # if self.game_id in self.game_states:
+        #     self.game_states[self.game_id]['status'] = 'finished'
+        #     await database_sync_to_async(self.update_game_status)('finished')
 
     async def receive_json(self, content):
         message_type = content.get('type')
@@ -83,59 +92,34 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
             if self.game_id in self.game_states:
                 self.game_states[self.game_id]['paddles'][player_id] = y_pos
 
-    async def find_or_create_game(self):
-        waiting_game = await self.find_waiting_game()
+    @database_sync_to_async
+    def find_or_create_game_and_get_usertype(self)->Tuple[GameRoom, PlayerType]:
+        waiting_game = GameRoom.objects.filter(status='waiting', player2__isnull=True).first()
 
-        if waiting_game:
-            return await self.update_waiting_game(waiting_game)
+        if not waiting_game:
+            return GameRoom.objects.create(player1=self.user), PlayerType.PLAYER1
         else:
-            return await self.create_new_game()
+            waiting_game.player2 = self.user
+            waiting_game.status = GameStatus.PLAYING
+            waiting_game.save()
+            return waiting_game, PlayerType.PLAYER2
 
-    @database_sync_to_async
-    def find_waiting_game(self):
-        return GameRoom.objects.filter(
-            status='waiting',
-            player2__isnull=True
-        ).first()
+    # async def game_start(self, event):
+    #     await self.send_json(
+    #         {
+    #             'type': 'game_start',
+    #             'game_id': event['game_id'],
+    #             'player_id': self.player_id
+    #         }
+    #     )
 
-    @database_sync_to_async
-    def update_waiting_game(self, game):
-        if game.player1_id != self.user_id:
-            game.player2_id = self.user_id
-            game.status = 'playing'
-            game.save()
-            return game
-        else:
-            # 自分が既にplayer1の場合は新しいゲームを作成する
-            new_game = GameRoom.objects.create(
-                player1_id=self.user_id,
-                status='waiting'
-            )
-            return new_game
-
-    @database_sync_to_async
-    def create_new_game(self):
-        return GameRoom.objects.create(
-            player1_id=self.user_id,  # self.user_idを事前に設定必要
-            status='waiting'
-        )
-
-    async def game_start(self, event):
-        await self.send_json(
-            {
-                'type': 'game_start',
-                'game_id': event['game_id'],
-                'player_id': self.player_id
-            }
-        )
-
-    async def game_state(self, event):
-        event_copy = event.copy()
-        event_copy.pop('type', None)  # typeキーを削除
-        await self.send_json({
-            'type': 'game_state',
-            **event_copy  # 残りのデータを展開
-        })
+    # async def game_state(self, event):
+    #     event_copy = event.copy()
+    #     event_copy.pop('type', None)  # typeキーを削除
+    #     await self.send_json({
+    #         'type': 'game_state',
+    #         **event_copy  # 残りのデータを展開
+    #     })
 
     async def game_over(self, event):
         await self.send_json({
@@ -204,7 +188,7 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
                 # if speed > max_speed:
 
                 await self.channel_layer.group_send(
-                    self.game_group_name,
+                    self.game_group.id,
                     {
                         'type': 'game_state',
                         # 'state': game_state
@@ -224,34 +208,34 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
         except Exception as e:
             print(f"Game loop error: {e}")
 
-    def initialize_game_state(self, game_room):
-        width = 800
-        height = 600
-        paddle_height = 80
-        paddle_width = 20
+    # def initialize_game_state(self, game_room):
+    #     width = 800
+    #     height = 600
+    #     paddle_height = 80
+    #     paddle_width = 20
 
-        return {
-            'status': 'playing' if game_room.status == 'playing' else 'waiting',
-            'ball': {
-                'x': width / 2,
-                'y': height / 2,
-                'dx': 5,
-                'dy': 0,
-                'radius': 10
-            },
-            'paddles': {
-                1: height / 2,
-                2: height / 2,
-            },
-            'score': {
-                '1': 0,
-                '2': 0
-            },
-            'width': width,
-            'height': height,
-            'paddle_height': paddle_height,
-            'paddle_width': paddle_width
-        }
+    #     return {
+    #         'status': 'playing' if game_room.status == 'playing' else 'waiting',
+    #         'ball': {
+    #             'x': width / 2,
+    #             'y': height / 2,
+    #             'dx': 5,
+    #             'dy': 0,
+    #             'radius': 10
+    #         },
+    #         'paddles': {
+    #             1: height / 2,
+    #             2: height / 2,
+    #         },
+    #         'score': {
+    #             '1': 0,
+    #             '2': 0
+    #         },
+    #         'width': width,
+    #         'height': height,
+    #         'paddle_height': paddle_height,
+    #         'paddle_width': paddle_width
+    #     }
 
     def reset_ball(self,game_state):
         import random
@@ -270,7 +254,7 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
         await database_sync_to_async(self.update_game_status)('finished')
         #todo update winner to model
         await self.channel_layer.group_send(
-            self.game_group_name,
+            self.game_room.id,
             {
                 'type': 'game_over',
                 'winner': winner,

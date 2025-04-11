@@ -6,6 +6,9 @@ then check localhost:8000/admin
 email = admin@example.com
 password = password
 
+emal = test@example.com
+password = 42Tokyo42Tokyo
+
 # pip
 pip install -r requirements.txt
 

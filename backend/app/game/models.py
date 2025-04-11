@@ -1,5 +1,4 @@
 from django.db import models
-from django.db.models.manager import BaseManager
 from django.contrib.auth import get_user_model
 
 
@@ -7,21 +6,21 @@ import datetime
 
 User = get_user_model()
 
+class GameStatus(models.TextChoices):
+    WAITING = 'waiting', '待機中'
+    PLAYING = 'playing', 'プレイ中'
+    FINISHED = 'finished', '終了'
+
 class GameRoom(models.Model):
     """
     model for a indiv game contains 2 players
     """
-    STATUS_CHOICES = [
-        ('waiting', '待機中'),
-        ('playing', 'プレイ中'),
-        ('finished', '終了')
-    ]
     player1 = models.ForeignKey(User, on_delete=models.CASCADE, related_name='games_as_p1', null=False, blank=False)
     player2 = models.ForeignKey(User, on_delete=models.CASCADE, related_name='games_as_p2', blank=False, null=True)
     player1_score = models.IntegerField(default=0)
     player2_score = models.IntegerField(default=0)
     winner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='winner', null=True, blank=True)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='waiting')
+    status = models.CharField(max_length=10, choices=GameStatus.choices, default=GameStatus.WAITING)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
