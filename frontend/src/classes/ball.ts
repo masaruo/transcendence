@@ -50,26 +50,26 @@ export class Ball {
 		ctx.closePath();
 	}
 
-	checkCollision(canvasHeight: number, canvaWidth: number, leftPaddle: Paddle, rightPaddle: Paddle): void {
-		// 上下との接触確認
-		if (this.y - this.radious < 0 || this.y + this.radious > canvasHeight){
-			this.dy *= -1;
-		}
-		// 左右からボールが出たか確認
-		else if (this.x + this.radious < 0 || this.x - this.radious > canvaWidth){
-			this.is_gameContinue = false;
-		}
-		// left paddle
-		else if (this.x - this.radious <= leftPaddle.x_ + leftPaddle.width_ && this.y - this.radious > leftPaddle.getY() && this.y + this.radious < leftPaddle.getY() + leftPaddle.height_)
-		{
-			this.dx = Math.abs(this.dx);
-		}
-		// right paddle
-		else if (this.x + this.radious >= rightPaddle.x_  && this.y - this.radious > rightPaddle.getY()  && this.y + this.radious < rightPaddle.getY() + rightPaddle.height_)
-		{
-			this.dx = -Math.abs(this.dx);
-		}
-	}
+	// checkCollision(canvasHeight: number, canvaWidth: number, leftPaddle: Paddle, rightPaddle: Paddle): void {
+	// 	// 上下との接触確認
+	// 	if (this.y - this.radious < 0 || this.y + this.radious > canvasHeight){
+	// 		this.dy *= -1;
+	// 	}
+	// 	// 左右からボールが出たか確認
+	// 	else if (this.x + this.radious < 0 || this.x - this.radious > canvaWidth){
+	// 		this.is_gameContinue = false;
+	// 	}
+	// 	// left paddle
+	// 	else if (this.x - this.radious <= leftPaddle.x_ + leftPaddle.width_ && this.y - this.radious > leftPaddle.getY() && this.y + this.radious < leftPaddle.getY() + leftPaddle.height_)
+	// 	{
+	// 		this.dx = Math.abs(this.dx);
+	// 	}
+	// 	// right paddle
+	// 	else if (this.x + this.radious >= rightPaddle.x_  && this.y - this.radious > rightPaddle.getY()  && this.y + this.radious < rightPaddle.getY() + rightPaddle.height_)
+	// 	{
+	// 		this.dx = -Math.abs(this.dx);
+	// 	}
+	// }
 
 	checkGameContinue(): boolean {
 		return (this.is_gameContinue);

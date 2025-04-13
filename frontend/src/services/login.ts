@@ -24,8 +24,8 @@ export async function handleLoginFormSubmission(form: HTMLFormElement): Promise<
             }
 
             const data = await response.json();
-            localStorage.setItem("access", data.access);
-            localStorage.setItem("refresh", data.refresh);
+            sessionStorage.setItem("access", data.access);
+            sessionStorage.setItem("refresh", data.refresh);
             console.log("Login successful:", data);
         } catch (error) {
             console.error("Error during login:", error);
