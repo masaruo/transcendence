@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="./src/style.css">
+	<title>Game</title>
+	<script type="module" src="./src/main.ts"></script>
+</head>
+<body>
+	<!-- <canvas id="canvas" width="1000" height="600"></canvas> -->
+	<!-- <br>
+	<button id="start">Start</button>
+	<button id="end">End</button> -->
+	<h1>Create Tournament</h1>
+	<form id="tournament-form">
+		<label for="name">Tournament Name:</label>
+		<input type="text" id="name" name="name" required>
+		<br>
+		<label for="player_ids">Player IDs (comma-separated):</label>
+		<input type="text" id="player_ids" name="player_ids" required>
+		<br>
+		<button type="submit">Create Tournament</button>
+	</form>
+	<div id="response"></div>
+	<script>
+		document.getElementById("tournament-form").addEventListener("submit", async function(event) {
+			event.preventDefault();
+			const name = document.getElementById("name").value;
+			const playerIds = document.getElementById("player_ids").value.split(",").map(id => id.trim());
+
+			try {
+				const response = await fetch("/api/game/create_tournament/", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({ name, player_ids: playerIds }),
+				});
+
+				let result;
+				try {
+					result = await response.json();
+				} catch (error) {
+					result = { error: "Invalid JSON response from server." };
+				}
+
+				document.getElementById("response").innerText = JSON.stringify(result, null, 2);
+			} catch (error) {
+				document.getElementById("response").innerText = `Error: ${error.message}`;
+			}
+		});
+	</script>
+</body>
+</html>

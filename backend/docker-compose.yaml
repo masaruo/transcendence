@@ -1,0 +1,63 @@
+services:
+  django:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports: #open for https?
+      - "8000:8000"
+    restart:
+      always
+    volumes: #? need to change
+      - .:/app
+    env_file:
+      - .env
+    networks:
+      - backend
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: >
+        /bin/bash -c " python /app/app/manage.py migrate && \
+        python /app/app/manage.py runserver 0.0.0.0:8000"
+
+  db:
+    image: postgres:15
+    restart: always
+    # shm_size: 128mb #shared memory
+    env_file:
+      - .env
+    volumes:
+      - postgres_volume:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - backend
+
+  redis:
+    image: redis:7.4-alpine
+    restart: always
+    volumes:
+      - redis_channel_layer:/data
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+
+volumes:
+  postgres_volume:
+    name: transcendence_db_volume
+  redis_channel_layer:
+    name: transcendence_channle_layer_volume
+
+networks:
+  backend:
+    name: transcendence
