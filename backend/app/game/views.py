@@ -4,11 +4,9 @@ from rest_framework import viewsets, mixins
 from rest_framework import generics, permissions
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-from .models import GameModel, Tournament
+from .models import GameRoom, Tournament
 from game import serializers
 
 import random
@@ -17,11 +15,12 @@ User = get_user_model()
 
 class GameViewSet(
         mixins.ListModelMixin,
+        mixins.RetrieveModelMixin,
         mixins.CreateModelMixin,
         mixins.UpdateModelMixin,
         viewsets.GenericViewSet
     ):
-    queryset = GameModel.objects.all()
+    queryset = GameRoom.objects.all()
     serializer_class = serializers.GameSerializer
     permission_classes = [permissions.IsAuthenticated]
     authentication_classes = [JWTAuthentication]

@@ -4,14 +4,16 @@ then check localhost:8000/admin
 
 # django db super user
 email = admin@example.com
-password = pass
+password = password
+
+emal = test@example.com
+password = 42Tokyo42Tokyo
 
 # pip
 pip install -r requirements.txt
 
 # run server
-in app dir
-python manage.py runserver
+python /app/manage.py runserver 0.0.0.0:8000
 
 # flake8 : norm check
 flake8

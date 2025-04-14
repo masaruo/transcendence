@@ -29,4 +29,11 @@ export default defineConfig({
 		assetsDir: 'assets',
 		sourcemap: true,
 	},
+	css: {
+		preprocessorOptions: {
+			scss: {
+				quietDeps: true
+			}
+		}
+	}
 })

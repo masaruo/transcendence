@@ -4,7 +4,7 @@ from game import models
 
 class GameSerializer(serializers.ModelSerializer):
     class Meta:
-        model = models.GameModel
+        model = models.GameRoom
         fields = '__all__'
 
 

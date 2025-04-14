@@ -15,7 +15,7 @@ export default class FriendsView extends AbstractView {
 	async loadScripts(): Promise<void> {
 		const friendsList = document.getElementById('friends-list');
 		try {
-			const token = localStorage.getItem('access'); // Retrieve token from localStorage
+			const token = sessionStorage.getItem('access'); // Retrieve token from localStorage
 			console.log('Retrieved token:', token); // Debugging log
 			if (!token) {
 				throw new Error('No authentication token found.');
