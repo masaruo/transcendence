@@ -13,8 +13,7 @@ password = 42Tokyo42Tokyo
 pip install -r requirements.txt
 
 # run server
-in app dir
-python manage.py runserver
+python /app/manage.py runserver 0.0.0.0:8000
 
 # flake8 : norm check
 flake8

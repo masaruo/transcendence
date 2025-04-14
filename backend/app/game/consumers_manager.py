@@ -8,8 +8,8 @@ class GameManager:
     # status: GameStatus
     _canvas: Screen
     _ball: Ball
-    # left_paddle: Paddle
-    # right_paddle: Paddle
+    _left_paddle: Paddle
+    _right_paddle: Paddle
     # score:Score
 
     def __init__(self, group_name: str):
@@ -18,8 +18,8 @@ class GameManager:
         # self.status = self.game_room.status
         self._screen = Screen()
         self._ball = Ball()
-        # self.left_paddle = Paddle()
-        # self.right_paddle = Paddle()
+        self._left_paddle = Paddle()
+        self._right_paddle = Paddle()
         # self.score = Score()
 
     @property
@@ -45,6 +45,8 @@ class GameManager:
         return {
             'type': 'game_state',
             'ball': self._ball.to_dict(),
+            'left_paddle': self._left_paddle.to_dict(),
+            'right_paddle': self._right_paddle.to_dict(),
         }
 
 

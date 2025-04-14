@@ -27,10 +27,10 @@ class LoggingOriginMiddleware:
         self.inner = inner
 
     async def __call__(self, scope, receive, send):
-        print("Logging middleware running")
+        # print("Logging middleware running")
         headers_dict = dict(scope.get('headers', []))
-        print(f"Headers: {headers_dict}")
-        print(f"Origin: {headers_dict.get(b'origin', b'unknown')}")
+        # print(f"Headers: {headers_dict}")
+        # print(f"Origin: {headers_dict.get(b'origin', b'unknown')}")
         return await self.inner(scope, receive, send)
 
 # Then update your application definition to use this class

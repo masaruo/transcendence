@@ -1,5 +1,5 @@
 import AbstractView from "./AbstractView";
-import { Pong } from "../classes/pong";
+import { Pong } from "../pong/pong";
 
 export default class PongView extends AbstractView {
 	constructor (params: string){
@@ -8,7 +8,7 @@ export default class PongView extends AbstractView {
 	}
 	async getHtml(): Promise<string> {
 		return `
-			<canvas id="canvas" width="600" height="300"></canvas>
+			<canvas id="canvas" width="600" height="600"></canvas>
 			<br>
 			<button id="join">Join</button>
 			<button id="start">Start</button>
@@ -23,7 +23,9 @@ export default class PongView extends AbstractView {
 		document.addEventListener("keyup", (e) => {keyState[e.key] = false})
 
 		const canvas = document.getElementById("canvas") as HTMLCanvasElement | null;
+		if (!canvas)
+			throw Error("Failed to find canvas element.")
 		const pong = new Pong(canvas);
-		pong.start();
+		// pong.start();
 	}
 }

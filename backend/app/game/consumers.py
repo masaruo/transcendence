@@ -15,34 +15,34 @@ User = get_user_model()
 
 class GameConsumer(AsyncJsonWebsocketConsumer):
 
-    user: UserType
-    player_type: PlayerType
-    manager: GameManager
-    status: GameStatus
-    game_room: GameRoom
+    _user: UserType
+    _player_type: PlayerType  #* PLAYER2 = left paddle, PLAYER1 = right paddle
+    _manager: GameManager
+    _status: GameStatus
+    _game_room: GameRoom
     _coroutine: Coroutine
 
     async def connect(self):
-        self.user = self.scope['user']
-        if not self.user.is_authenticated:
+        self._user = self.scope['user']
+        if not self._user.is_authenticated:
             await self.close()
             return
         await self.accept()
 
-        game_room, self.player_type = await self.find_or_create_game_and_get_usertype()
-        self.manager = GameManager(f"room_{str(game_room.id)}")
+        game_room, self._player_type = await self.find_or_create_game_and_set_usertype()
+        self._manager = GameManager(f"room_{str(game_room.id)}")
 
         await self.channel_layer.group_add(
-            self.manager.group_name, self.channel_name
+            self._manager.group_name, self.channel_name
         )
 
         # if self.manager.status() == GameStatus.PLAYING:
-        if self.player_type == PlayerType.PLAYER2:
+        if self._player_type == PlayerType.PLAYER2:
             await self.channel_layer.group_send(
-                self.manager.group_name,
+                self._manager.group_name,
                 {
                     'type': 'game_start',
-                    'message': "hello world",
+                    'data': "hello world",
                 }
             )
             self._coroutine = asyncio.create_task(self.game_loop())
@@ -50,11 +50,22 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
     async def game_loop(self):
         try:
             while True:
-                self.manager.update()
+                self._manager.update()
                 await self.channel_layer.group_send(
-                    self.manager.group_name,
-                    self.manager.to_dict()
-                )
+                    self._manager.group_name,
+                    # self._manager.to_dict()
+                    {   'type': 'game_update',
+                        'data': {
+                            'ball': {
+                                'x': self._manager._ball.getX(),
+                                'y': self._manager._ball.getY(),
+                            },
+                            'left_paddle': {
+                                'y': self._manager._left_paddle.getTopY(),
+                            }
+                        }
+                    })
+                await asyncio.sleep(1)
         except ValueError as e:
             pass
         # game state intialization
@@ -78,7 +89,21 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
     async def game_start(self, event):
         await self.send_json({
             'type': 'game_start',
-            'message': event['message']
+            'data': {
+                'ball': {
+                    'x': '150',
+                    'y': '100',
+                    'radius': '10',
+                    'color': 'white',
+                },
+                'left_paddle': {
+                    'x': '0',
+                    'y': '150',
+                    'width': '20',
+                    'height': '80',
+                    'color': 'green',
+                },
+            }
             })
 
     async def disconnect(self, code):
@@ -95,22 +120,43 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
 
     async def receive_json(self, content):
         message_type = content.get('type')
+        if not message_type == 'paddle_movement':
+            return
 
-        if message_type == 'paddle_move':
-            player_id = int(content.get('player_id', self.player_id))
-            y_pos = float(content.get('y', 0))
+        direction = content.get('direction')
+        # print(direction, "direction !")
+        if self._player_type == PlayerType.PLAYER1:  #* right
+            if direction == 'ArrowUp':
+                self._manager._right_paddle.move(-10)
+            elif direction == 'ArrowDown':
+                self._manager._right_paddle.move(10)
+        elif self._player_type == PlayerType.PLAYER2:  #* left
+            if direction == 'w':
+                self._manager._left_paddle.move(-10)
+            elif direction == 's':
+                self._manager._left_paddle.move(10)
+        else:
+            pass
+    # async def receive_json(self, content):
+    #     message_type = content.get('type')
 
-            if self.game_id in self.game_states:
-                self.game_states[self.game_id]['paddles'][player_id] = y_pos
+    #     if message_type == 'paddle_move':
+    #         player_id = int(content.get('player_id', self.player_id))
+    #         y_pos = float(content.get('y', 0))
+
+    #         if self.game_id in self.game_states:
+    #             self.game_states[self.game_id]['paddles'][player_id] = y_pos
 
     @database_sync_to_async
-    def find_or_create_game_and_get_usertype(self)->Tuple[GameRoom, PlayerType]:
+    def find_or_create_game_and_set_usertype(self)->Tuple[GameRoom, PlayerType]:
         waiting_game = GameRoom.objects.filter(status='waiting', player2__isnull=True).first()
 
         if not waiting_game:
-            return GameRoom.objects.create(player1=self.user), PlayerType.PLAYER1
+            return GameRoom.objects.create(player1=self._user), PlayerType.PLAYER1
+        elif waiting_game.player1 == self._user:
+            raise ValueError("User cannot participate in same game.")
         else:
-            waiting_game.player2 = self.user
+            waiting_game.player2 = self._user
             waiting_game.status = GameStatus.PLAYING
             waiting_game.save()
             return waiting_game, PlayerType.PLAYER2
@@ -124,12 +170,15 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
     #         }
     #     )
 
-    async def game_state(self, event):
-        event_copy = event.copy()
-        event_copy.pop('type', None)  # typeキーを削除
+    async def game_update(self, event):
+        # event_copy = event.copy()
+        # event_copy.pop('type', None)  # typeキーを削除
+        # await self.send_json({
+        #     'type': 'game_state',
+        #     **event_copy  # 残りのデータを展開
+        # }
         await self.send_json({
-            'type': 'game_state',
-            **event_copy  # 残りのデータを展開
+            **event
         })
 
     async def game_over(self, event):
@@ -236,7 +285,7 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
         await database_sync_to_async(self.update_game_status)('finished')
         #todo update winner to model
         await self.channel_layer.group_send(
-            self.game_room.id,
+            self._game_room.id,
             {
                 'type': 'game_over',
                 'winner': winner,
