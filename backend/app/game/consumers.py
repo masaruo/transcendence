@@ -17,7 +17,7 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
 
     _user: UserType
     _player_type: PlayerType  #* PLAYER2 = left paddle, PLAYER1 = right paddle
-    _manager: GameManager
+    _manager: GameManager  #? keep NULL apart from Player2
     _status: GameStatus
     _game_room: GameRoom
     _coroutine: Coroutine
@@ -45,7 +45,7 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
                     'data': "hello world",
                 }
             )
-            self._coroutine = asyncio.create_task(self.game_loop())
+            self._coroutine = asyncio.create_task(self.game_loop())  #!game loop only in player2
 
     async def game_loop(self):
         try:
@@ -62,29 +62,15 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
                             },
                             'left_paddle': {
                                 'y': self._manager._left_paddle.getTopY(),
+                            },
+                            'right_paddle': {
+                                'y': self._manager._right_paddle.getTopY(),
                             }
                         }
                     })
                 await asyncio.sleep(1)
         except ValueError as e:
             pass
-        # game state intialization
-        # self.game_states = self.initialize_game_state(game_room)
-
-        # if game_room.status == 'playing':
-        #     if self.player_id == 2:
-        #         self.game_loops[self.game_id] = asyncio.create_task(
-        #             self.game_loop(self.game_id)
-        #         )
-
-        #     await self.channel_layer.group_send(
-        #         self.game_room.id,
-        #         {
-        #             'type': 'game_start',
-        #             'game_id': self.game_id,
-        #             'player_id': self.player_id
-        #         }
-        #     )
 
     async def game_start(self, event):
         await self.send_json({
@@ -102,6 +88,13 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
                     'width': '20',
                     'height': '80',
                     'color': 'green',
+                },
+                'right_paddle': {
+                    'x': '300',
+                    'y': '150',
+                    'width': '20',
+                    'height': '80',
+                    'color': 'blue',
                 },
             }
             })
@@ -124,12 +117,21 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
             return
 
         direction = content.get('direction')
-        # print(direction, "direction !")
+        move_value = 0
         if self._player_type == PlayerType.PLAYER1:  #* right
             if direction == 'ArrowUp':
-                self._manager._right_paddle.move(-10)
+                move_value = -10
+                self._manager._right_paddle.move(move_value)
             elif direction == 'ArrowDown':
-                self._manager._right_paddle.move(10)
+                move_value = 10
+                self._manager._right_paddle.move(move_value)
+            await self.channel_layer.group_send(
+                self._manager.group_name,
+                {
+                    'type': 'right_paddle_move',
+                    'move_value': move_value,
+                }
+            )
         elif self._player_type == PlayerType.PLAYER2:  #* left
             if direction == 'w':
                 self._manager._left_paddle.move(-10)
@@ -146,6 +148,10 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
 
     #         if self.game_id in self.game_states:
     #             self.game_states[self.game_id]['paddles'][player_id] = y_pos
+
+    async def right_paddle_move(self, event):
+        move_value = event.get('move_value')
+        self._manager._right_paddle.move(move_value)
 
     @database_sync_to_async
     def find_or_create_game_and_set_usertype(self)->Tuple[GameRoom, PlayerType]:
