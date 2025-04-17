@@ -6,7 +6,7 @@ class GameManager:
     # game_room: GameRoom
     _group_name: str
     # status: GameStatus
-    _canvas: Screen
+    _screen: Screen
     _ball: Ball
     _left_paddle: Paddle
     _right_paddle: Paddle
@@ -30,12 +30,27 @@ class GameManager:
     def group_name(self, name:str)-> None:
         self._group_name = name
 
-    def _collision_ball_and_wall(self)-> None:
+    def _ball_vs_wall(self)-> None:
         if self._ball.getTopY() < 0 or self._ball.getBottomY() > self._screen.height:
             self._ball.setDy(-self._ball.getDy())
 
+    def _ball_vs_paddles(self)-> None:
+        # vs left
+        if self._ball.getLeftX() <= self._left_paddle.getRightX() and self._ball.getBottomY() >= self._left_paddle.getTopY() and self._ball.getTopY() <= self._left_paddle.getBottomY():
+            self._ball.setDx(abs(self._ball.getDx()))
+            relative_y = (self._ball.getY() - self._left_paddle.getTopY()) / self._left_paddle.getHeight()
+            self._ball.setDy(relative_y * 2)
+            print("left paddle collison")
+        # vs right
+        elif self._ball.getRightX() >= self._right_paddle.getLeftX() and self._ball.getBottomY() >= self._right_paddle.getTopY() and self._ball.getTopY() <= self._right_paddle.getBottomY():
+            self._ball.setDx(-abs(self._ball.getDx()))
+            relative_y = (self._ball.getY() - self._right_paddle.getTopY()) / self._right_paddle.getHeight()
+            self._ball.setDy(relative_y * 2)
+            print("right paddle collision")
+
     def _check_collision(self)-> None:
-        self._collision_ball_and_wall()
+        self._ball_vs_wall()
+        self._ball_vs_paddles()
 
     def update(self)-> None:
         self._ball.move()
