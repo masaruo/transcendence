@@ -1,3 +1,5 @@
+import HeaderView from "./HeaderView";
+
 export default abstract class View {
 	protected params: string;
 	constructor(params: string) {
@@ -8,7 +10,11 @@ export default abstract class View {
 		document.title = title;
 	}
 
-	async getHtml(): Promise<string> {
+	async getHeader(): Promise<string> {
+		return HeaderView.getHeader();
+	}
+
+	async getBody(): Promise<string> {
 		return "";
 	}
 

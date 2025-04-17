@@ -6,7 +6,7 @@ export default class FriendsView extends AbstractView {
 		this.setTitle("Friends");
 	}
 
-	async getHtml(): Promise<string> {
+	async getBody(): Promise<string> {
 		return `
 		<div id="friends-list"></div>
 		`

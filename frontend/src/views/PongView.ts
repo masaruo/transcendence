@@ -6,7 +6,7 @@ export default class PongView extends AbstractView {
 		super(params);
 		this.setTitle("Pong");
 	}
-	async getHtml(): Promise<string> {
+	async getBody(): Promise<string> {
 		return `
 			<canvas id="canvas" width="900" height="600"></canvas>
 			<br>
