@@ -45,32 +45,32 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
                     'data': "hello world",
                 }
             )
-            self._coroutine = asyncio.create_task(self.game_loop())  #!game loop only in player2
+            # self._coroutine = asyncio.create_task(self.game_loop())  #!game loop only in player2
 
-    async def game_loop(self):
-        try:
-            while True:
-                self._manager.update()
-                await self.channel_layer.group_send(
-                    self._manager.group_name,
-                    # self._manager.to_dict()
-                    {   'type': 'game_update',
-                        'data': {
-                            'ball': {
-                                'x': self._manager._ball.getX(),
-                                'y': self._manager._ball.getY(),
-                            },
-                            'left_paddle': {
-                                'y': self._manager._left_paddle.getTopY(),
-                            },
-                            'right_paddle': {
-                                'y': self._manager._right_paddle.getTopY(),
-                            }
-                        }
-                    })
-                await asyncio.sleep(1)
-        except ValueError as e:
-            pass
+    # async def game_loop(self):
+    #     try:
+    #         while True:
+    #             self._manager.update()
+    #             await self.channel_layer.group_send(
+    #                 self._manager.group_name,
+    #                 # self._manager.to_dict()
+    #                 {   'type': 'game_update',
+    #                     'data': {
+    #                         'ball': {
+    #                             'x': self._manager._ball.getX(),
+    #                             'y': self._manager._ball.getY(),
+    #                         },
+    #                         'left_paddle': {
+    #                             'y': self._manager._left_paddle.getTopY(),
+    #                         },
+    #                         'right_paddle': {
+    #                             'y': self._manager._right_paddle.getTopY(),
+    #                         }
+    #                     }
+    #                 })
+    #             await asyncio.sleep(1 / 20)
+    #     except ValueError as e:
+    #         pass
 
     async def game_start(self, event):
         await self.send_json({
@@ -90,7 +90,7 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
                     'color': 'green',
                 },
                 'right_paddle': {
-                    'x': '300',
+                    'x': '880',
                     'y': '150',
                     'width': '20',
                     'height': '80',
@@ -139,15 +139,6 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
                 self._manager._left_paddle.move(10)
         else:
             pass
-    # async def receive_json(self, content):
-    #     message_type = content.get('type')
-
-    #     if message_type == 'paddle_move':
-    #         player_id = int(content.get('player_id', self.player_id))
-    #         y_pos = float(content.get('y', 0))
-
-    #         if self.game_id in self.game_states:
-    #             self.game_states[self.game_id]['paddles'][player_id] = y_pos
 
     async def right_paddle_move(self, event):
         move_value = event.get('move_value')
@@ -167,22 +158,7 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
             waiting_game.save()
             return waiting_game, PlayerType.PLAYER2
 
-    # async def game_start(self, event):
-    #     await self.send_json(
-    #         {
-    #             'type': 'game_start',
-    #             'game_id': event['game_id'],
-    #             'player_id': self.player_id
-    #         }
-    #     )
-
     async def game_update(self, event):
-        # event_copy = event.copy()
-        # event_copy.pop('type', None)  # typeキーを削除
-        # await self.send_json({
-        #     'type': 'game_state',
-        #     **event_copy  # 残りのデータを展開
-        # }
         await self.send_json({
             **event
         })

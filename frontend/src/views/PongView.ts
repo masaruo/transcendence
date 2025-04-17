@@ -8,7 +8,7 @@ export default class PongView extends AbstractView {
 	}
 	async getHtml(): Promise<string> {
 		return `
-			<canvas id="canvas" width="600" height="600"></canvas>
+			<canvas id="canvas" width="900" height="600"></canvas>
 			<br>
 			<button id="join">Join</button>
 			<button id="start">Start</button>
