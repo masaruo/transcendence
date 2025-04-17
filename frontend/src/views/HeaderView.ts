@@ -37,7 +37,7 @@ export default class HeaderView {
 					<a class="nav-link active nav__link" aria-current="page" href="/login" data-link>Login</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link active nav__link" aria-current="page" href="/signup" data-link>Sign Up</a>
+					<a class="nav-link active nav__link" aria-current="page" href="/user" data-link>Sign Up</a>
 				</li>
 			`
 		}
