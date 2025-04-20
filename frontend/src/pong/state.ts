@@ -1,6 +1,11 @@
 import { Ball } from "./ball";
 import { Paddle } from "./paddle";
 
+export interface IPongObj {
+	set(): void;
+	draw(): void;
+}
+
 export type GameData = {
 	data: {
 		ball: {
@@ -33,15 +38,6 @@ export class State {
 	// private	paddles_: Paddle[];
 	// private	score_: Score
 
-	// static jsonToGameData(jsonString: string): GameData {
-	// 	try {
-	// 		const parsedData: GameData = JSON.parse(jsonString);
-	// 		// validate
-	// 		return parsedData;
-	// 	} catch (error) {
-	// 		throw new Error("Invalid JSON data: " + error.message);
-	// 	}
-	// }
 	constructor(state: GameData){
 		const parsedBall = state.data.ball;
 		this.ball_ = new Ball(parsedBall.x, parsedBall.y, parsedBall.radius ?? 10, parsedBall.color ?? 'white');

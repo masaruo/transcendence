@@ -46,22 +46,4 @@ export default class Fetch {
 			throw error;
 		}
 	}
-	// async jsonFetch(): Promise<any> {
-	// 	try {
-	// 		const response = await fetch(this.url, {
-	// 			method: this.method,
-	// 			body: this.body ? JSON.stringify(this.body) : null,
-	// 			headers: { 'Content-Type': 'application/json' },
-	// 		});
-
-	// 		if (!response.ok)
-	// 			throw new Error(`HTTP error! status: ${response.status}`);
-	// 		}
-
-	// 		return await response.json();
-	// 	} catch (error) {
-	// 		console.error('Fetch error:', error);
-	// 		throw error;
-	// 	}
-	// }
 }
