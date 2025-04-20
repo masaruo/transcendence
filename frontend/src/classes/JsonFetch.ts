@@ -1,30 +1,67 @@
-export default class JsonFetch {
+export default class Fetch {
 	private url: string;
 	private method: string;
-	private body: object | null;
+	private headers: { [key: string]: string };
+	private body?: string;
 
-	constructor(url: string, method: string, body: object | null) {
+	constructor(url: string, method: string = "GET", header?: {[key: string]: string}, body?: object) {
 		this.url = url;
 		this.method = method;
-		this.body = body;
+		this.headers = header || {};
+		if (!this.headers["Content-Type"])
+			this.headers["Content-Type"] = "application/json";
+		if (!this.headers["Accept"])
+			this.headers["Accept"] = "application/json";
+		this.body = body ? JSON.stringify(body) : undefined;
 	}
 
-	async jsonFetch(): Promise<any> {
+	async fetch_without_auth(): Promise<any> {
 		try {
-			const response = await fetch(this.url, {
+			const requestOptions: RequestInit = {
 				method: this.method,
-				body: this.body ? JSON.stringify(this.body) : null,
-				headers: { 'Content-Type': 'application/json' },
-			});
-
-			if (!response.ok) {
-				throw new Error(`HTTP error! status: ${response.status}`);
+				headers: this.headers,
 			}
 
-			return await response.json();
+			if (this.body) {
+				requestOptions.body = this.body;
+			}
+
+			const res = await fetch(this.url, requestOptions);
+			const res_in_json = await res.json();
+			return res_in_json;
 		} catch (error) {
-			console.error('Fetch error:', error);
 			throw error;
 		}
 	}
+
+	async fetch_with_auth(): Promise<any> {
+		try {
+			const token = sessionStorage.getItem('access');
+			if (!token) {
+				throw new Error("No auth token found.");
+			}
+			this.headers["Authorization"] = "Bearer " + token;
+			return this.fetch_without_auth();
+		} catch (error) {
+			throw error;
+		}
+	}
+	// async jsonFetch(): Promise<any> {
+	// 	try {
+	// 		const response = await fetch(this.url, {
+	// 			method: this.method,
+	// 			body: this.body ? JSON.stringify(this.body) : null,
+	// 			headers: { 'Content-Type': 'application/json' },
+	// 		});
+
+	// 		if (!response.ok)
+	// 			throw new Error(`HTTP error! status: ${response.status}`);
+	// 		}
+
+	// 		return await response.json();
+	// 	} catch (error) {
+	// 		console.error('Fetch error:', error);
+	// 		throw error;
+	// 	}
+	// }
 }

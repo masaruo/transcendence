@@ -1,6 +1,3 @@
-import { Ball } from "./ball";
-import { Paddle } from "./paddle";
-import { IdEvent } from "../classes/IdEvent";
 import { State, GameData } from "./state";
 
 

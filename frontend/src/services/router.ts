@@ -2,6 +2,8 @@ import FriendsView from "../views/FriendsView";
 import IndexView from "../views/IndexView";
 import LoginView from "../views/LoginView";
 import PongView from "../views/PongView";
+import UserUpdataView from "../views/UserUpdateView";
+import UserView from "../views/UserView";
 
 const pathToRegex = (path: string) => new RegExp("^" + path.replace(/\//g, "\\/").replace(/:\w+/g, "(.+)") + "$");
 
@@ -22,6 +24,8 @@ export const navigateTo = (url: string) => {
 export const router = async() => {
 	const routes = [
 		{path: "/", view: IndexView},
+		{path: "/user/me", view: UserView},
+		{path: "/user/me/update", view: UserUpdataView},
 		{path: "/login", view: LoginView },
 		{path: "/friends", view: FriendsView},
 		{path: "/pong", view: PongView},
@@ -36,6 +40,7 @@ export const router = async() => {
 			result: location.pathname.match(pathToRegex(route.path))
 		}
 	})
+
 	let match = potentialMatches.find(potentialMatch => potentialMatch.result != null);
 
 	if (!match) {
@@ -47,9 +52,11 @@ export const router = async() => {
 
 	const view = new match.route.view(getParams(match));
 
-	const app = document.getElementById("app");
-	if (!app) throw new Error("element app not found");
-	app.innerHTML = await view.getHtml();
+	const body = document.getElementById("body");
+	const header = document.getElementById('header');
+	if (!body || !header) throw new Error("element app not found");
+	header.innerHTML = await view.getHeader();
+	body.innerHTML = await view.getBody();
 
 	await view.loadScripts();
 };
