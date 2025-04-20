@@ -11,6 +11,10 @@ export default class JsonFetch
 		this.body = body;
 	}
 
+	addBody(body: object): void {
+		this.body = body;
+	}
+
 	async jsonFetch(): Promise<any> {
 		try {
 			const response = await fetch(this.url, {
