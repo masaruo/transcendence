@@ -1,6 +1,3 @@
-import { Ball } from "./ball";
-import { Paddle } from "./paddle";
-import { IdEvent } from "../classes/IdEvent";
 import { State, GameData } from "./state";
 
 
@@ -25,13 +22,7 @@ export class Pong {
 	readonly	ctx_: CanvasRenderingContext2D;
 	readonly	width_: number;
 	readonly	height_: number;
-	// readonly ball: Ball;
-	// readonly r_paddle: Paddle;
-	// readonly l_paddle:Paddle;
 	private	intervalID_: NodeJS.Timeout | number = 0;
-	// private join_: IdEvent;
-	// private start_: IdEvent;
-	// private stop_: IdEvent;
 	private keyState_: {[key: string]: boolean} = {};
 
 	constructor (canvas: HTMLCanvasElement | null) {
@@ -119,7 +110,7 @@ export class Pong {
 
 	handleEvent(parsedData: { type: string; data?: GameData }): void {
 		switch (parsedData.type) {
-			case 'game_start':
+			case 'game_initialization':
 				if (parsedData.data) {
 					this.state_ = new State(parsedData.data);
 				} else {

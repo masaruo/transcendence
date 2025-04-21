@@ -16,9 +16,3 @@ document.addEventListener("DOMContentLoaded", () => {
 	})
 	router();
 })
-
-// import { Pong } from "./classes/pong";
-
-// const canvas = document.getElementById("canvas") as HTMLCanvasElement | null;
-// const pong = new Pong(canvas);
-// pong.start();

@@ -6,7 +6,7 @@ export default class FriendsView extends AbstractView {
 		this.setTitle("Friends");
 	}
 
-	async getHtml(): Promise<string> {
+	async getBody(): Promise<string> {
 		return `
 		<div id="friends-list"></div>
 		`
@@ -16,7 +16,7 @@ export default class FriendsView extends AbstractView {
 		const friendsList = document.getElementById('friends-list');
 		try {
 			const token = sessionStorage.getItem('access'); // Retrieve token from localStorage
-			console.log('Retrieved token:', token); // Debugging log
+			// console.log('Retrieved token:', token); // Debugging log
 			if (!token) {
 				throw new Error('No authentication token found.');
 			}

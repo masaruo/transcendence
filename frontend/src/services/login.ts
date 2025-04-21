@@ -1,3 +1,5 @@
+import { navigateTo } from "./router";
+
 export async function handleLoginFormSubmission(form: HTMLFormElement): Promise<void> {
     form.addEventListener("submit", async (event) => {
         event.preventDefault();
@@ -26,6 +28,8 @@ export async function handleLoginFormSubmission(form: HTMLFormElement): Promise<
             const data = await response.json();
             sessionStorage.setItem("access", data.access);
             sessionStorage.setItem("refresh", data.refresh);
+            sessionStorage.setItem("is_authenticated", "true");
+            navigateTo('/');
             console.log("Login successful:", data);
         } catch (error) {
             console.error("Error during login:", error);

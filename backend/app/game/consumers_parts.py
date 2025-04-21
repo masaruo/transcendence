@@ -14,7 +14,7 @@ class Screen:
     _width: int
     _height: int
 
-    def __init__(self, width=600, height=300):
+    def __init__(self, width=900, height=600):
         self._width = width
         self._height = height
 
@@ -46,6 +46,10 @@ class Score:
         }
 
 class Paddle:
+    class PaddleType(Enum):
+        LEFT = 0,
+        RIGHT = 1,
+
     x: int
     x: int
     height: int
@@ -71,6 +75,9 @@ class Paddle:
 
     def move(self, delta_y):
         self.y += delta_y
+
+    def getHeight(self):
+        return (self.height)
 
     def to_dict(self):
         return {
