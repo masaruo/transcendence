@@ -1,13 +1,12 @@
 import asyncio
-from typing import Dict, List
 from game.pong.APongObj import PongObj
 from game.pong.ball import Ball
 from game.pong.paddle import Paddle
 from game.pong.wall import Wall
-from channels.layers import get_channel_layer
+from channels.layers import get_channel_layer # type: ignore
 
 class Manager:
-    _instances: Dict[str, 'Manager'] = {}
+    _instances: dict[str, 'Manager'] = {}
 
     @classmethod
     def get_instance(cls, name: str)-> 'Manager':
@@ -20,10 +19,10 @@ class Manager:
         if name in cls._instances:
             del cls._instances[name]
 
-    def __init__(self, group_name: str):
-        self.objs: List[PongObj] = [
+    def __init__(self, group_name: str) -> None:
+        self.objs: list[PongObj] = [
             Ball(),
-            Ball(color='yellow'),
+            Ball(y=150, color='yellow'),
             Ball(y=100, color='red'),
             Paddle(side=Paddle.SIDE.R1, color="green"),
             Paddle(side=Paddle.SIDE.R2, color="white"),
@@ -31,7 +30,7 @@ class Manager:
             Paddle(side=Paddle.SIDE.L2, color="red"),
         ]
         self.wall = Wall()
-        self._group_name = group_name
+        self._group_name: str = group_name
         self.channel_layer = get_channel_layer()
         self.task = None
         self.is_continue = True
@@ -86,24 +85,25 @@ class Manager:
                 paddle_arr.append(obj.to_dict())
         obj_dict["balls"] = ball_arr
         obj_dict['paddles'] = paddle_arr
-        print(f"objdict={obj_dict}")
+        # print(f"objdict={obj_dict}")
         return (obj_dict)
 
-    def check_collisions(self):
-        balls = [obj for obj in self.objs if isinstance(obj, Ball)]
-        paddles = [obj for obj in self.objs if isinstance(obj, Paddle)]
+    def check_collisions(self) -> None:
+        balls: list[Ball] = [obj for obj in self.objs if isinstance(obj, Ball)]
+        paddles: list[Paddle] = [obj for obj in self.objs if isinstance(obj, Paddle)]
 
         to_continue: bool = True
 
         for ball in balls:
+            to_continue = ball.check_to_continue_with_wall(wall=self.wall)
+            if (to_continue == False):
+                break
             for paddle in paddles:
-                ball.check_with_paddle(paddle)
-            # to_continue = ball.check_to_continue_with_wall(self.wall)
+                ball.check_with_paddle(paddle=paddle)
 
-        # self.is_continue = to_continue
+        self.is_continue: bool = to_continue
 
     async def init(self):
-        # print(f"datasending: {self.to_dict()}")
         await self.channel_layer.group_send(
             self.group_name,
             {

@@ -1,10 +1,10 @@
 from game.X_consumers.constants import SCREEN_HEIGHT, SCREEN_WITDH
 
 class Wall:
-    def __init__(self, width=SCREEN_WITDH, height=SCREEN_HEIGHT):
+    def __init__(self, width:int=SCREEN_WITDH, height:int=SCREEN_HEIGHT):
         self.x = 0
         self.y = 0
-        self.widh = width
+        self.width = width
         self.height = height
 
     def get_bounds(self):
