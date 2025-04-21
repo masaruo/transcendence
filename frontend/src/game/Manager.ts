@@ -11,21 +11,6 @@ type GameData = {
 	paddles: Paddle[],
 }
 
-// type BallData = {
-// 	x: number;
-// 	y: number;
-// 	radius: number;
-// 	color: string;
-// }
-
-// type PaddleData = {
-// 	x: number;
-// 	y: number;
-// 	width: number;
-// 	height: number;
-// 	color: string;
-// }
-
 export class Manager {
 	readonly ctx: CanvasRenderingContext2D;
 
@@ -43,7 +28,7 @@ export class Manager {
 		this.ctx.clearRect(0, 0, 900, 600);
 
 		const data = event.data;
-		// console.log("thisis data: ",data);
+		console.log("thisis data: ",data);
 
 		if (data.balls) {
 			for (const ball of data.balls) {
