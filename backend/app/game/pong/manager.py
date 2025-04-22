@@ -111,3 +111,9 @@ class Manager:
                 'data': self.to_dict()
             }
         )
+
+    def get_paddle(self, side: Paddle.SIDE) -> Paddle | None:
+        for obj in self.objs:
+            if isinstance(obj, Paddle) and obj.type == side:
+                return obj
+        return None

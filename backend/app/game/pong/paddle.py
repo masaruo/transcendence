@@ -1,4 +1,3 @@
-from typing import Dict
 from game.pong.APongObj import PongObj
 from enum import Enum
 from game.pong.constants import SCREEN_HEIGHT, PADDLE_HEIGHT, PADDLE_WIDTH, SCREEN_WITDH, MOVE_VALUE
@@ -11,13 +10,13 @@ class Paddle(PongObj):
         L1 = 3,
         L2 = 4
 
-    def __init__(self, side=SIDE.R1, x=0, y=SCREEN_HEIGHT//2, width=PADDLE_WIDTH, height=PADDLE_HEIGHT, color="white"):
-        self.type = side
-        self.y = y
-        self.width = width
-        self.height = height
-        self.color = color
-        self.x = x
+    def __init__(self, side:SIDE=SIDE.R1, x:int=0, y:int=SCREEN_HEIGHT//2, width:int=PADDLE_WIDTH, height:int=PADDLE_HEIGHT, color:str="white") -> None:
+        self.type: Paddle.SIDE = side
+        self.y: int = y
+        self.width: int = width
+        self.height: int = height
+        self.color: str = color
+        self.x: int = x
         if self.type == self.SIDE.R1:
             self.x = SCREEN_WITDH - self.width
         elif self.type == self.SIDE.L1:
@@ -27,7 +26,7 @@ class Paddle(PongObj):
         elif self.type == self.SIDE.L2:
             self.x = x + 20
 
-    def get_bounds(self):
+    def get_bounds(self) -> tuple[int, int, int, int]:
         """Return the bounding box as (left, right, top, bottom)"""
         return self.left, self.right, self.top, self.bottom
 
@@ -47,7 +46,7 @@ class Paddle(PongObj):
     def bottom(self):
         return self.y + self.height
 
-    def to_dict(self)-> Dict:
+    def to_dict(self)-> dict[str, int | str]:
         """Convert obj to dict"""
         return {
             'x': self.x,

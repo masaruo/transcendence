@@ -58,11 +58,9 @@ class Ball(PongObj):
         bl, br, bt, bb = self.get_bounds()
         wl, wr, wt, wb = wall.get_bounds()
 
-        print("checking starting")
         if bt < wt:
             self.reverseDy()
         elif bb > wb:
-            print("checking down")
             self.reverseDy()
 
         if bl > wr or br < wl:

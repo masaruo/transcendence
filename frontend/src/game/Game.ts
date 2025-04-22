@@ -92,7 +92,30 @@ export class Game {
 		}
 	}
 
+	check_and_notify_keymove(): void {
+		let direction: string | null = null;
+		if (this.keyMovements['ArrowUp']) {
+			direction = 'ArrowUp';
+		} else if (this.keyMovements['ArrowDown']) {
+			direction = 'ArrowDown';
+		} else if (this.keyMovements['w']) {
+			direction = 'w';
+		} else if (this.keyMovements['s']) {
+			direction = 's';
+		}
+
+		if (direction != null && this.socket_) {
+			this.socket_.send(JSON.stringify(
+				{
+					type: 'paddle_movement',
+					direction: direction
+				}
+			))
+		}
+	}
+
 	draw(): void {
+		this.check_and_notify_keymove();
 		return;
 	}
 }
