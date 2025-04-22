@@ -1,7 +1,4 @@
 from django.urls import re_path
-# from .import consumers
-# from game.consumers import GameConsumer
-# from game.consumers.GameConsumer import GameConsumer
 from game.pong.consumer import GameConsumer
 
 game_urlpatterns = [
