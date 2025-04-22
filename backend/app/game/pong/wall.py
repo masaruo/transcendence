@@ -1,16 +1,9 @@
-from game.consumers.constants import SCREEN_HEIGHT, SCREEN_WITDH
+from  game.pong.constants import SCREEN_HEIGHT, SCREEN_WITDH
 
 class Wall:
-    # def __init__(self, **kwargs):
-    #     super().__init__(
-    #         x=0,
-    #         y=0,
-    #         width=kwargs.get('width', SCREEN_WITDH),
-    #         height=kwargs.get('height', SCREEN_HEIGHT)
-    #     )
-    def __init__(self, x=0, y=0, width=SCREEN_WITDH, height=SCREEN_HEIGHT):
-        self.x = x
-        self.y = y
+    def __init__(self, width:int=SCREEN_WITDH, height:int=SCREEN_HEIGHT):
+        self.x = 0
+        self.y = 0
         self.width = width
         self.height = height
 
