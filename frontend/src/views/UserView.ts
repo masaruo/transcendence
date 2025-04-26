@@ -13,7 +13,32 @@ export default class UserView extends AbstructView {
             const fetcher = new Fetch("http://localhost:8000/api/user/me/");
             this.me = await fetcher.fetch_with_auth();
             return `
-            <div class="my-page-container d-flex justify-content-center">
+            <head>
+              <link rel="preconnect" href="https://fonts.googleapis.com">
+              <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+              <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Italiana&display=swap" rel="stylesheet">
+            </head>
+            <style>
+              .my-page-container {
+                height: 85vh;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background-color: #b7bff2;
+              }
+              .my-page-container h2{
+               font-family: "Bodoni Moda", serif;
+               font-optical-sizing: auto;
+               font-weight: 700;
+               font-style: normal; 
+               color: #110167;
+              }
+            </style>
+
+            <div class="my-page-container d-flex justify-content-center flex-column align-items-center">
+              <div class="text-center mt-5 mb-3">
+                <h2>My Profile</h2>
+              </div>
               <div class="container rounded bg-white mt-5 mb-5">
                 <div class="row">
                   <div class="col-md-4 border-end">
@@ -82,15 +107,6 @@ export default class UserView extends AbstructView {
               </div>
             </div>
 
-            <style>
-              .my-page-container {
-                height: 85vh;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                background-color: #b7bff2;
-              }
-            </style>
             `
         } catch (error) {
             throw error;
