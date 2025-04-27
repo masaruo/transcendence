@@ -13,11 +13,6 @@ export default class UserView extends AbstructView {
             const fetcher = new Fetch("http://localhost:8000/api/user/me/");
             this.me = await fetcher.fetch_with_auth();
             return `
-            <head>
-              <link rel="preconnect" href="https://fonts.googleapis.com">
-              <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-              <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Italiana&display=swap" rel="stylesheet">
-            </head>
             <style>
               .my-page-container {
                 height: 85vh;
@@ -43,12 +38,13 @@ export default class UserView extends AbstructView {
                 <div class="row">
                   <div class="col-md-4 border-end">
                     <div class="d-flex flex-column align-items-center text-center p-3 py-5">
-                      <img src="${this.me.avatar}" alt="user-image" class="rounded-circle mt-5" object-fit: cover;">
+                      <img src="${this.me.avatar}" alt="user-image" class="rounded-circle" style="object-fit: cover; width: 150px; height: 150px;">
+                      </br>
                       <div class="row w-100">
                         <div class="col-5 text-start">
                           <span>id: </span>
                         </div>
-                        <div class="col-7">
+                        <div class="col-7 text-start">
                           <span class="font-weight-bold">${this.me.id}</span>
                         </div>
                       </div>
@@ -56,7 +52,7 @@ export default class UserView extends AbstructView {
                         <div class="col-5 text-start">
                           <span>nick name: </span>
                           </div>
-                        <div class="col-7">
+                        <div class="col-7 text-start">
                           <span class="font-weight-bold">${this.me.nickname}</span>
                         </div>
                       </div>
@@ -64,7 +60,7 @@ export default class UserView extends AbstructView {
                         <div class="col-5 text-start">
                           <div>e-mail: </div>
                         </div>
-                        <div class="col-7">
+                        <div class="col-7 text-start">
                           <span class="font-weight-bold">${this.me.email}</span>
                         </div>
                       </div>

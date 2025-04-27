@@ -8,11 +8,6 @@ export default class FriendsView extends AbstractView {
 
 	async getBody(): Promise<string> {
 		return `
-		<head>
-			<link rel="preconnect" href="https://fonts.googleapis.com">
-			<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-			<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Italiana&display=swap" rel="stylesheet">
-		</head>
 		<style>
 		.my-container {
 			height: 85vh;
