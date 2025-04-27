@@ -37,7 +37,7 @@ export default class UserView extends AbstructView {
 
             <div class="my-page-container d-flex justify-content-center flex-column align-items-center">
               <div class="text-center mt-5 mb-3">
-                <h2>My Profile</h2>
+                <h2>Your Profile</h2>
               </div>
               <div class="container rounded bg-white mt-5 mb-5">
                 <div class="row">
