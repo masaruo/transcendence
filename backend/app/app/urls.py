@@ -25,7 +25,8 @@ urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/token/verify/', TokenVerifyView.as_view(), name="token_verfify"),
     path('api/user/', include("user.urls")),
-    path('api/tournament/', include("game.urls")),
+    path('api/tournament/', include('tournament.urls')),
+    # path('api/tournament/', include("game.urls")),
     path('chat/', include("chat.urls")),
 ] + debug_toolbar_urls()
 

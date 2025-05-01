@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'app',
     'user',
     'game',
+    'tournament',
     'chat',
     # 3rd party apps
     'rest_framework',
@@ -57,6 +58,7 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'corsheaders',
     'channels',
+    'nested_admin',
 ]
 
 MIDDLEWARE = [
@@ -190,3 +192,8 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=300),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 }
+
+#! securities!
+# SECURE_SSL_REDIRECT = True
+# SESSION_COOKIE_SECURE = True
+# CSRF_COOKIE_SECURE = True
