@@ -1,5 +1,6 @@
 import AbstractView from "./AbstractView";
-import { Pong } from "../pong/pong";
+// import { Pong } from "../pong/pong";
+import { Game } from "../game/Game";
 
 export default class PongView extends AbstractView {
 	constructor (params: string){
@@ -42,7 +43,8 @@ export default class PongView extends AbstractView {
 		const canvas = document.getElementById("canvas") as HTMLCanvasElement | null;
 		if (!canvas)
 			throw Error("Failed to find canvas element.")
-		const pong = new Pong(canvas);
+		// const pong = new Pong(canvas);
+		const game = new Game(canvas);
 		// pong.start();
 	}
 }
