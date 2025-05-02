@@ -8,6 +8,7 @@ export default class HeaderView {
 					background-color: #3f392b !important;
 				}
 			</style>
+
 			<nav class="navbar navbar-expand-sm navbar-expand-lg bg-dark custom-navbar" data-bs-theme="dark">
 				<div class="container-fluid">
 					<div class="collapse navbar-collapse" id="navbarNav">

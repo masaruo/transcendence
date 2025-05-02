@@ -25,6 +25,7 @@ export default class IndexView extends AbstractView {
 					font-size: 6rem;
 				}
 			</style>
+
 			<div class="container-fluid my-container">
 					<h1 class="welcome-msg">Ready to Pong?</h1>
 					<h3>Click the "Login" and let the battle begin.</h3>

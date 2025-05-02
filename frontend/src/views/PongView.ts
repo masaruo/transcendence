@@ -9,6 +9,17 @@ export default class PongView extends AbstractView {
 	}
 	async getBody(): Promise<string> {
 		return `
+			<style>
+  			body {
+    			background-color: #ecedd6;
+  			}
+				.custom-btn {
+			    background-color: #0b1a5b;
+			    color: white;
+			    border: 2px solid #ecedd6;
+			  }
+			</style>
+
 			<br>
 			<div class="container d-flex justify-content-center" height="85vh">
 				<canvas id="canvas" width="900" height="600"></canvas>
@@ -21,16 +32,6 @@ export default class PongView extends AbstractView {
 				</div>
 			</div>
 			<br>
-			<style>
-  			body {
-    			background-color: #ecedd6;
-  			}
-				.custom-btn {
-			    background-color: #0b1a5b;
-			    color: white;
-			    border: 2px solid #ecedd6;
-			  }
-			</style>
 		`
 	}
 	async loadScripts(): Promise<void> {

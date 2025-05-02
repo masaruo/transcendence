@@ -10,24 +10,22 @@ export default class LoginView extends AbstractView {
 
 	async getBody(): Promise<string> {
 		return `
-		<head>
-			<style>
-				.left-side {
-					background-image: url('src/image/login-pingpong.jpg');
-					background-size: cover;
-					background-position: center;
-					position: relative;
-					height: 85vh;
-   			}
-				.right-side {
-					display: flex;
-					justify-content: center;
-					align-items: center;
-					height: 85vh;
-					background-color: #d4e0d5;
-				}
-			</style>
-		</head>
+		<style>
+			.left-side {
+				background-image: url('src/image/login-pingpong.jpg');
+				background-size: cover;
+				background-position: center;
+				position: relative;
+				height: 85vh;
+  			}
+			.right-side {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				height: 85vh;
+				background-color: #d4e0d5;
+			}
+		</style>
 
 		<div class="container-fluid">
 			<div class="row">
