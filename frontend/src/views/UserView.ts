@@ -39,7 +39,7 @@ export default class UserView extends AbstructView {
                   <div class="col-md-4 border-end">
                     <div class="d-flex flex-column align-items-center text-center p-3 py-5">
                       <img src="${this.me.avatar}" alt="user-image" class="rounded-circle" style="object-fit: cover; width: 150px; height: 150px;">
-                      </br>
+                      <br>
                       <div class="row w-100">
                         <div class="col-5 text-start">
                           <span>id: </span>
