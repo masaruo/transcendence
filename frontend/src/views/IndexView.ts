@@ -8,7 +8,28 @@ export default class IndexView extends AbstractView {
 
 	async getBody(): Promise<string> {
 		return `
-			<h1>PONG. PONG. Pong</h1>
+			<style>
+				.my-container{
+					height: 85vh;
+					width: 100%;
+					background-image: url('src/image/index.jpg');
+					background-size: cover;
+					background-position: center;
+					font-family: "Bodoni Moda", serif;
+     			font-optical-sizing: auto;
+     			font-weight: 900;
+     			font-style: normal; 
+					color: #19254f;
+				}
+				.welcome-msg{
+					font-size: 6rem;
+				}
+			</style>
+
+			<div class="container-fluid my-container">
+					<h1 class="welcome-msg">Ready to Pong?</h1>
+					<h3>Click the "Login" and let the battle begin.</h3>
+			</div>
 		`;
 	}
 
