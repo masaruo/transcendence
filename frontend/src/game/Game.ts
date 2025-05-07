@@ -48,11 +48,10 @@ export class Game {
 
 		const token = sessionStorage.getItem('access');
 		console.log("token ", token)
-		this.socket_ = new WebSocket(`${protocol}//localhost:8000/ws/game/?token=${token}`);
+		this.socket_ = new WebSocket(`${protocol}//localhost:8000/ws/game/?token=${token}`);//! WSSWSS~~~!!!
 
 		this.socket_.onopen = () => {
 			console.log("WebSocket接続成功", new Date().toISOString());
-			// console.log("readyState:", this._socket.readyState);
 		  }
 
 		this.socket_.onmessage = (event) => {

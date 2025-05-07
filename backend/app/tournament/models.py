@@ -1,10 +1,13 @@
 from time import timezone, sleep
+import uuid
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import Q
-from django.contrib.auth import get_user_model
+# from django.contrib.auth import get_user_model
 
-User = get_user_model()
+# from app.app import settings
+from django.conf import settings
+
 
 class MatchStatusType(models.IntegerChoices):
     WAITING = 1
@@ -33,7 +36,7 @@ class RoundType(models.IntegerChoices):
 
 
 class TournamentManager(models.Manager):
-    def get_or_create_tournament(self, player:'User', match_type:MatchModeType=MatchModeType.SINGLES, size:int=4):
+    def get_or_create_tournament(self, player, match_type:MatchModeType=MatchModeType.SINGLES, size:int=4):
         waiting_tournament = self.filter(status=MatchStatusType.WAITING).order_by('created_at').first()
         if not waiting_tournament:
             tournament = self.create(match_type=match_type, size=size)
@@ -47,7 +50,7 @@ class TournamentManager(models.Manager):
 
 
 class Tournament(models.Model):
-    players = models.ManyToManyField(to=User, through='TournamentPlayer', through_fields=('tournament', 'player'))
+    players = models.ManyToManyField(to=settings.AUTH_USER_MODEL, through='TournamentPlayer', through_fields=('tournament', 'player'))
     size = models.IntegerField()
     status = models.IntegerField(choices=MatchStatusType.choices, default=MatchStatusType.WAITING)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -153,6 +156,7 @@ class Match(models.Model):
     match_status = models.IntegerField(choices=MatchStatusType.choices, default=MatchStatusType.WAITING)
     # game_type = models.IntegerField(choices=MatchModeType.choices, default=MatchModeType.SINGLES)
     round = models.IntegerField(choices=RoundType.choices, default=RoundType.PRELIMINARY)
+    # websocket_key = models.UUIDField(default=uuid.uuid4, editable=False)
     # todo create Score model -> FK to Match
 
     objects = MatchManager()
@@ -205,8 +209,8 @@ class Match(models.Model):
         return True
 
 class Team(models.Model):
-    player1 = models.ForeignKey(to=User, on_delete=models.DO_NOTHING, related_name='teams_as_player1')
-    player2 = models.ForeignKey(to=User, on_delete=models.DO_NOTHING, null=True, blank=True, related_name='teams_as_palyer2')
+    player1 = models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING, related_name='teams_as_player1')
+    player2 = models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING, null=True, blank=True, related_name='teams_as_palyer2')
 
     def __str__(self):
         if self.player2:
@@ -215,7 +219,7 @@ class Team(models.Model):
 
 
 class TournamentPlayer(models.Model):
-    player = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name='tournament_entries')
+    player = models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='tournament_entries')
     tournament = models.ForeignKey(to='Tournament', on_delete=models.CASCADE, related_name='player_entries')
     final_round = models.IntegerField(choices=RoundType.choices)
 

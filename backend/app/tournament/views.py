@@ -2,14 +2,12 @@ from rest_framework import viewsets, mixins, permissions, status
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from yaml import serialize
 from tournament.serializers import TournamentSerializer
-from tournament.models import Tournament
+from tournament.models import Tournament, Match
 
-from django.contrib.auth import get_user_model
-# from tournament.models import MatchModeType
+# from django.contrib.auth import get_user_model
 
-User = get_user_model()
+# User = get_user_model()
 
 class TournamentViewSet(
     mixins.ListModelMixin,
@@ -39,3 +37,29 @@ class TournamentViewSet(
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(serializer.data, status=status.HTTP_404_NOT_FOUND)
+
+    @action(detail=True, methods=['get'])
+    def status(self, request, pk=None):
+        tournament = self.get_object()
+        matches = Match.objects.filter(tournament=tournament)
+
+        data = {
+            'user_id': request.user.id,
+            'status': tournament.status,
+            'matches': [{
+                'id': match.id,
+                'team1': {
+                    'id': match.team1.id,
+                    'player1': match.team1.player1.id,
+                    'player2': match.team1.player2.id if match.team1.player2 else None
+                },
+                'team2': {
+                    'id': match.team2.id,
+                    'player1': match.team2.player1.id,
+                    'player2': match.team2.player2.id if match.team2.player2 else None
+                },
+                'status': match.match_status,
+                'match_round': match.round,
+            } for match in matches]
+        }
+        return Response(data)

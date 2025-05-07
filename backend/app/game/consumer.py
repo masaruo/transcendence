@@ -6,7 +6,6 @@ from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from channels.db import database_sync_to_async
 
 class GameConsumer(AsyncJsonWebsocketConsumer):
-
     async def connect(self) -> None:
         self.user = self.scope['user']
         if not self.user.is_authenticated:
