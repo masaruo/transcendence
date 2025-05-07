@@ -13,22 +13,96 @@ export default class UserView extends AbstructView {
             const fetcher = new Fetch("http://localhost:8000/api/user/me/");
             this.me = await fetcher.fetch_with_auth();
             return `
-            <div>MyID: ${this.me.id}</div>
-            <div>My nickname: ${this.me.nickname}</div>
-                <input type="text" id="nicknameInput" placeholder="new nickname">
+            <style>
+              .my-page-container {
+                height: 85vh;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background-color: #b7bff2;
+              }
+              .my-page-container h2{
+               font-family: "Bodoni Moda", serif;
+               font-optical-sizing: auto;
+               font-weight: 700;
+               font-style: normal; 
+               color: #110167;
+              }
+            </style>
 
-                <div>My email: ${this.me.email}</div>
-                <input type="text" id="emailInput" placeholder="new nickname">
+            <div class="my-page-container d-flex justify-content-center flex-column align-items-center">
+              <div class="text-center mt-5 mb-3">
+                <h2>Your Profile</h2>
+              </div>
+              <div class="container rounded bg-white mt-5 mb-5">
+                <div class="row">
+                  <div class="col-md-4 border-end">
+                    <div class="d-flex flex-column align-items-center text-center p-3 py-5">
+                      <img src="${this.me.avatar}" alt="user-image" class="rounded-circle" style="object-fit: cover; width: 150px; height: 150px;">
+                      <br>
+                      <div class="row w-100">
+                        <div class="col-5 text-start">
+                          <span>id: </span>
+                        </div>
+                        <div class="col-7 text-start">
+                          <span class="font-weight-bold">${this.me.id}</span>
+                        </div>
+                      </div>
+                      <div class="row w-100">
+                        <div class="col-5 text-start">
+                          <span>nick name: </span>
+                          </div>
+                        <div class="col-7 text-start">
+                          <span class="font-weight-bold">${this.me.nickname}</span>
+                        </div>
+                      </div>
+                      <div class="row w-100">
+                        <div class="col-5 text-start">
+                          <div>e-mail: </div>
+                        </div>
+                        <div class="col-7 text-start">
+                          <span class="font-weight-bold">${this.me.email}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="p-3 py-5">
+                      <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="text-right">Edit your profile</h6>
+                      </div>
+                      <div class="row g-5 align-items-center mb-3">
+                        <div class="col-4">
+                          <label for="fileInput" class="form-label">image</label>
+                        </div>
+                        <div class="col-8">
+                          <input type="file" class="form-control" id="fileInput">
+                        </div>
+                        <div class="col-4">
+                          <label for="nicknameInput" class="form-label">nick name</label>
+                        </div>
+                        <div class="col-8">
+                          <input type="text" id="nicknameInput" placeholder="new nickname" class="form-control">
+                        </div>
+                      </div>
+                      <div class="row g-5 align-items-center mb-3">
+                        <div class="col-4">
+                          <label for="emailInput" class="form-label">e-mail</label>
+                        </div>
+                        <div class="col-8">
+                          <input type="text" id="emailInput" placeholder="new e-mail" class="form-control">
+                        </div>
+                      </div>
+                    </div> 
+                    <button id="updateButton" class="btn btn-outline-secondary">Submit</button>
+                  </div> 
+                  <a href="/user/me/" class="link-dark link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> 
+                    Back to Profile
+                  </a>
+                </div>
+              </div>
+            </div>
 
-                <br>
-                <img src="${this.me.avatar}" alt="user-image">
-                <br>
-                <input type="file" id="fileInput">
-                <br>
-                <a href="/user/me/">Back to Profile</a>
-                <br>
-
-                <button id="updateButton">Submit</button>
             `
         } catch (error) {
             throw error;

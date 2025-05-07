@@ -9,11 +9,29 @@ export default class PongView extends AbstractView {
 	}
 	async getBody(): Promise<string> {
 		return `
-			<canvas id="canvas" width="900" height="600"></canvas>
+			<style>
+  			body {
+    			background-color: #ecedd6;
+  			}
+				.custom-btn {
+			    background-color: #0b1a5b;
+			    color: white;
+			    border: 2px solid #ecedd6;
+			  }
+			</style>
+
 			<br>
-			<button id="join">Join</button>
-			<button id="start">Start</button>
-			<button id="end">End</button>
+			<div class="container d-flex justify-content-center" height="85vh">
+				<canvas id="canvas" width="900" height="600"></canvas>
+			</div>
+			<div class="d-flex justify-content-center">
+				<div class="btn-group" style="width: 900px;" role="group" aria-label="Basic outlined example">
+			 		<button id="join" type="button" class="btn btn-primary custom-btn">JOIN</button>
+			  	<button id="start" type="button" class="btn btn-primary custom-btn">START</button>
+			  	<button id="end" type="button" class="btn btn-primary custom-btn">END</button>
+				</div>
+			</div>
+			<br>
 		`
 	}
 	async loadScripts(): Promise<void> {

@@ -10,17 +10,49 @@ export default class LoginView extends AbstractView {
 
 	async getBody(): Promise<string> {
 		return `
-			<form id="loginForm">
-				<div class="mb-3">
-					<label for="exampleInputEmail1" class="form-label">Email address</label>
-					<input type="email" class="form-control" id="login-email" aria-describedby="emailHelp">
+		<style>
+			.left-side {
+				background-image: url('src/image/login-pingpong.jpg');
+				background-size: cover;
+				background-position: center;
+				position: relative;
+				height: 85vh;
+  			}
+			.right-side {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				height: 85vh;
+				background-color: #d4e0d5;
+			}
+		</style>
+
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-md-6 left-side">
 				</div>
-				<div class="mb-3">
-					<label for="exampleInputPassword1" class="form-label">Password</label>
-					<input type="password" class="form-control" id="login-password">
+				<div class="col-md-6 right-side ">
+					<form id="loginForm">
+						<div class="row g-5 align-items-center mb-3">
+  						<div class="col-4">
+								<label for="exampleInputEmail1" class="form-label">Email</label>
+							</div>
+							<div class="col-8">
+								<input type="email" class="form-control" id="login-email" aria-describedby="emailHelp">
+							</div>
+						</div>
+						<div class="row g-5 align-items-center mb-3">
+  						<div class="col-4">
+								<label for="exampleInputPassword1" class="form-label">Password</label>
+							</div>
+							<div class="col-8">	
+								<input type="password" class="form-control" id="login-password">	
+							</div>
+							<button type="submit" class="btn btn-success">Submit</button>
+					</form>
 				</div>
-					<button type="submit" class="btn btn-primary">Submit</button>
-			</form>
+			</div>
+		</div>
 		`
 	}
 
