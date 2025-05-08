@@ -1,7 +1,8 @@
 import { Manager, WebSocketEvent } from "./Manager";
 
-export class Game {
+export class Pong {
 	readonly ctx: CanvasRenderingContext2D;
+	readonly matchId: number = 0;
 	readonly width: number;
 	readonly height: number;
 
@@ -10,7 +11,7 @@ export class Game {
 	private keyMovements: {[key: string]: boolean} = {};
 	private manager: Manager | null = null;
 
-	constructor(canvas: HTMLCanvasElement) {
+	constructor(canvas: HTMLCanvasElement, matchId: number) {
 		if (!canvas) {
 			throw Error('failed to get canvas element.');
 		}
@@ -21,6 +22,7 @@ export class Game {
 		this.width = canvas.width;
 		this.height = canvas.height;
 
+		this.matchId = matchId;
 		document.addEventListener('keydown', (e) => {
 			this.keyMovements[e.key] = true;
 		})
@@ -47,8 +49,8 @@ export class Game {
 		const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
 
 		const token = sessionStorage.getItem('access');
-		console.log("token ", token)
-		this.socket_ = new WebSocket(`${protocol}//localhost:8000/ws/game/?token=${token}`);//! WSSWSS~~~!!!
+		// console.log("token ", token)
+		this.socket_ = new WebSocket(`${protocol}//localhost:8000/ws/game/${this.matchId}/?token=${token}`);
 
 		this.socket_.onopen = () => {
 			console.log("WebSocket接続成功", new Date().toISOString());

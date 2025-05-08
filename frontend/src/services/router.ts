@@ -3,7 +3,7 @@ import IndexView from "../views/IndexView";
 import LoginView from "../views/LoginView";
 import PongView from "../views/PongView";
 import TournamentCreateView from "../views/TournamentCreateView";
-import TournamentView from "../views/TournamentView";
+import TournamentListView from "../views/TournamentListView";
 import UserUpdataView from "../views/UserUpdateView";
 import UserView from "../views/UserView";
 
@@ -30,8 +30,8 @@ export const router = async() => {
 		{path: "/user/me/update", view: UserUpdataView},
 		{path: "/login", view: LoginView },
 		{path: "/friends", view: FriendsView},
-		{path: "/pong", view: PongView},
-		{path: "/tournament", view: TournamentView},
+		{path: "/pong/:id", view: PongView},
+		{path: "/tournament", view: TournamentListView},
 		{path: "/tournament/create", view: TournamentCreateView},
 		// {path: "/posts", view: Posts },
 		// {path: "/posts/:id", view: PostView },

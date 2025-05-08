@@ -1,6 +1,7 @@
 import AbstractView from "./AbstractView";
 // import { Pong } from "../pong/pong";
-import { Game } from "../game/Game";
+import { Pong } from "../game/Game";
+import Tournament from "@/game/Tournament";
 
 export default class PongView extends AbstractView {
 	constructor (params: string){
@@ -35,7 +36,7 @@ export default class PongView extends AbstractView {
 		`
 	}
 	async loadScripts(): Promise<void> {
-		console.log("pongview activated")
+		// console.log("pongview activated")
 		const keyState: {[key: string]: boolean} = {};
 
 		document.addEventListener("keydown", (e) => {keyState[e.key] = true;})
@@ -45,7 +46,8 @@ export default class PongView extends AbstractView {
 		if (!canvas)
 			throw Error("Failed to find canvas element.")
 		// const pong = new Pong(canvas);
-		const game = new Game(canvas);
+		const tournament = new Tournament(canvas);
+		// const game = new Pong(canvas);
 		// pong.start();
 	}
 }

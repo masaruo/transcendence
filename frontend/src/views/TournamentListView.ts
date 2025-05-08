@@ -3,10 +3,10 @@ import Fetch from "../classes/JsonFetch"
 import { navigateTo } from "../services/router";
 import { PATH } from "../services/constants"
 
-export default class TournamentView extends AbstractView {
+export default class TournamentListView extends AbstractView {
 	constructor (params: string) {
 		super(params);
-		this.setTitle("Tournaments");
+		this.setTitle("Tournaments List");
 	}
 	async getBody(): Promise<string> {
 		return `
@@ -45,6 +45,7 @@ export default class TournamentView extends AbstractView {
 			<h3>トーナメント #${tournament.id}</h3>
 			<p>作成日: ${createdDate}</p>
 			<p>マッチタイプ: ${tournament.match_type === 1 ? 'シングル' : 'ダブル'}</p>
+			<p>Size: ${tournament.size}</p>
 			<div class="players-container">
 			  <h4>参加プレイヤー:</h4>
 			  ${playersHTML}

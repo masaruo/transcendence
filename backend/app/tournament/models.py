@@ -3,6 +3,8 @@ import uuid
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import Q
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 # from django.contrib.auth import get_user_model
 
 # from app.app import settings
@@ -60,6 +62,21 @@ class Tournament(models.Model):
 
     def __str__(self):
         return f"Tournament #{self.id} ({self.get_status_display()}) - {self.size} players"
+
+    # def joinTournamentConsumer(self):
+    #     channel_layer = get_channel_layer()
+    #     matches = Match.objects.filter(tournament=self)
+
+    #     for match in matches:
+    #         async_to_sync(channel_layer.group_send)(
+    #             f'tournament_{self.id}',
+    #             {
+    #                 'match_id': match.id,
+    #                 'players': [
+
+    #                 ]
+    #             }
+    #         )
 
     def add_player(self, player:'User', round=RoundType.PRELIMINARY) -> 'TournamentPlayer':
         return TournamentPlayer.objects.create(player=player, tournament=self, final_round=round)
