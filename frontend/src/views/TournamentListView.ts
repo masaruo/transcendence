@@ -1,7 +1,7 @@
-import AbstractView from "./AbstractView"
-import Fetch from "../classes/JsonFetch"
+import AbstractView from "./AbstractView";
+import Fetch from "../classes/JsonFetch";
 import { navigateTo } from "../services/router";
-import { PATH } from "../services/constants"
+import { PATH } from "../services/constants";
 
 export default class TournamentListView extends AbstractView {
 	constructor (params: string) {
@@ -61,8 +61,9 @@ export default class TournamentListView extends AbstractView {
 				try {
 					const fetcher = new Fetch(`${PATH}/api/tournament/${tournament_id}/add_player/`, "POST");
 					const response = await fetcher.fetch_with_auth()
-					console.log(response)
-					window.location.reload();
+					// console.log(response)
+					// window.location.reload();
+					navigateTo(`/tournament/${tournament_id}`)
 				} catch (error) {
 					console.error("failed to join a tournament", error);
 				}

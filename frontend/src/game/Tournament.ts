@@ -1,20 +1,20 @@
 import { WS_PATH } from "@/services/constants";
-import { Pong } from "./Game";
+// import Pong from "@/game/Pong";
+import { navigateTo } from "@/services/router";
 
 export default class Tournament {
+	private tournamentId: string;
 	private socket: WebSocket | null = null;
-	private canvas: HTMLCanvasElement;
 
-	constructor (canvas: HTMLCanvasElement) {
-		if (!canvas) {
-			throw Error('failed to get canvas element.');
-		}
-		this.canvas = canvas;
+	constructor(tournamentId:string) {
+		this.tournamentId = tournamentId;
 	}
 
-	connect(tournamentId: string): void {
+	connect(): void {
 		const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-		this.socket = new WebSocket(`${protocol}${WS_PATH}/ws/tournament/${tournamentId}/`);
+		const token = sessionStorage.getItem('access');
+		// this.socket = new WebSocket(`${protocol}//${WS_PATH}/tournament/${this.tournamentId}/`);
+		this.socket = new WebSocket(`${protocol}://localhost:8000/ws/tournament/${this.tournamentId}/?token=${token}`);
 
 		this.socket.onopen = () => {
 			console.log("Connected to a tournament");
@@ -23,11 +23,11 @@ export default class Tournament {
 		this.socket.onmessage = (e) => {
 			const data = JSON.parse(e.data);
 			if (data.type === 'match_start') {
-				const isMyMatch = data.players.some(player => player.id === currentUserId);
-
-				if (isMyMatch) {
-					const pong = new Pong(this.canvas, isMyMatch.id);
-					// this.startPongGame(data.match_id);
+				const match = data.match;
+				const ids = match.playerIds;
+				const currentUserId = parseInt(sessionStorage.getItem('user_id'));
+				if (ids.includes(currentUserId)) {
+					navigateTo(`/pong/${match.id}`)
 				}
 			} else if (data.type === 'tournament_update') {
 				console.log(data, "tournament update received");

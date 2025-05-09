@@ -1,6 +1,7 @@
 import AbstractView from "./AbstractView"
 import Fetch from "../classes/JsonFetch"
 import { PATH } from "../services/constants"
+import { navigateTo } from "@/services/router";
 
 export default class TournamentCreateView extends AbstractView {
 	constructor (params: string) {
@@ -28,18 +29,6 @@ export default class TournamentCreateView extends AbstractView {
     </div>
     <div class="setting-section">
 
-      <h4>トーナメントサイズ</h4>
-      <div class="radio-options">
-        <label>
-          <input type="radio" name="tournament-size" value="2" checked>
-          2人
-        </label>
-        <label>
-          <input type="radio" name="tournament-size" value="4">
-          4人
-        </label>
-      </div>
-    </div>
 
     <div class="setting-section">
       <h4>ボールの数</h4>
@@ -104,14 +93,14 @@ function handleFormSubmission() {
 		// フォームの値を取得
 		const formData = new FormData(form as HTMLFormElement);
 		const playType = formData.get('play-type');
-		const tournamentSize = formData.get('tournament-size');
+		// const tournamentSize = formData.get('tournament-size');
 		const ballCount = formData.get('ball-count');
 		const ballSpeed = formData.get('ball-speed');
 
 		// APIに送信するデータを準備
 		const tournamentData = {
 		  playType: parseInt(playType as string),
-		  size: parseInt(tournamentSize as string),
+		  // size: parseInt(tournamentSize as string),
 		  ball_count: parseInt(ballCount as string),
 		  ball_speed: ballSpeed
 		};
@@ -120,12 +109,15 @@ function handleFormSubmission() {
 		  // APIリクエストを送信
 		  const fetcher = new Fetch(`${PATH}/api/tournament/`, 'POST');
 		  const response = await fetcher.fetch_with_auth(tournamentData);
+      const res_json = await response.json();
+      const tournament_id = res_json.id;
 
-		  console.log('トーナメント作成成功:', response);
+		  // console.log('トーナメント作成成功:', response);
 		  alert('トーナメントが作成されました！');
-
+      navigateTo(`/tournament/${tournament_id}`);
 		  // 成功したらページをリロードするか、新しいトーナメントを表示
-		  window.location.href = '/tournaments';
+		  // window.location.href = '/tournaments';
+
 		} catch (error) {
 		  console.error('トーナメント作成エラー:', error);
 		  alert('トーナメント作成に失敗しました。もう一度お試しください。');

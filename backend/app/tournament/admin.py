@@ -20,7 +20,7 @@ class MatchInline(nested_admin.NestedTabularInline):
 @admin.register(Tournament)
 class TournamentAdmin(admin.ModelAdmin):
     inlines = [MatchInline]
-    list_display = ['id', 'size', 'status', 'match_type', 'created_at']
+    list_display = ['id', 'status', 'match_type', 'created_at']
 
 # admin.site.register(TournamentAdmin)
 # admin.site.register(Match)

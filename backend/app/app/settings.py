@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     # own apps
     'app',
     'user',
-    'game',
+    # 'game',
     'tournament',
     'chat',
     # 3rd party apps

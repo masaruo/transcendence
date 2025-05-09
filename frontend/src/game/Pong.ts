@@ -1,6 +1,6 @@
 import { Manager, WebSocketEvent } from "./Manager";
 
-export class Game {
+export default class Pong {
 	readonly ctx: CanvasRenderingContext2D;
 	readonly matchId: number = 0;
 	readonly width: number;
@@ -50,7 +50,7 @@ export class Game {
 
 		const token = sessionStorage.getItem('access');
 		// console.log("token ", token)
-		this.socket_ = new WebSocket(`${protocol}//localhost:8000/ws/game/${this.matchId}/?token=${token}`);
+		this.socket_ = new WebSocket(`${protocol}//localhost:8000/ws/match/${this.matchId}/?token=${token}`);
 
 		this.socket_.onopen = () => {
 			console.log("WebSocket接続成功", new Date().toISOString());

@@ -1,3 +1,4 @@
+import TournamentDetailView from "@/views/TournamentDetailView";
 import FriendsView from "../views/FriendsView";
 import IndexView from "../views/IndexView";
 import LoginView from "../views/LoginView";
@@ -33,6 +34,7 @@ export const router = async() => {
 		{path: "/pong/:id", view: PongView},
 		{path: "/tournament", view: TournamentListView},
 		{path: "/tournament/create", view: TournamentCreateView},
+		{path: "/tournament/:id", view: TournamentDetailView},
 		// {path: "/posts", view: Posts },
 		// {path: "/posts/:id", view: PostView },
 		// {path: "/settings", view: Settings }
