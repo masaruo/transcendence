@@ -1,4 +1,5 @@
 import IGameObj from "./IGameObj";
+import * as THREE from 'three';
 
 export default class Paddle implements IGameObj {
 	readonly x: number;
@@ -6,6 +7,7 @@ export default class Paddle implements IGameObj {
 	readonly width: number;
 	readonly height: number;
 	readonly color: string;
+	mesh: THREE.Mesh;
 
 	constructor(x: number, y: number, width: number, height: number, color: string) {
 		this.x = x;
@@ -13,16 +15,17 @@ export default class Paddle implements IGameObj {
 		this.width = width;
 		this.height = height;
 		this.color = color;
+		const geometry = new THREE.BoxGeometry(width, height, 1);
+		const material = new THREE.MeshBasicMaterial({ color: color });
+		this.mesh = new THREE.Mesh(geometry, material);
+		this.mesh.position.set(x, y, 0);
 	}
 
 	// update(new_x: number, new_y: number): IGameObj {
 	// 	return new Paddle(new_x, new_y, this.width, this.height, this.color);
 	// }
 
-	draw(ctx: CanvasRenderingContext2D): void {
-		ctx.beginPath();
-		ctx.fillStyle = this.color;
-		ctx.fillRect(this.x, this.y, this.width, this.height);
-		ctx.closePath();
+	update() {
+
 	}
 }

@@ -1,11 +1,13 @@
 import { Manager, WebSocketEvent } from "./Manager";
+import * as THREE from 'three';
 
 export class Game {
-	readonly ctx: CanvasRenderingContext2D;
 	readonly width: number;
 	readonly height: number;
+	readonly renderer: THREE.WebGLRenderer;
+	scene: THREE.Scene;
+  camera: THREE.PerspectiveCamera;
 
-	private interavlID: NodeJS.Timeout | null = null;
 	private socket_: WebSocket | null = null;
 	private keyMovements: {[key: string]: boolean} = {};
 	private manager: Manager | null = null;
@@ -14,12 +16,17 @@ export class Game {
 		if (!canvas) {
 			throw Error('failed to get canvas element.');
 		}
-		const ctx = canvas.getContext('2d');
-		if (!ctx)
-			throw Error('failed to get context.');
-		this.ctx = ctx;
 		this.width = canvas.width;
 		this.height = canvas.height;
+
+		this.renderer = new THREE.WebGLRenderer({ canvas });
+		this.renderer.setPixelRatio(window.devicePixelRatio);
+		this.renderer.setSize(this.width, this.height);
+
+		this.scene = new THREE.Scene();
+		
+		this.camera = new THREE.PerspectiveCamera(35, this.width / this.height);
+    this.camera.position.set(this.width / 2, this.height / 2, +1000);
 
 		document.addEventListener('keydown', (e) => {
 			this.keyMovements[e.key] = true;
@@ -36,10 +43,7 @@ export class Game {
 		}
 		join.addEventListener('click', async() => {
 			this.connectWebSocket();
-			if (this.interavlID == null)
-				this.interavlID = setInterval(() => {
-					this.draw();
-				}, 16);
+			this.draw();
 		})
 	}
 
@@ -75,7 +79,7 @@ export class Game {
 		switch (event.type) {
 			case 'game_initialization':
 				if (event.data) {
-					this.manager = new Manager(this.ctx);
+					this.manager = new Manager(this.renderer, this.scene);
 					this.manager.update(event);
 					// this.state_ = new State(parsedData.data);
 				} else {
@@ -88,7 +92,6 @@ export class Game {
 				else
 					console.error("State is not initialized");
 				break;
-
 		}
 	}
 
@@ -115,7 +118,9 @@ export class Game {
 	}
 
 	draw(): void {
+		requestAnimationFrame(() => this.draw());
 		this.check_and_notify_keymove();
+		this.renderer.render(this.scene, this.camera);
 		return;
 	}
 }
