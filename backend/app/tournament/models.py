@@ -56,6 +56,7 @@ class Tournament(models.Model):
     status = models.IntegerField(choices=MatchStatusType.choices, default=MatchStatusType.WAITING)
     created_at = models.DateTimeField(auto_now_add=True)
     match_type = models.IntegerField(choices=MatchModeType.choices, default=MatchModeType.SINGLES)
+    is_ready_to_start = models.BooleanField(default=False)
 
     objects = TournamentManager()
 
@@ -92,10 +93,9 @@ class Tournament(models.Model):
         self.status = MatchStatusType.PLAYING
         self.save()
         self.generate_matches()
-        # self.update_tournament_status()
+        return True
 
     def generate_matches(self) -> None:
-        # breakpoint()
         players = list(self.players.all())
         import random
         random.shuffle(players)
@@ -108,16 +108,20 @@ class Tournament(models.Model):
                     match = Match.objects.create(tournament=self, team1=team1, team2=team2, round=RoundType.QUARTERFINAL)
                     self._notify_match_start(match)
         else:
-            for i in range(0, len(players), 2):
-                if i + 1 < len(players):
-                    team1 = Team.objects.create(player1=players[0])
-                    team2 = Team.objects.create(player1=players[1])
-                    match = Match.objects.create(tournament=self, team1=team1, team2=team2, round=RoundType.QUARTERFINAL)
-                    self._notify_match_start(match)
+            # For singles, we need to handle odd numbers of players
+            remaining_players = players.copy()
+            while len(remaining_players) >= 2:
+                team1 = Team.objects.create(player1=remaining_players.pop(0))
+                team2 = Team.objects.create(player1=remaining_players.pop(0))
+                match = Match.objects.create(tournament=self, team1=team1, team2=team2, round=RoundType.QUARTERFINAL)
+                self._notify_match_start(match)
 
     def _notify_match_start(self, match):
+        print(f"[DEBUG] Notifying match start for match {match.id}")
         channel_layer = get_channel_layer()
         tournament_group_name = f'tournament_{self.id}'
+        print(f"[DEBUG] Sending to tournament group: {tournament_group_name}")
+
         async_to_sync(channel_layer.group_send)(
             tournament_group_name,
             {
@@ -125,6 +129,7 @@ class Tournament(models.Model):
                 'match': match.to_dict()
             }
         )
+        print(f"[DEBUG] Match notification sent for match {match.id}")
 
     def check_matches_status(self) -> bool:
         return Match.objects.is_round_complete(tournament=self)

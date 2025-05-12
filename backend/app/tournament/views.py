@@ -4,7 +4,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from tournament.serializers import TournamentSerializer
 from tournament.models import Tournament, Match
-
+import time
 # from django.contrib.auth import get_user_model
 
 # User = get_user_model()
@@ -29,11 +29,16 @@ class TournamentViewSet(
     def add_player(self, request, pk=None):
         tournament = self.get_object()
         user = request.user
+        serializer = self.get_serializer(tournament)
 
         if user.is_authenticated:
             tournament.add_player(user)
-            tournament.start_tournament()
-            serializer = self.get_serializer(tournament)
+            #todo only SINGLES so far
+            # Only start tournament if we have enough players after adding this one
+            if tournament.player_entries.count() >= 4:  # For singles tournament
+                # tournament.start_tournament()
+                tournament.is_ready_to_start = True
+                tournament.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(serializer.data, status=status.HTTP_404_NOT_FOUND)

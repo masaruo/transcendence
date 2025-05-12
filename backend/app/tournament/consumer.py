@@ -1,7 +1,7 @@
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from channels.db import database_sync_to_async
 import json
-from tournament.models import Match, MatchStatusType
+from tournament.models import Match, MatchStatusType, Tournament
 from tournament.pong.manager import Manager
 
 class TournamentConsumer(AsyncJsonWebsocketConsumer):
@@ -12,8 +12,28 @@ class TournamentConsumer(AsyncJsonWebsocketConsumer):
         await self.channel_layer.group_add(self.tournament_group_name, self.channel_name)
         await self.accept()
 
+        await self.check_tournament_ready()
+
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(self.tournament_group_name, self.channel_name)
+
+    async def check_tournament_ready(self):
+        try:
+            # 同期関数を直接渡す
+            tournament = await database_sync_to_async(Tournament.objects.get)(id=self.tournament_id)
+
+            # フィールドの値を取得
+            is_ready = await database_sync_to_async(lambda t: t.is_ready_to_start)(tournament)
+
+            if is_ready:
+                # メソッド呼び出し
+                success = await database_sync_to_async(lambda t: t.start_tournament())(tournament)
+                print(f"トーナメント{self.tournament_id}開始: {success}")
+
+        except Exception as e:
+            import traceback
+            print(f"エラー: {e}")
+            print(traceback.format_exc())
 
     async def tournament_update(self, event):
         await self.send(text_data=json.dumps({
@@ -22,7 +42,6 @@ class TournamentConsumer(AsyncJsonWebsocketConsumer):
         }))
 
     async def match_start(self, event):
-        # breakpoint()
         await self.send(text_data=json.dumps({
             'type': 'match_start',
             'match': event['match']

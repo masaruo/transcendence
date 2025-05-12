@@ -27,7 +27,7 @@ urlpatterns = [
     path('api/user/', include("user.urls")),
     path('api/tournament/', include('tournament.urls')),
     # path('api/tournament/', include("game.urls")),
-    path('chat/', include("chat.urls")),
+    # path('chat/', include("chat.urls")),
 ] + debug_toolbar_urls()
 
 
