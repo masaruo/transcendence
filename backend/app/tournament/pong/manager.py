@@ -91,7 +91,6 @@ class Manager:
                 paddle_arr.append(obj.to_dict())
         obj_dict["balls"] = ball_arr
         obj_dict['paddles'] = paddle_arr
-        # print(f"objdict={obj_dict}")
         return (obj_dict)
 
     async def check_collisions(self) -> None:

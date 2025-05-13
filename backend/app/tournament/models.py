@@ -289,7 +289,7 @@ class TournamentPlayer(models.Model):
 
 
 class Score(models.Model):
-    match = models.ForeignKey(to='Match', on_delete=models.DO_NOTHING)
+    match = models.ForeignKey(to='Match', on_delete=models.CASCADE)
     team1_score = models.IntegerField(default=0)
     team2_score = models.IntegerField(default=0)
     winner = models.ForeignKey(to='Team', on_delete=models.DO_NOTHING, blank=True, null=True)
