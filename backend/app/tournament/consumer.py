@@ -1,8 +1,10 @@
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from channels.db import database_sync_to_async
 import json
-from tournament.models import Match, MatchStatusType, Tournament
+from tournament.models import Match, MatchModeType, Tournament
 from tournament.pong.manager import Manager
+from tournament.pong.paddle import Paddle
+from asgiref.sync import sync_to_async
 
 class TournamentConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
@@ -57,8 +59,10 @@ class MatchConsumer(AsyncJsonWebsocketConsumer):
         await self.accept()
 
         self.match_id = self.scope['url_route']['kwargs']['match_id']
+
+        self.paddle = await sync_to_async(self.assign_paddle)()
         self.match_group_name = f'match_{self.match_id}'
-        self.manager = Manager.get_instance(self.match_group_name)
+        self.manager = Manager.get_instance(self.match_group_name, self.match_id)
 
         await self.channel_layer.group_add(
             self.match_group_name,
@@ -92,3 +96,21 @@ class MatchConsumer(AsyncJsonWebsocketConsumer):
 
     async def game_update(self, state: dict[str, str]) -> None:
         await self.send_json(content=state)
+
+    def assign_paddle(self):
+        """同期的にマッチを取得してパドルを割り当てる"""
+        match = Match.objects.get(id=self.match_id)
+
+        # 同期的なコンテキストの中で関連オブジェクトにアクセス
+        if match.team1.player1 and match.team1.player1.id == self.user.id:
+            return Paddle.SIDE.L1
+        elif match.team2.player1 and match.team2.player1.id == self.user.id:
+            return Paddle.SIDE.R1
+
+        if match.get_match_type() == MatchModeType.DOUBLES:
+            if match.team1.player2 and match.team1.player2.id == self.user.id:
+                return Paddle.SIDE.L2
+            elif match.team2.player2 and match.team2.player2.id == self.user.id:
+                return Paddle.SIDE.R2
+
+        return None

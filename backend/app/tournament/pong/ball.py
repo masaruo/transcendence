@@ -3,6 +3,12 @@ from .paddle import Paddle
 from .wall import Wall
 from .constants import SCREEN_HEIGHT, SCREEN_WITDH, BALL_RADIUS, BALL_SPEED
 import random
+from enum import Enum
+
+class LOSER(Enum):
+    CONTINUE = 0
+    RIGHT = 1
+    LEFT = 2
 
 class Ball(PongObj):
     def __init__(self, x: int = SCREEN_WITDH // 2, y: int = SCREEN_HEIGHT // 2, radius: int = BALL_RADIUS, color: str = "white"):
@@ -54,7 +60,7 @@ class Ball(PongObj):
             if(br >= pl and bb >= pt and bt <= pb):
                 self.reverseDx()
 
-    def check_to_continue_with_wall(self, wall: Wall)-> bool:
+    def check_to_continue_with_wall(self, wall: Wall)-> 'LOSER':
         bl, br, bt, bb = self.get_bounds()
         wl, wr, wt, wb = wall.get_bounds()
 
@@ -63,10 +69,17 @@ class Ball(PongObj):
         elif bb > wb:
             self.reverseDy()
 
-        if bl > wr or br < wl:
-            print(f"Ball out of bounds: {bl},{br} wall: {wl},{wr}")
-            return False
-        return True
+        if bl > wr:
+            return LOSER.RIGHT
+        elif br < wl:
+            return LOSER.LEFT
+        else:
+            return LOSER.CONTINUE
+
+        # if bl > wr or br < wl:
+        #     print(f"Ball out of bounds: {bl},{br} wall: {wl},{wr}")
+        #     return False
+        # return True
 
     def to_dict(self) -> dict[str, int | str]:
         return {

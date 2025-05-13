@@ -5,9 +5,9 @@ from .constants import SCREEN_HEIGHT, PADDLE_HEIGHT, PADDLE_WIDTH, SCREEN_WITDH,
 
 class Paddle(PongObj):
     class SIDE(Enum):
-        R1 = 1,
-        R2 = 2,
-        L1 = 3,
+        R1 = 1
+        R2 = 2
+        L1 = 3
         L2 = 4
 
     def __init__(self, side:SIDE=SIDE.R1, x:int=0, y:int=SCREEN_HEIGHT//2, width:int=PADDLE_WIDTH, height:int=PADDLE_HEIGHT, color:str="white") -> None:

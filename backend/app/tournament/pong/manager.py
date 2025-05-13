@@ -1,6 +1,10 @@
 import asyncio
+from re import Match
+from asgiref.sync import sync_to_async
+
+from tournament.models import TeamType, Match
 from .APongObj import PongObj
-from .ball import Ball
+from .ball import Ball, LOSER
 from .paddle import Paddle
 from .wall import Wall
 from channels.layers import get_channel_layer # type: ignore
@@ -9,9 +13,9 @@ class Manager:
     _instances: dict[str, 'Manager'] = {}
 
     @classmethod
-    def get_instance(cls, name: str)-> 'Manager':
+    def get_instance(cls, name: str, match_id=None)-> 'Manager':
         if name not in cls._instances:
-            cls._instances[name] = cls(name)
+            cls._instances[name] = cls(name, match_id)
         return cls._instances[name]
 
     @classmethod
@@ -19,18 +23,20 @@ class Manager:
         if name in cls._instances:
             del cls._instances[name]
 
-    def __init__(self, group_name: str) -> None:
+    def __init__(self, group_name: str, match_id=None) -> None:
         self.objs: list[PongObj] = [
             Ball(),
-            Ball(y=150, color='yellow'),
-            Ball(y=100, color='red'),
+            #todo add multiple balls and paddles
+            # Ball(y=150, color='yellow'),
+            # Ball(y=100, color='red'),
             Paddle(side=Paddle.SIDE.R1, color="green"),
-            Paddle(side=Paddle.SIDE.R2, color="white"),
+            # Paddle(side=Paddle.SIDE.R2, color="white"),
             Paddle(side=Paddle.SIDE.L1, color="blue"),
-            Paddle(side=Paddle.SIDE.L2, color="red"),
+            # Paddle(side=Paddle.SIDE.L2, color="red"),
         ]
         self.wall = Wall()
         self._group_name: str = group_name
+        self._match_id = match_id
         self.channel_layer = get_channel_layer()
         self.task = None
         self.is_continue = True
@@ -49,7 +55,7 @@ class Manager:
     async def run_game_loop(self):
         try:
             while self.is_continue:
-                self.update()
+                await self.update()
                 await self.channel_layer.group_send(
                     self.group_name,
                     {
@@ -61,13 +67,13 @@ class Manager:
         except asyncio.CancelledError:
             self.is_continue = False
 
-    def update(self):  #todo PADDLE update
+    async def update(self):  #todo PADDLE update
         for obj in self.objs:
             if isinstance(obj, Ball):
                 obj.update()
-        self.check_collisions()
+        await self.check_collisions()
 
-    def reset(self):
+    def reset_match(self):
         for obj in self.objs:
             if isinstance(obj, PongObj):
                 obj.reset()
@@ -88,16 +94,16 @@ class Manager:
         # print(f"objdict={obj_dict}")
         return (obj_dict)
 
-    def check_collisions(self) -> None:
+    async def check_collisions(self) -> None:
         balls: list[Ball] = [obj for obj in self.objs if isinstance(obj, Ball)]
         paddles: list[Paddle] = [obj for obj in self.objs if isinstance(obj, Paddle)]
 
         to_continue: bool = True
 
         for ball in balls:
-            to_continue = ball.check_to_continue_with_wall(wall=self.wall)
-            if (to_continue == False):
-                break
+            loser = ball.check_to_continue_with_wall(wall=self.wall)
+            if loser in [LOSER.LEFT, LOSER.RIGHT]:
+                await sync_to_async(self.update_score)(loser)
             for paddle in paddles:
                 ball.check_with_paddle(paddle=paddle)
 
@@ -117,3 +123,14 @@ class Manager:
             if isinstance(obj, Paddle) and obj.type == side:
                 return obj
         return None
+
+    def update_score(self, loser):
+        match = Match.objects.get(id=self._match_id)
+        if loser == LOSER.LEFT:
+            match.add_score(team_type=TeamType.TEAM1)
+            match.save()
+            self.reset_match()
+        elif loser == LOSER.RIGHT:
+            match.add_score(team_type=TeamType.TEAM2)
+            match.save()
+            self.reset_match()

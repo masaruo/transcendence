@@ -10,6 +10,8 @@ from asgiref.sync import async_to_sync
 # from app.app import settings
 from django.conf import settings
 
+# from app import tournament
+
 
 class MatchStatusType(models.IntegerChoices):
     WAITING = 1
@@ -49,7 +51,6 @@ class TournamentManager(models.Manager):
             waiting_tournament.add_player(player=player)
             waiting_tournament.save()
             return waiting_tournament
-
 
 class Tournament(models.Model):
     players = models.ManyToManyField(to=settings.AUTH_USER_MODEL, through='TournamentPlayer', through_fields=('tournament', 'player'))
@@ -210,6 +211,9 @@ class Match(models.Model):
             'round': self.round,
             'playerIds': ids
         }
+
+    def get_match_type(self):
+        return self.tournament.match_type
 
     def add_score(self, team_type: TeamType) -> None:
         score, created = Score.objects.get_or_create(match=self)
