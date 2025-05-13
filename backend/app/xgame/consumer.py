@@ -18,11 +18,7 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
         self.manager = Manager.get_instance(self.group_name)
 
         await self.channel_layer.group_add(self.group_name, self.channel_name)
-
         await self.manager.init()
-
-        # if self.type == self.Type.p4:
-        #     await self.manager.start()
         await self.manager.start()
 
     async def disconnect(self, code) -> None:

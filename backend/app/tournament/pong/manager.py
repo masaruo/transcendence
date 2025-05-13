@@ -2,7 +2,7 @@ import asyncio
 from re import Match
 from asgiref.sync import sync_to_async
 
-from tournament.models import TeamType, Match
+from tournament.models import MatchStatusType, TeamType, Match
 from .APongObj import PongObj
 from .ball import Ball, LOSER
 from .paddle import Paddle
@@ -13,7 +13,7 @@ class Manager:
     _instances: dict[str, 'Manager'] = {}
 
     @classmethod
-    def get_instance(cls, name: str, match_id=None)-> 'Manager':
+    def get_instance(cls, name: str, match_id=None, websocket=None)-> 'Manager':
         if name not in cls._instances:
             cls._instances[name] = cls(name, match_id)
         return cls._instances[name]
@@ -23,7 +23,7 @@ class Manager:
         if name in cls._instances:
             del cls._instances[name]
 
-    def __init__(self, group_name: str, match_id=None) -> None:
+    def __init__(self, group_name: str, match_id=None, websocket=None) -> None:
         self.objs: list[PongObj] = [
             Ball(),
             #todo add multiple balls and paddles
@@ -37,6 +37,7 @@ class Manager:
         self.wall = Wall()
         self._group_name: str = group_name
         self._match_id = match_id
+        self._websocket = websocket
         self.channel_layer = get_channel_layer()
         self.task = None
         self.is_continue = True
@@ -54,6 +55,7 @@ class Manager:
 
     async def run_game_loop(self):
         try:
+            print("Game loop started")
             while self.is_continue:
                 await self.update()
                 await self.channel_layer.group_send(
@@ -63,9 +65,17 @@ class Manager:
                         'data': self.to_dict()
                     }
                 )
-                await asyncio.sleep(1/10)#! SPPEEDDDDD!!!!
+                await asyncio.sleep(1/10)
         except asyncio.CancelledError:
+            print("Game loop cancelled")
             self.is_continue = False
+            # 必要に応じてクリーンアップ処理
+        except Exception as e:
+            print(f"Error in game loop: {e}")
+            self.is_continue = False
+        finally:
+            print("Game loop ended")
+            # 最終的なクリーンアップ処理
 
     async def update(self):  #todo PADDLE update
         for obj in self.objs:
@@ -126,10 +136,47 @@ class Manager:
     def update_score(self, loser):
         match = Match.objects.get(id=self._match_id)
         if loser == LOSER.LEFT:
-            match.add_score(team_type=TeamType.TEAM1)
+            match.add_score_and_check_finished(team_type=TeamType.TEAM1)
             match.save()
-            self.reset_match()
         elif loser == LOSER.RIGHT:
-            match.add_score(team_type=TeamType.TEAM2)
+            match.add_score_and_check_finished(team_type=TeamType.TEAM2)
             match.save()
-            self.reset_match()
+
+        if match.match_status == MatchStatusType.FINISHED:
+            self.finish_sync()
+
+        self.reset_match()
+
+    async def finish(self):
+        print("async finish called")
+        if hasattr(self, 'task') and self.task:
+            print(f"Cancelling task: {self.task}")
+            self.task.cancel()
+
+            try:
+                # キャンセルされたタスクの完了を待つ
+                await asyncio.shield(asyncio.wait_for(self.task, timeout=2.0))
+                print("Task completed successfully after cancellation")
+            except asyncio.CancelledError:
+                print("Task was cancelled as expected")
+            except asyncio.TimeoutError:
+                print("Warning: Task cancellation timed out")
+            except Exception as e:
+                print(f"Error during task cancellation: {e}")
+
+        await self.channel_layer.group_send(
+            self._group_name,
+            {
+                'type': 'game_finished',
+                'message': 'Game has ended'
+            }
+        )
+
+        # 確実にis_continueをFalseに設定
+        self.is_continue = False
+
+
+    def finish_sync(self):
+        from asgiref.sync import async_to_sync
+        print("finish_sync called - wrapping async finish")
+        async_to_sync(self.finish)()

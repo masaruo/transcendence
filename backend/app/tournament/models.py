@@ -3,7 +3,7 @@ import uuid
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import Q
-from channels.layers import get_channel_layer
+from channels.layers import channel_layers, get_channel_layer
 from asgiref.sync import async_to_sync
 # from django.contrib.auth import get_user_model
 
@@ -118,10 +118,10 @@ class Tournament(models.Model):
                 self._notify_match_start(match)
 
     def _notify_match_start(self, match):
-        print(f"[DEBUG] Notifying match start for match {match.id}")
+        # print(f"[DEBUG] Notifying match start for match {match.id}")
         channel_layer = get_channel_layer()
         tournament_group_name = f'tournament_{self.id}'
-        print(f"[DEBUG] Sending to tournament group: {tournament_group_name}")
+        # print(f"[DEBUG] Sending to tournament group: {tournament_group_name}")
 
         async_to_sync(channel_layer.group_send)(
             tournament_group_name,
@@ -131,6 +131,20 @@ class Tournament(models.Model):
             }
         )
         print(f"[DEBUG] Match notification sent for match {match.id}")
+
+    def _notify_match_end(self, match):
+        channel_layer = get_channel_layer()
+        tournament_grou_name = f'tournament_{self.id}'
+
+        async_to_sync(channel_layer.group_send)(
+            tournament_grou_name,
+            {
+                'type': 'match_end',
+                'match': match.to_dict(),
+                'winner': match.winner.to_dict() if match.winner else None,
+            }
+        )
+
 
     def check_matches_status(self) -> bool:
         return Match.objects.is_round_complete(tournament=self)
@@ -167,9 +181,9 @@ class MatchManager(models.Manager):
         else:
             return True
 
-    def get_current_round(self, tournament: 'Tournament') -> RoundType:
-        latest_round_match = Match.objects.filter(tournament=tournament).order_by('-round').first()
-        return latest_round_match.round
+    def get_current_round(self, tournament: 'Tournament'):
+        latest_match = Match.objects.filter(tournament=tournament).order_by('-round').first()
+        return latest_match.round if latest_match else None
 
     def get_winners(self, tournament: 'Tournament', prev_round: RoundType) -> list['Team']:
         won_teams = []
@@ -215,49 +229,31 @@ class Match(models.Model):
     def get_match_type(self):
         return self.tournament.match_type
 
-    def add_score(self, team_type: TeamType) -> None:
+    def add_score_and_check_finished(self, team_type: TeamType) -> None:
         score, created = Score.objects.get_or_create(match=self)
         if team_type == TeamType.TEAM1:
             score.team1_score += 1
         else:
             score.team2_score += 1
         score.save()
+        if score.team1_score >= 5:
+            self.finish_match(winner_team=self.team1)
+            # score.winner = self.team1
+            # self.match_status = MatchStatusType.FINISHED
+        elif score.team2_score >= 5:
+            self.finish_match(winner_team=self.team2)
+            # self.winner = self.team2
+            # self.match_status = MatchStatusType.FINISHED
+        # score.save()
 
-    def get_match_status(self):
-        score = Score.objects.filter(match=self).first()
-        if not score:
-            return {
-                "team1": str(self.team1),
-                "team2": str(self.team2),
-                "team1_score": 0,
-                "team2_score": 0,
-                "status": self.match_status,
-                "winner": None
-            }
-
-        return {
-            "team1": str(self.team1),
-            "team2": str(self.team2),
-            "team1_score": score.team1_score,
-            "team2_score": score.team2_score,
-            "status": self.match_status,
-            "winner": score.winner
-        }
-
-    def finish_match(self, team1_score: int, team2_score: int) -> bool:
-        if self.match_status != MatchStatusType.PLAYING:
-            return False
-
-        score, created = Score.objects.get_or_create(match=self)
-        score.team1_score = team1_score
-        score.team2_score = team2_score
-        score.set_winner()
-        score.save()
-
+    def finish_match(self, winner_team):
+        self.winner = winner_team
         self.match_status = MatchStatusType.FINISHED
         self.save()
-        self.tournament.update_tournament_status()
-        return True
+
+        self.tournament._notify_match_end(self)
+        if Match.objects.is_round_complete(self.tournament):
+            self.tournament.update_tournament_status()
 
 class Team(models.Model):
     player1 = models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING, related_name='teams_as_player1')

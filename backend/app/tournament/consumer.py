@@ -1,3 +1,4 @@
+import asyncio
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from channels.db import database_sync_to_async
 import json
@@ -62,7 +63,7 @@ class MatchConsumer(AsyncJsonWebsocketConsumer):
 
         self.paddle = await sync_to_async(self.assign_paddle)()
         self.match_group_name = f'match_{self.match_id}'
-        self.manager = Manager.get_instance(self.match_group_name, self.match_id)
+        self.manager = Manager.get_instance(self.match_group_name, self.match_id, websocket=self)
 
         await self.channel_layer.group_add(
             self.match_group_name,
@@ -73,8 +74,11 @@ class MatchConsumer(AsyncJsonWebsocketConsumer):
         await self.manager.start()
 
     async def disconnect(self, code):
-        #todo
-        pass
+        await self.channel_layer.group_discard(
+            self.match_group_name,
+            self.channel_name
+        )
+        Manager.remove_instance(name=self.match_group_name)
 
     async def receive_json(self, content: dict[str, str]) -> None:
         message_type: str = content.get('type')
@@ -114,3 +118,12 @@ class MatchConsumer(AsyncJsonWebsocketConsumer):
                 return Paddle.SIDE.R2
 
         return None
+
+    async def game_finished(self, event):
+        await self.send_json({
+            'type': 'game_finished',
+            'message': event.get('message', 'Game finished')
+        })
+
+        await asyncio.sleep(0.5)
+        await self.close()
