@@ -106,7 +106,7 @@ class Tournament(models.Model):
                 if i + 3 < len(players):
                     team1 = Team.objects.create(player1=players[i], player2=players[i + 1])
                     team2 = Team.objects.create(player1=players[i + 2], player2=players[i + 3])
-                    match = Match.objects.create(tournament=self, team1=team1, team2=team2, round=RoundType.QUARTERFINAL)
+                    match = Match.objects.create(tournament=self, team1=team1, team2=team2)
                     self._notify_match_start(match)
         else:
             # For singles, we need to handle odd numbers of players
@@ -114,7 +114,7 @@ class Tournament(models.Model):
             while len(remaining_players) >= 2:
                 team1 = Team.objects.create(player1=remaining_players.pop(0))
                 team2 = Team.objects.create(player1=remaining_players.pop(0))
-                match = Match.objects.create(tournament=self, team1=team1, team2=team2, round=RoundType.QUARTERFINAL)
+                match = Match.objects.create(tournament=self, team1=team1, team2=team2)
                 self._notify_match_start(match)
 
     def _notify_match_start(self, match):
@@ -136,19 +136,21 @@ class Tournament(models.Model):
         channel_layer = get_channel_layer()
         tournament_grou_name = f'tournament_{self.id}'
 
-        async_to_sync(channel_layer.group_send)(
-            tournament_grou_name,
-            {
-                'type': 'match_end',
-                'match': match.to_dict(),
-                'winner': match.winner.to_dict() if match.winner else None,
-            }
-        )
+        #todo notify match end for all consumers
+        # async_to_sync(channel_layer.group_send)(
+        #     tournament_grou_name,
+        #     {
+        #         'type': 'match_end',
+        #         'match': match.to_dict(),
+        #         'winner': match.winner.to_dict() if match.winner else None,
+        #     }
+        # )
 
 
     def check_matches_status(self) -> bool:
         return Match.objects.is_round_complete(tournament=self)
 
+    #todo refactor
     def update_tournament_status(self):
         prev_round = Match.objects.get_current_round(tournament=self)
 
@@ -160,17 +162,19 @@ class Tournament(models.Model):
         self.generate_next_round(prev_round)
 
     def generate_next_round(self, prev_round:RoundType):
-        won_teams = Match.objects.get_winner(tournament=self, prev_round=prev_round)
-
-        for i in range(0, len(won_teams), 2):
+        # breakpoint()
+        won_teams = Match.objects.get_winners(tournament=self, prev_round=prev_round)
+        for i in range(0, len(won_teams), 2):#todo magic number
             if i + 1 < len(won_teams):
-                Match.objects.create(
+                new_match = Match.objects.create(
                     tournament=self,
                     team1=won_teams[i],
                     team2=won_teams[i + 1],
                     match_status=MatchStatusType.WAITING,
                     # game_type=self.game_type,
                     round=prev_round + 1)
+                breakpoint()
+                self._notify_match_start(new_match)
 
 class MatchManager(models.Manager):
     def is_round_complete(self, tournament: 'Tournament') -> bool:
@@ -186,13 +190,14 @@ class MatchManager(models.Manager):
         return latest_match.round if latest_match else None
 
     def get_winners(self, tournament: 'Tournament', prev_round: RoundType) -> list['Team']:
+        # breakpoint()
         won_teams = []
         prev_matches = Match.objects.filter(tournament=tournament, round=prev_round)
 
         for match in prev_matches:
-            won_team = Score.objects.filter(match=match).first().winner
+            # won_team = Score.objects.filter(match=match).first().winner
+            won_team = Score.objects.get(match=match).winner
             won_teams.append(won_team)
-
         return won_teams
 
 class Match(models.Model):
@@ -202,7 +207,7 @@ class Match(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     match_status = models.IntegerField(choices=MatchStatusType.choices, default=MatchStatusType.WAITING)
     # game_type = models.IntegerField(choices=MatchModeType.choices, default=MatchModeType.SINGLES)
-    round = models.IntegerField(choices=RoundType.choices, default=RoundType.PRELIMINARY)
+    round = models.IntegerField(choices=RoundType.choices, default=RoundType.SEMIFINAL)
     # websocket_key = models.UUIDField(default=uuid.uuid4, editable=False)
     # todo create Score model -> FK to Match
 
@@ -216,7 +221,6 @@ class Match(models.Model):
         team1Ids = self.team1.to_dict()['playerIds']
         team2Ids = self.team2.to_dict()['playerIds']
         ids = team1Ids + team2Ids
-        # breakpoint()
         return {
             'id': self.id,
             'team1': self.team1.to_dict(),
@@ -233,20 +237,24 @@ class Match(models.Model):
         score, created = Score.objects.get_or_create(match=self)
         if team_type == TeamType.TEAM1:
             score.team1_score += 1
-        else:
+        elif team_type == TeamType.TEAM2:
             score.team2_score += 1
         score.save()
-        if score.team1_score >= 5:
+
+        if score.team1_score >= 5:#todo change magic number
+            score.winner = self.team1
+            score.save()
             self.finish_match(winner_team=self.team1)
-            # score.winner = self.team1
             # self.match_status = MatchStatusType.FINISHED
-        elif score.team2_score >= 5:
+        if score.team2_score >= 5:#todo change magic number
+            score.winner = self.team2
+            score.save()
             self.finish_match(winner_team=self.team2)
-            # self.winner = self.team2
             # self.match_status = MatchStatusType.FINISHED
         # score.save()
 
-    def finish_match(self, winner_team):
+    #* calling next round of the tournament
+    def finish_match(self, winner_team):#todo delete winner_team arg
         self.winner = winner_team
         self.match_status = MatchStatusType.FINISHED
         self.save()

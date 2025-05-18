@@ -27,7 +27,16 @@ class Manager:
         self.objs: list[PongObj] = [
             Ball(),
             #todo add multiple balls and paddles
-            # Ball(y=150, color='yellow'),
+            Ball(y=150, color='yellow'),
+            # Ball(y=100, color='red'),
+            # Ball(y=100, color='red'),
+            # Ball(y=100, color='red'),
+            # Ball(y=100, color='red'),
+            # Ball(y=100, color='red'),
+            # Ball(y=100, color='red'),
+            # Ball(y=100, color='red'),
+            # Ball(y=100, color='red'),
+            # Ball(y=100, color='red'),
             # Ball(y=100, color='red'),
             Paddle(side=Paddle.SIDE.R1, color="green"),
             # Paddle(side=Paddle.SIDE.R2, color="white"),
@@ -112,7 +121,7 @@ class Manager:
         for ball in balls:
             loser = ball.check_to_continue_with_wall(wall=self.wall)
             if loser in [LOSER.LEFT, LOSER.RIGHT]:
-                await sync_to_async(self.update_score)(loser)
+                await sync_to_async(self.check_match_finish_after_update)(loser)
             for paddle in paddles:
                 ball.check_with_paddle(paddle=paddle)
 
@@ -133,7 +142,7 @@ class Manager:
                 return obj
         return None
 
-    def update_score(self, loser):
+    def check_match_finish_after_update(self, loser):
         match = Match.objects.get(id=self._match_id)
         if loser == LOSER.LEFT:
             match.add_score_and_check_finished(team_type=TeamType.TEAM1)
@@ -142,41 +151,43 @@ class Manager:
             match.add_score_and_check_finished(team_type=TeamType.TEAM2)
             match.save()
 
-        if match.match_status == MatchStatusType.FINISHED:
-            self.finish_sync()
+        # if match.match_status == MatchStatusType.FINISHED:
+        #     self.finish_sync()
 
         self.reset_match()
 
-    async def finish(self):
-        print("async finish called")
-        if hasattr(self, 'task') and self.task:
-            print(f"Cancelling task: {self.task}")
-            self.task.cancel()
+    #? redundant?
+    # async def finish(self):
+    #     print("async finish called")
+    #     if hasattr(self, 'task') and self.task:
+    #         print(f"Cancelling task: {self.task}")
+    #         self.task.cancel()
 
-            try:
-                # キャンセルされたタスクの完了を待つ
-                await asyncio.shield(asyncio.wait_for(self.task, timeout=2.0))
-                print("Task completed successfully after cancellation")
-            except asyncio.CancelledError:
-                print("Task was cancelled as expected")
-            except asyncio.TimeoutError:
-                print("Warning: Task cancellation timed out")
-            except Exception as e:
-                print(f"Error during task cancellation: {e}")
+    #         try:
+    #             # キャンセルされたタスクの完了を待つ
+    #             await asyncio.shield(asyncio.wait_for(self.task, timeout=2.0))
+    #             print("Task completed successfully after cancellation")
+    #         except asyncio.CancelledError:
+    #             print("Task was cancelled as expected")
+    #         except asyncio.TimeoutError:
+    #             print("Warning: Task cancellation timed out")
+    #         except Exception as e:
+    #             print(f"Error during task cancellation: {e}")
 
-        await self.channel_layer.group_send(
-            self._group_name,
-            {
-                'type': 'game_finished',
-                'message': 'Game has ended'
-            }
-        )
+    #     await self.channel_layer.group_send(
+    #         self._group_name,
+    #         {
+    #             'type': 'game_finished',
+    #             'message': 'Game has ended'
+    #         }
+    #     )
 
-        # 確実にis_continueをFalseに設定
-        self.is_continue = False
+    #     # 確実にis_continueをFalseに設定
+    #     self.is_continue = False
 
 
-    def finish_sync(self):
-        from asgiref.sync import async_to_sync
-        print("finish_sync called - wrapping async finish")
-        async_to_sync(self.finish)()
+    #? redundant
+    # def finish_sync(self):
+    #     from asgiref.sync import async_to_sync
+    #     print("finish_sync called - wrapping async finish")
+    #     async_to_sync(self.finish)()
