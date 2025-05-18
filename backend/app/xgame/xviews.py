@@ -6,7 +6,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import GameRoom, Tournament
+from .models import GameRoom, TournamentModel
 from game import serializers
 
 import random
@@ -56,7 +56,7 @@ class TournamentViewSet(
                 mixins.UpdateModelMixin,
                 mixins.DestroyModelMixin,
                 viewsets.GenericViewSet):
-    queryset = Tournament.objects.all()
+    queryset = TournamentModel.objects.all()
     serializer_class = serializers.TournamentSerializer
     permission_classes = [permissions.IsAuthenticated]
     authentication_classes = [JWTAuthentication]

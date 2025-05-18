@@ -18,7 +18,7 @@ export default class IndexView extends AbstractView {
 					font-family: "Bodoni Moda", serif;
      			font-optical-sizing: auto;
      			font-weight: 900;
-     			font-style: normal; 
+     			font-style: normal;
 					color: #19254f;
 				}
 				.welcome-msg{
