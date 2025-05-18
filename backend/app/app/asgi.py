@@ -18,7 +18,8 @@ from app.middleware import JWTAuthMiddleware
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'app.settings')
 
 from chat.routing import chat_urlpatterns
-from game.routing import game_urlpatterns
+# from game.routing import game_urlpatterns
+from tournament.routing import tournament_urlpatterns
 
 
 # Add this class before your application definition
@@ -41,7 +42,7 @@ application = ProtocolTypeRouter(
             AllowedHostsOriginValidator(
                 JWTAuthMiddleware(
                     AuthMiddlewareStack(
-                        URLRouter(game_urlpatterns + chat_urlpatterns)
+                        URLRouter(chat_urlpatterns + tournament_urlpatterns)
                     )
                 )
             )

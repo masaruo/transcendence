@@ -15,7 +15,11 @@ export default class Fetch {
 		this.body = body ? JSON.stringify(body) : undefined;
 	}
 
-	async fetch_without_auth(): Promise<any> {
+	add_header(key:string, value:string): void {
+		this.headers[key] = value;
+	}
+
+	async fetch_without_auth(data?: any): Promise<any> {
 		try {
 			const requestOptions: RequestInit = {
 				method: this.method,
@@ -26,22 +30,29 @@ export default class Fetch {
 				requestOptions.body = this.body;
 			}
 
+			if (data) {
+				requestOptions.body = JSON.stringify(data);
+				this.headers['Content-Type'] = 'application/json';
+			}
+
 			const res = await fetch(this.url, requestOptions);
-			const res_in_json = await res.json();
-			return res_in_json;
+			if (!res.ok) {
+				throw new Error(`HttpError ${res.status}`);
+			}
+			return await res.json();
 		} catch (error) {
 			throw error;
 		}
 	}
 
-	async fetch_with_auth(): Promise<any> {
+	async fetch_with_auth(data?: any): Promise<any> {
 		try {
 			const token = sessionStorage.getItem('access');
 			if (!token) {
 				throw new Error("No auth token found.");
 			}
 			this.headers["Authorization"] = "Bearer " + token;
-			return this.fetch_without_auth();
+			return this.fetch_without_auth(data);
 		} catch (error) {
 			throw error;
 		}

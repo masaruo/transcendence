@@ -49,7 +49,7 @@ class GameRoom(models.Model):
 #             tournament.games.add(game)
 #         return super().create(**kwargs)
 
-class Tournament(models.Model):
+class TournamentModel(models.Model):
     """
     model for a tournament contains multiple games
     """

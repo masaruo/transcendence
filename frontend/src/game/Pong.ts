@@ -1,12 +1,12 @@
 import { Manager, WebSocketEvent } from "./Manager";
 
-export class Game {
+export default class Pong {
 	readonly ctx: CanvasRenderingContext2D;
 	readonly matchId: number = 0;
 	readonly width: number;
 	readonly height: number;
 
-	private interavlID: NodeJS.Timeout | null = null;
+	private intervalID: NodeJS.Timeout | null = null;
 	private socket_: WebSocket | null = null;
 	private keyMovements: {[key: string]: boolean} = {};
 	private manager: Manager | null = null;
@@ -38,8 +38,8 @@ export class Game {
 		}
 		join.addEventListener('click', async() => {
 			this.connectWebSocket();
-			if (this.interavlID == null)
-				this.interavlID = setInterval(() => {
+			if (this.intervalID == null)
+				this.intervalID = setInterval(() => {
 					this.draw();
 				}, 16);
 		})
@@ -50,20 +50,26 @@ export class Game {
 
 		const token = sessionStorage.getItem('access');
 		// console.log("token ", token)
-		this.socket_ = new WebSocket(`${protocol}//localhost:8000/ws/game/${this.matchId}/?token=${token}`);
+		this.socket_ = new WebSocket(`${protocol}//localhost:8000/ws/match/${this.matchId}/?token=${token}`);
 
 		this.socket_.onopen = () => {
 			console.log("WebSocket接続成功", new Date().toISOString());
+			//todo 試合スコアやプレイヤー名の表示
 		  }
 
 		this.socket_.onmessage = (event) => {
 			console.log("received data: ", event.data);
 			const parsedData = JSON.parse(event.data);
 			this.handleEvent(parsedData)
+			//todo 試合状況の表示
 		}
 
 		this.socket_.onclose = () => {
+			//todo 試合終了のお知らせ
 			// setTimeout(() => this.connectWebSocket(), 3000);
+			console.log("websocket on close");
+			clearInterval(this.intervalID);
+			this.intervalID = null;
 		}
 
 		this.socket_.onerror = (error) => {
