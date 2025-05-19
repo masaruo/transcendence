@@ -5,13 +5,10 @@ from django.db import models
 from django.db.models import Q
 from channels.layers import channel_layers, get_channel_layer
 from asgiref.sync import async_to_sync
-# from django.contrib.auth import get_user_model
 
-# from app.app import settings
 from django.conf import settings
 
-# from app import tournament
-
+WIN_SCORE = 3
 
 class MatchStatusType(models.IntegerChoices):
     WAITING = 1
@@ -101,6 +98,7 @@ class Tournament(models.Model):
         import random
         random.shuffle(players)
 
+#* refactor : team creationのリファクタ
         if self.match_type == MatchModeType.DOUBLES:
             for i in range(0, len(players), 4):
                 if i + 3 < len(players):
@@ -109,7 +107,6 @@ class Tournament(models.Model):
                     match = Match.objects.create(tournament=self, team1=team1, team2=team2)
                     self._notify_match_start(match)
         else:
-            # For singles, we need to handle odd numbers of players
             remaining_players = players.copy()
             while len(remaining_players) >= 2:
                 team1 = Team.objects.create(player1=remaining_players.pop(0))
@@ -118,10 +115,8 @@ class Tournament(models.Model):
                 self._notify_match_start(match)
 
     def _notify_match_start(self, match):
-        # print(f"[DEBUG] Notifying match start for match {match.id}")
         channel_layer = get_channel_layer()
         tournament_group_name = f'tournament_{self.id}'
-        # print(f"[DEBUG] Sending to tournament group: {tournament_group_name}")
 
         async_to_sync(channel_layer.group_send)(
             tournament_group_name,
@@ -131,19 +126,32 @@ class Tournament(models.Model):
             }
         )
 
+    #todo end of match (frontend too)
     def _notify_match_end(self, match):
         channel_layer = get_channel_layer()
-        tournament_grou_name = f'tournament_{self.id}'
+        # match_group_name = f'match_{match.id}'
+        tournament_group_name = f'tournament_{self.id}'
+
+        # async_to_sync(channel_layer.group_send)(
+        #     match_group_name,
+        #     {
+        #         'type': 'match_finish',
+        #     }
+        # )
 
         #todo notify match end for all consumers
         # async_to_sync(channel_layer.group_send)(
-        #     tournament_grou_name,
+        #     tournament_group_name,
         #     {
         #         'type': 'match_end',
         #         'match': match.to_dict(),
         #         'winner': match.winner.to_dict() if match.winner else None,
         #     }
         # )
+
+    def _notify_tournament_end(self):
+        channel_layers = get_channel_layer()
+        #todo
 
     def is_tournament_players_ready(self) -> bool:
         required_number = self.match_size * self.match_type
@@ -156,19 +164,21 @@ class Tournament(models.Model):
         return Match.objects.is_round_complete(tournament=self)
 
     #todo refactor
-    def update_tournament_status(self):
+    def update_tournament_status(self) -> None:
+        # breakpoint()
         prev_round = Match.objects.get_current_round(tournament=self)
 
         if prev_round == RoundType.FINAL:
             self.status = MatchStatusType.FINISHED
             self.save()
+            self._notify_tournament_end()
             return
         self.generate_next_round(prev_round)
 
     def generate_next_round(self, prev_round:RoundType):
         # breakpoint()
         won_teams = Match.objects.get_winners(tournament=self, prev_round=prev_round)
-        for i in range(0, len(won_teams), 2):#todo magic number
+        for i in range(0, len(won_teams),2):
             if i + 1 < len(won_teams):
                 new_match = Match.objects.create(
                     tournament=self,
@@ -176,7 +186,8 @@ class Tournament(models.Model):
                     team2=won_teams[i + 1],
                     match_status=MatchStatusType.PLAYING,
                     round=prev_round + 1)
-                self._notify_match_start(new_match)
+                self._notify_match_start(match=new_match)
+                print(f'generate new round at {new_match.id}')
 
 class MatchManager(models.Manager):
     def is_round_complete(self, tournament: 'Tournament') -> bool:
@@ -192,12 +203,10 @@ class MatchManager(models.Manager):
         return latest_match.round if latest_match else None
 
     def get_winners(self, tournament: 'Tournament', prev_round: RoundType) -> list['Team']:
-        # breakpoint()
         won_teams = []
         prev_matches = Match.objects.filter(tournament=tournament, round=prev_round)
 
         for match in prev_matches:
-            # won_team = Score.objects.filter(match=match).first().winner
             won_team = Score.objects.get(match=match).winner
             won_teams.append(won_team)
         return won_teams
@@ -208,10 +217,7 @@ class Match(models.Model):
     team2 = models.ForeignKey(to='Team', on_delete=models.DO_NOTHING, related_name='team2_matches')
     created_at = models.DateTimeField(auto_now_add=True)
     match_status = models.IntegerField(choices=MatchStatusType.choices, default=MatchStatusType.WAITING)
-    # game_type = models.IntegerField(choices=MatchModeType.choices, default=MatchModeType.SINGLES)
     round = models.IntegerField(choices=RoundType.choices, default=RoundType.SEMIFINAL)
-    # websocket_key = models.UUIDField(default=uuid.uuid4, editable=False)
-    # todo create Score model -> FK to Match
 
     objects = MatchManager()
 
@@ -235,33 +241,37 @@ class Match(models.Model):
     def get_match_type(self):
         return self.tournament.match_type
 
-    def add_score_and_check_finished(self, team_type: TeamType) -> None:
+    def add_score(self, team_type: TeamType) -> None:
         score, created = Score.objects.get_or_create(match=self)
+        #todo　レースコンディション
         if team_type == TeamType.TEAM1:
             score.team1_score += 1
         elif team_type == TeamType.TEAM2:
             score.team2_score += 1
         score.save()
+        if score.team1_score >= WIN_SCORE or score.team2_score >= WIN_SCORE:
+            score.set_winner()
+            score.save()
+            self.finish_match()
 
-        if score.team1_score >= 5:#todo change magic number
-            score.winner = self.team1
-            score.save()
-            self.finish_match(winner_team=self.team1)
-            # self.match_status = MatchStatusType.FINISHED
-        if score.team2_score >= 5:#todo change magic number
-            score.winner = self.team2
-            score.save()
-            self.finish_match(winner_team=self.team2)
-            # self.match_status = MatchStatusType.FINISHED
-        # score.save()
+        score.save()
 
     #* calling next round of the tournament
-    def finish_match(self, winner_team):#todo delete winner_team arg
-        self.winner = winner_team
+    def finish_match(self) -> None:
         self.match_status = MatchStatusType.FINISHED
         self.save()
 
-        self.tournament._notify_match_end(self)
+        channel_layer = get_channel_layer()
+        match_group_name = f'match_{self.id}'
+
+        async_to_sync(channel_layer.group_send)(
+            match_group_name,
+            {
+                'type': 'match_finished',
+            }
+        )
+
+        # self.tournament._notify_match_end(self)
         if Match.objects.is_round_complete(self.tournament):
             self.tournament.update_tournament_status()
 
