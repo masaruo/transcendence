@@ -30,7 +30,7 @@ export default class Tournament {
 				const currentUserId = parseInt(sessionStorage.getItem('user_id'));
 				console.log("[DEBUG] Current user ID:", currentUserId, "Match player IDs:", ids);
 				if (ids.includes(currentUserId)) {
-					navigateTo(`/pong/${match.id}`)
+					navigateTo(`/tournament/${this.tournamentId}/pong/${match.id}`)
 				} else {
 					console.log("[DEBUG] User is not in this match");
 				}

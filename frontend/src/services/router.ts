@@ -32,17 +32,18 @@ export const router = async() => {
 		{path: "/user/me/update", view: UserUpdataView},
 		{path: "/login", view: LoginView },
 		{path: "/friends", view: FriendsView},
-		{path: "/pong/:pong_id", view: PongView},
+		// {path: "/pong/:pong_id", view: PongView},
 		{path: "/tournament", view: TournamentListView},
 		{path: "/tournament/create", view: TournamentCreateView},
 		{path: "/tournament/:tournament_id", view: TournamentDetailView},
+		{path: "/tournament/:tournament_id/pong/:pong_id", view: PongView},
 		// {path: "/posts", view: Posts },
 		// {path: "/posts/:id", view: PostView },
 		// {path: "/settings", view: Settings }
 	];
 
 	 // マッチング処理を明示的に行う
-  const currentPath = location.pathname;
+  const currentPath = location.pathname.replace(/\/$/, '');
   console.log("Current path:", currentPath);
 
   let match = null;

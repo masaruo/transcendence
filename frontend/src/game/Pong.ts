@@ -85,7 +85,8 @@ export default class Pong {
 			console.log("websocket on close");
 			clearInterval(this.intervalID);
 			this.intervalID = null;
-			navigateTo(`/tournament/`)
+			const parent_path = location.pathname.replace(/\pong\/.*$/, '');
+			navigateTo(parent_path);
 		}
 
 		this.socket_.onerror = (error) => {
