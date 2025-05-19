@@ -1,14 +1,12 @@
 import { Manager, WebSocketEvent } from "./Manager";
-import * as THREE from 'three';
 
-export class Game {
+export default class Pong {
+	readonly ctx: CanvasRenderingContext2D;
 	readonly matchId: number = 0;
 	readonly width: number;
 	readonly height: number;
-	readonly renderer: THREE.WebGLRenderer;
-	scene: THREE.Scene;
-  camera: THREE.PerspectiveCamera;
 
+	private intervalID: NodeJS.Timeout | null = null;
 	private socket_: WebSocket | null = null;
 	private keyMovements: {[key: string]: boolean} = {};
 	private manager: Manager | null = null;
@@ -17,17 +15,12 @@ export class Game {
 		if (!canvas) {
 			throw Error('failed to get canvas element.');
 		}
+		const ctx = canvas.getContext('2d');
+		if (!ctx)
+			throw Error('failed to get context.');
+		this.ctx = ctx;
 		this.width = canvas.width;
 		this.height = canvas.height;
-
-		this.renderer = new THREE.WebGLRenderer({ canvas });
-		this.renderer.setPixelRatio(window.devicePixelRatio);
-		this.renderer.setSize(this.width, this.height);
-
-		this.scene = new THREE.Scene();
-		
-		this.camera = new THREE.PerspectiveCamera(35, this.width / this.height);
-    this.camera.position.set(this.width / 2, this.height / 2, +1000);
 
 		this.matchId = matchId;
 		document.addEventListener('keydown', (e) => {
@@ -45,7 +38,10 @@ export class Game {
 		}
 		join.addEventListener('click', async() => {
 			this.connectWebSocket();
-			this.draw();
+			if (this.intervalID == null)
+				this.intervalID = setInterval(() => {
+					this.draw();
+				}, 16);
 		})
 	}
 
@@ -54,20 +50,26 @@ export class Game {
 
 		const token = sessionStorage.getItem('access');
 		// console.log("token ", token)
-		this.socket_ = new WebSocket(`${protocol}//localhost:8000/ws/game/${this.matchId}/?token=${token}`);
+		this.socket_ = new WebSocket(`${protocol}//localhost:8000/ws/match/${this.matchId}/?token=${token}`);
 
 		this.socket_.onopen = () => {
 			console.log("WebSocket接続成功", new Date().toISOString());
+			//todo 試合スコアやプレイヤー名の表示
 		  }
 
 		this.socket_.onmessage = (event) => {
 			console.log("received data: ", event.data);
 			const parsedData = JSON.parse(event.data);
 			this.handleEvent(parsedData)
+			//todo 試合状況の表示
 		}
 
 		this.socket_.onclose = () => {
+			//todo 試合終了のお知らせ
 			// setTimeout(() => this.connectWebSocket(), 3000);
+			console.log("websocket on close");
+			clearInterval(this.intervalID);
+			this.intervalID = null;
 		}
 
 		this.socket_.onerror = (error) => {
@@ -80,7 +82,7 @@ export class Game {
 		switch (event.type) {
 			case 'game_initialization':
 				if (event.data) {
-					this.manager = new Manager(this.renderer, this.scene);
+					this.manager = new Manager(this.ctx);
 					this.manager.update(event);
 					// this.state_ = new State(parsedData.data);
 				} else {
@@ -93,6 +95,7 @@ export class Game {
 				else
 					console.error("State is not initialized");
 				break;
+
 		}
 	}
 
@@ -119,9 +122,7 @@ export class Game {
 	}
 
 	draw(): void {
-		requestAnimationFrame(() => this.draw());
 		this.check_and_notify_keymove();
-		this.renderer.render(this.scene, this.camera);
 		return;
 	}
 }

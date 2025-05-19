@@ -1,4 +1,6 @@
 import { navigateTo } from "./router";
+import Fetch from "@/classes/JsonFetch";
+import { PATH } from "@services/constants"
 
 export async function handleLoginFormSubmission(form: HTMLFormElement): Promise<void> {
     form.addEventListener("submit", async (event) => {
@@ -29,6 +31,12 @@ export async function handleLoginFormSubmission(form: HTMLFormElement): Promise<
             sessionStorage.setItem("access", data.access);
             sessionStorage.setItem("refresh", data.refresh);
             sessionStorage.setItem("is_authenticated", "true");
+
+            const fetcher = new Fetch(`${PATH}/api/user/me/`);
+            const res_json = await fetcher.fetch_with_auth()
+            // const res_json = await res.json()
+            sessionStorage.setItem('user_id', res_json.id);
+
             navigateTo('/');
             console.log("Login successful:", data);
         } catch (error) {

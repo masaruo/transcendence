@@ -11,7 +11,7 @@ class GameSerializer(serializers.ModelSerializer):
 class TournamentSerializer(serializers.ModelSerializer):
     games = GameSerializer(many=True, read_only=True)
     class Meta:
-        model = models.Tournament
+        model = models.TournamentModel
         fields = '__all__'
 
 # class GameCreateSerializer(serializers.ModelSerializer):
