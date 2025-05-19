@@ -38,12 +38,16 @@ class RoundType(models.IntegerChoices):
     SEMIFINAL = 2
     FINAL = 3
 
+class MatchSizeType(models.IntegerChoices):
+    TWO = 2
+    FOUR = 4
+    EIGHT = 8
 
 class TournamentManager(models.Manager):
-    def get_or_create_tournament(self, player, match_type:MatchModeType=MatchModeType.SINGLES, size:int=4):
+    def get_or_create_tournament(self, player, match_type = MatchModeType.SINGLES, match_size = MatchSizeType.FOUR):
         waiting_tournament = self.filter(status=MatchStatusType.WAITING).order_by('created_at').first()
         if not waiting_tournament:
-            tournament = self.create(match_type=match_type, size=size)
+            tournament = self.create(match_type=match_type, match_size=match_size)
             tournament.add_player(player=player)
             tournament.save()
             return tournament
@@ -58,6 +62,7 @@ class Tournament(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     match_type = models.IntegerField(choices=MatchModeType.choices, default=MatchModeType.SINGLES)
     is_ready_to_start = models.BooleanField(default=False)
+    match_size = models.IntegerField(choices=MatchSizeType.choices, default=MatchSizeType.FOUR)
 
     objects = TournamentManager()
 
@@ -76,19 +81,14 @@ class Tournament(models.Model):
             'players': player_list,
         }
 
-    def add_player(self, player:'User', round=RoundType.PRELIMINARY) -> 'TournamentPlayer':
+    def add_player(self, player, round=RoundType.PRELIMINARY) -> 'TournamentPlayer':
         return TournamentPlayer.objects.create(player=player, tournament=self, final_round=round)
 
     def start_tournament(self) -> bool:
         if self.status != MatchStatusType.WAITING:
             return False
 
-        required_number = 4
-        if self.match_type == MatchModeType.DOUBLES:
-            required_number = 8
-
-        player_count = self.player_entries.count()
-        if player_count < required_number:
+        if not self.is_tournament_players_ready():
             return False
 
         self.status = MatchStatusType.PLAYING
@@ -130,7 +130,6 @@ class Tournament(models.Model):
                 'match': match.to_dict()
             }
         )
-        print(f"[DEBUG] Match notification sent for match {match.id}")
 
     def _notify_match_end(self, match):
         channel_layer = get_channel_layer()
@@ -146,6 +145,12 @@ class Tournament(models.Model):
         #     }
         # )
 
+    def is_tournament_players_ready(self) -> bool:
+        required_number = self.match_size * self.match_type
+        if self.player_entries.count() >= required_number:
+            return True
+        else:
+            return False
 
     def check_matches_status(self) -> bool:
         return Match.objects.is_round_complete(tournament=self)
@@ -158,7 +163,6 @@ class Tournament(models.Model):
             self.status = MatchStatusType.FINISHED
             self.save()
             return
-
         self.generate_next_round(prev_round)
 
     def generate_next_round(self, prev_round:RoundType):
@@ -170,10 +174,8 @@ class Tournament(models.Model):
                     tournament=self,
                     team1=won_teams[i],
                     team2=won_teams[i + 1],
-                    match_status=MatchStatusType.WAITING,
-                    # game_type=self.game_type,
+                    match_status=MatchStatusType.PLAYING,
                     round=prev_round + 1)
-                breakpoint()
                 self._notify_match_start(new_match)
 
 class MatchManager(models.Manager):
