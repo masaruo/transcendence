@@ -1,8 +1,8 @@
 import asyncio
 from re import I, Match
-from asgiref.sync import sync_to_async
+from asgiref.sync import sync_to_async, async_to_sync
 
-from tournament.models import MatchStatusType, TeamType, Match
+from tournament.models import MatchStatusType, TeamType, Match, Score
 from .APongObj import PongObj
 from .ball import Ball, LOSER
 from .paddle import Paddle
@@ -58,7 +58,7 @@ class Manager:
                         'data': self.to_dict()
                     }
                 )
-                await asyncio.sleep(1/10)
+                await asyncio.sleep(1/10)#! game speed?
         except asyncio.CancelledError:
             print("Game loop cancelled")
             self.is_continue = False
@@ -70,7 +70,7 @@ class Manager:
             print("Game loop ended")
             # 最終的なクリーンアップ処理
 
-    async def update(self):  #todo PADDLE update
+    async def update(self):
         for obj in self.objs:
             if isinstance(obj, Ball):
                 obj.update()
@@ -131,46 +131,26 @@ class Manager:
         if match.match_status == MatchStatusType.FINISHED:
             return
 
+        self.update_status(match)
+
         if loser == LOSER.LEFT:
             match.add_score(team_type=TeamType.TEAM1)
         elif loser == LOSER.RIGHT:
             match.add_score(team_type=TeamType.TEAM2)
         self.reset_match()
 
+    def update_status(self, match: Match):
+        score = Score.objects.get(match=match)
+        async_to_sync(self.channel_layer.group_send)(
+            self._group_name,
+            {
+                'type': 'status_update',
+                'data': {
+                    'match': match.to_dict(),
+                    'score': score.to_dict(),
+                }
+            }
+        )
+
     def finish(self):
         self.task.cancel()
-    #? redundant?
-    # async def finish(self):
-    #     print("async finish called")
-    #     if hasattr(self, 'task') and self.task:
-    #         print(f"Cancelling task: {self.task}")
-    #         self.task.cancel()
-
-    #         try:
-    #             # キャンセルされたタスクの完了を待つ
-    #             await asyncio.shield(asyncio.wait_for(self.task, timeout=2.0))
-    #             print("Task completed successfully after cancellation")
-    #         except asyncio.CancelledError:
-    #             print("Task was cancelled as expected")
-    #         except asyncio.TimeoutError:
-    #             print("Warning: Task cancellation timed out")
-    #         except Exception as e:
-    #             print(f"Error during task cancellation: {e}")
-
-    #     await self.channel_layer.group_send(
-    #         self._group_name,
-    #         {
-    #             'type': 'game_finished',
-    #             'message': 'Game has ended'
-    #         }
-    #     )
-
-    #     # 確実にis_continueをFalseに設定
-    #     self.is_continue = False
-
-
-    #? redundant
-    # def finish_sync(self):
-    #     from asgiref.sync import async_to_sync
-    #     print("finish_sync called - wrapping async finish")
-    #     async_to_sync(self.finish)()

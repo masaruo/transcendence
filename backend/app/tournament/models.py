@@ -105,6 +105,7 @@ class Tournament(models.Model):
                     team1 = Team.objects.create(player1=players[i], player2=players[i + 1])
                     team2 = Team.objects.create(player1=players[i + 2], player2=players[i + 3])
                     match = Match.objects.create(tournament=self, team1=team1, team2=team2)
+                    score = Score.objects.create(match=match)
                     self._notify_match_start(match)
         else:
             remaining_players = players.copy()
@@ -112,6 +113,7 @@ class Tournament(models.Model):
                 team1 = Team.objects.create(player1=remaining_players.pop(0))
                 team2 = Team.objects.create(player1=remaining_players.pop(0))
                 match = Match.objects.create(tournament=self, team1=team1, team2=team2)
+                score = Score.objects.create(match=match)
                 self._notify_match_start(match)
 
     def _notify_match_start(self, match):
@@ -186,6 +188,7 @@ class Tournament(models.Model):
                     team2=won_teams[i + 1],
                     match_status=MatchStatusType.PLAYING,
                     round=prev_round + 1)
+                score = Score.objects.create(match=new_match)
                 self._notify_match_start(match=new_match)
                 print(f'generate new round at {new_match.id}')
 
@@ -243,7 +246,7 @@ class Match(models.Model):
 
     def add_score(self, team_type: TeamType) -> None:
         score, created = Score.objects.get_or_create(match=self)
-        #todo　レースコンディション
+        #todo　レースコンディション?
         if team_type == TeamType.TEAM1:
             score.team1_score += 1
         elif team_type == TeamType.TEAM2:
@@ -312,6 +315,13 @@ class Score(models.Model):
 
     def __str__(self) -> str:
         return f"team1's score is {self.team1_score} and team2's is {self.team2_score} and winner is {self.winner}"
+
+    def to_dict(self):
+        return {
+            'team1_score': self.team1_score,
+            'team2_score': self.team2_score,
+            'winner': self.winner if self.winner else None
+        }
 
     def set_winner(self) -> None:
         if self.team1_score > self.team2_score:

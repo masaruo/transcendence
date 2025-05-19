@@ -3,7 +3,7 @@ import { handleLoginFormSubmission } from "../services/login";
 import { navigateTo } from "../services/router";
 
 export default class LoginView extends AbstractView {
-	constructor (params: string) {
+	constructor (params: Record<string, string>) {
 		super(params);
 		this.setTitle("Login");
 	}
@@ -45,8 +45,8 @@ export default class LoginView extends AbstractView {
   						<div class="col-4">
 								<label for="exampleInputPassword1" class="form-label">Password</label>
 							</div>
-							<div class="col-8">	
-								<input type="password" class="form-control" id="login-password">	
+							<div class="col-8">
+								<input type="password" class="form-control" id="login-password">
 							</div>
 							<button type="submit" class="btn btn-success">Submit</button>
 					</form>

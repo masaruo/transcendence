@@ -4,11 +4,12 @@ import { PATH } from "../services/constants"
 import { navigateTo } from "@/services/router";
 
 export default class TournamentCreateView extends AbstractView {
-	constructor (params: string) {
+	constructor (params: Record<string, string>) {
 		super(params);
 		this.setTitle("Tournament Create");
 	}
 	async getBody(): Promise<string> {
+      console.log("Params:", this.params); // パラメータ確認
 		return `
 	<form id="tournament-settings-form" class="settings-form">
   <div class="form-group">

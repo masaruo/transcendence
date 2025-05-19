@@ -5,7 +5,7 @@ import Pong from "@/game/Pong";
 // import Tournament from "@/game/Tournament";
 
 export default class PongView extends AbstractView {
-	constructor (params: string){
+	constructor (params: Record<string, string>){
 		super(params);
 		this.setTitle("Pong");
 	}
@@ -26,11 +26,10 @@ export default class PongView extends AbstractView {
 			<div class="container d-flex justify-content-center" height="85vh">
 				<canvas id="canvas" width="900" height="600"></canvas>
 			</div>
-			<div class="d-flex justify-content-center">
-				<div class="btn-group" style="width: 900px;" role="group" aria-label="Basic outlined example">
-			 		<button id="join" type="button" class="btn btn-primary custom-btn">JOIN</button>
-			  	<button id="start" type="button" class="btn btn-primary custom-btn">START</button>
-			  	<button id="end" type="button" class="btn btn-primary custom-btn">END</button>
+				<div class="d-flex justify-content-center">
+					<br>
+					<div id='match-data'></div>
+					<div id='score-data'></div>
 				</div>
 			</div>
 			<br>
@@ -46,10 +45,7 @@ export default class PongView extends AbstractView {
 		const canvas = document.getElementById("canvas") as HTMLCanvasElement | null;
 		if (!canvas)
 			throw Error("Failed to find canvas element.")
-		const pong = new Pong(canvas, this.params.id);
-		// const pong = new Pong(canvas);
-		// const tournament = new Tournament(canvas);
-		// const game = new Pong(canvas);
-		// pong.start();
+		const pong = new Pong(canvas, this.params.pong_id);
+		pong.start();
 	}
 }
