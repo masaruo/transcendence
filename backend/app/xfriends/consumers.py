@@ -1,6 +1,6 @@
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from asgiref.sync import sync_to_async
-from friends.models import Status
+from xfriends.models import Status
 
 class UserStatusConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
