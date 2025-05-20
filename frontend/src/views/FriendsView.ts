@@ -1,7 +1,7 @@
 import AbstractView from "./AbstractView"
 
 export default class FriendsView extends AbstractView {
-	constructor (params: string){
+	constructor (params: Record<string, string>){
 		super(params);
 		this.setTitle("Friends");
 	}
@@ -20,7 +20,7 @@ export default class FriendsView extends AbstractView {
 			font-family: "Bodoni Moda", serif;
       font-optical-sizing: auto;
       font-weight: 700;
-      font-style: normal; 
+      font-style: normal;
 		}
 		.card {
 			width: 18rem;
@@ -31,7 +31,7 @@ export default class FriendsView extends AbstractView {
 		.friends-grid{
 			display: flex;
       flex-wrap: wrap;
-      justify-content: center;	
+      justify-content: center;
 		}
 		</style>
 
@@ -64,11 +64,11 @@ export default class FriendsView extends AbstractView {
 				const friendItem = document.createElement('div');
 				friendItem.setAttribute("class", "card");
 				friendItem.innerHTML = `
-				  <div class="card-body">
+				<div class="card-body">
 				    <h5 class="card-title">${friend.nickname}</h5>
 				    <p class="card-text">ID: ${friend.id}</p>
 				    <p class="card-text">online: ${friend.is_online ? 'Yes' : 'No'}</p>
-					</div>
+				</div>
 				`; // Display id, nickname, and is_online
 				friendsList.appendChild(friendItem);
 			});

@@ -3,7 +3,7 @@ import Fetch from "../classes/JsonFetch";
 
 export default class UserView extends AbstructView {
     me: any;
-    constructor (params: string) {
+    constructor (params: Record<string, string>) {
         super(params);
         this.setTitle("User");
     }
@@ -25,7 +25,7 @@ export default class UserView extends AbstructView {
                font-family: "Bodoni Moda", serif;
                font-optical-sizing: auto;
                font-weight: 700;
-               font-style: normal; 
+               font-style: normal;
                color: #110167;
               }
             </style>
@@ -93,10 +93,10 @@ export default class UserView extends AbstructView {
                           <input type="text" id="emailInput" placeholder="new e-mail" class="form-control">
                         </div>
                       </div>
-                    </div> 
+                    </div>
                     <button id="updateButton" class="btn btn-outline-secondary">Submit</button>
-                  </div> 
-                  <a href="/user/me/" class="link-dark link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> 
+                  </div>
+                  <a href="/user/me/" class="link-dark link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
                     Back to Profile
                   </a>
                 </div>

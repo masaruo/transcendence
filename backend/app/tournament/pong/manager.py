@@ -1,8 +1,8 @@
 import asyncio
-from re import Match
-from asgiref.sync import sync_to_async
+from re import I, Match
+from asgiref.sync import sync_to_async, async_to_sync
 
-from tournament.models import MatchStatusType, TeamType, Match
+from tournament.models import MatchStatusType, TeamType, Match, Score
 from .APongObj import PongObj
 from .ball import Ball, LOSER
 from .paddle import Paddle
@@ -13,28 +13,21 @@ class Manager:
     _instances: dict[str, 'Manager'] = {}
 
     @classmethod
-    def get_instance(cls, name: str, match_id=None, websocket=None)-> 'Manager':
-        if name not in cls._instances:
-            cls._instances[name] = cls(name, match_id)
-        return cls._instances[name]
+    def get_instance(cls, match_id)-> 'Manager':
+        if match_id not in cls._instances:
+            cls._instances[match_id] = cls(match_id)
+        return cls._instances[match_id]
 
     @classmethod
-    def remove_instance(cls, name: str)-> None:
-        if name in cls._instances:
-            del cls._instances[name]
+    def remove_instance(cls, match_id)-> None:
+        if match_id in cls._instances:
+            del cls._instances[match_id]
 
-    def __init__(self, group_name: str, match_id=None, websocket=None) -> None:
+    def __init__(self, match_id) -> None:
         self.objs: list[PongObj] = [
             Ball(),
             #todo add multiple balls and paddles
-            Ball(y=150, color='yellow'),
-            # Ball(y=100, color='red'),
-            # Ball(y=100, color='red'),
-            # Ball(y=100, color='red'),
-            # Ball(y=100, color='red'),
-            # Ball(y=100, color='red'),
-            # Ball(y=100, color='red'),
-            # Ball(y=100, color='red'),
+            # Ball(y=150, color='yellow'),
             # Ball(y=100, color='red'),
             # Ball(y=100, color='red'),
             # Ball(y=100, color='red'),
@@ -44,37 +37,28 @@ class Manager:
             # Paddle(side=Paddle.SIDE.L2, color="red"),
         ]
         self.wall = Wall()
-        self._group_name: str = group_name
         self._match_id = match_id
-        self._websocket = websocket
+        self._group_name = f'match_{self._match_id}'
         self.channel_layer = get_channel_layer()
         self.task = None
         self.is_continue = True
-
-    @property
-    def group_name(self)-> str:
-        return self._group_name
-
-    @group_name.setter
-    def group_name(self, name: str)-> None:
-        self._group_name = name
 
     async def start(self):
         self.task = asyncio.create_task(self.run_game_loop())
 
     async def run_game_loop(self):
         try:
-            print("Game loop started")
+            # print("Game loop started")
             while self.is_continue:
                 await self.update()
                 await self.channel_layer.group_send(
-                    self.group_name,
+                    self._group_name,
                     {
                         'type': 'game_update',
                         'data': self.to_dict()
                     }
                 )
-                await asyncio.sleep(1/10)
+                await asyncio.sleep(1/10)#! game speed?
         except asyncio.CancelledError:
             print("Game loop cancelled")
             self.is_continue = False
@@ -86,7 +70,7 @@ class Manager:
             print("Game loop ended")
             # 最終的なクリーンアップ処理
 
-    async def update(self):  #todo PADDLE update
+    async def update(self):
         for obj in self.objs:
             if isinstance(obj, Ball):
                 obj.update()
@@ -121,7 +105,7 @@ class Manager:
         for ball in balls:
             loser = ball.check_to_continue_with_wall(wall=self.wall)
             if loser in [LOSER.LEFT, LOSER.RIGHT]:
-                await sync_to_async(self.check_match_finish_after_update)(loser)
+                await sync_to_async(self.update_score)(loser)
             for paddle in paddles:
                 ball.check_with_paddle(paddle=paddle)
 
@@ -129,7 +113,7 @@ class Manager:
 
     async def init(self):
         await self.channel_layer.group_send(
-            self.group_name,
+            self._group_name,
             {
                 'type': 'game_initialization',
                 'data': self.to_dict()
@@ -142,52 +126,31 @@ class Manager:
                 return obj
         return None
 
-    def check_match_finish_after_update(self, loser):
+    def update_score(self, loser):
         match = Match.objects.get(id=self._match_id)
+        if match.match_status == MatchStatusType.FINISHED:
+            return
+
+        self.update_status(match)
+
         if loser == LOSER.LEFT:
-            match.add_score_and_check_finished(team_type=TeamType.TEAM1)
-            match.save()
+            match.add_score(team_type=TeamType.TEAM1)
         elif loser == LOSER.RIGHT:
-            match.add_score_and_check_finished(team_type=TeamType.TEAM2)
-            match.save()
-
-        # if match.match_status == MatchStatusType.FINISHED:
-        #     self.finish_sync()
-
+            match.add_score(team_type=TeamType.TEAM2)
         self.reset_match()
 
-    #? redundant?
-    # async def finish(self):
-    #     print("async finish called")
-    #     if hasattr(self, 'task') and self.task:
-    #         print(f"Cancelling task: {self.task}")
-    #         self.task.cancel()
+    def update_status(self, match: Match):
+        score = Score.objects.get(match=match)
+        async_to_sync(self.channel_layer.group_send)(
+            self._group_name,
+            {
+                'type': 'status_update',
+                'data': {
+                    'match': match.to_dict(),
+                    'score': score.to_dict(),
+                }
+            }
+        )
 
-    #         try:
-    #             # キャンセルされたタスクの完了を待つ
-    #             await asyncio.shield(asyncio.wait_for(self.task, timeout=2.0))
-    #             print("Task completed successfully after cancellation")
-    #         except asyncio.CancelledError:
-    #             print("Task was cancelled as expected")
-    #         except asyncio.TimeoutError:
-    #             print("Warning: Task cancellation timed out")
-    #         except Exception as e:
-    #             print(f"Error during task cancellation: {e}")
-
-    #     await self.channel_layer.group_send(
-    #         self._group_name,
-    #         {
-    #             'type': 'game_finished',
-    #             'message': 'Game has ended'
-    #         }
-    #     )
-
-    #     # 確実にis_continueをFalseに設定
-    #     self.is_continue = False
-
-
-    #? redundant
-    # def finish_sync(self):
-    #     from asgiref.sync import async_to_sync
-    #     print("finish_sync called - wrapping async finish")
-    #     async_to_sync(self.finish)()
+    def finish(self):
+        self.task.cancel()

@@ -1,7 +1,7 @@
 import AbstructView from "./AbstractView"
 
 export default class UserUpdataView extends AbstructView {
-	constructor (params: string) {
+	constructor (params: Record<string, string>) {
 		super(params);
 		this.setTitle("User Update");
 	}

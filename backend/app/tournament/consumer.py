@@ -2,7 +2,7 @@ import asyncio
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from channels.db import database_sync_to_async
 import json
-from tournament.models import Match, MatchModeType, Tournament
+from tournament.models import Match, MatchModeType, Tournament, Score
 from tournament.pong.manager import Manager
 from tournament.pong.paddle import Paddle
 from asgiref.sync import sync_to_async
@@ -63,7 +63,7 @@ class MatchConsumer(AsyncJsonWebsocketConsumer):
 
         self.paddle = await sync_to_async(self.assign_paddle)()
         self.match_group_name = f'match_{self.match_id}'
-        self.manager = Manager.get_instance(self.match_group_name, self.match_id, websocket=self)
+        self.manager = Manager.get_instance(self.match_id)
 
         await self.channel_layer.group_add(
             self.match_group_name,
@@ -78,7 +78,7 @@ class MatchConsumer(AsyncJsonWebsocketConsumer):
             self.match_group_name,
             self.channel_name
         )
-        Manager.remove_instance(name=self.match_group_name)
+        Manager.remove_instance(match_id=self.match_id)
 
     async def receive_json(self, content: dict[str, str]) -> None:
         message_type: str = content.get('type')
@@ -96,10 +96,16 @@ class MatchConsumer(AsyncJsonWebsocketConsumer):
             paddle.moveDown()
 
     async def game_initialization(self, state: dict[str, str]) -> None:
-        await self.send_json(content=state)
+        try:
+            await self.send_json(content=state)
+        except Exception as e:
+            print(f'Error sending message: {e}')
 
     async def game_update(self, state: dict[str, str]) -> None:
-        await self.send_json(content=state)
+        try:
+            await self.send_json(state)
+        except Exception as e:
+            print(f'Error sending message: {e}')
 
     def assign_paddle(self):
         """同期的にマッチを取得してパドルを割り当てる"""
@@ -119,11 +125,30 @@ class MatchConsumer(AsyncJsonWebsocketConsumer):
 
         return None
 
-    async def game_finished(self, event):
-        await self.send_json({
-            'type': 'game_finished',
-            'message': event.get('message', 'Game finished')
-        })
+    async def match_finished(self, event):
+        try:
+            self.manager.finish()
+            await self.send_json({
+                'type': 'match_finished',
+            })
+            await asyncio.sleep(0.5)
+            await self.close(1000)
+        except Exception as e:
+            print(f'Error sending message: {e}')
 
-        await asyncio.sleep(0.5)
-        await self.close()
+
+    async def status_update(self, event):
+        # match = Match.objects.get(id=self.match_id)
+        # score = Score.objects.get(match=match)
+        try:
+            match_dict = event['data']['match']
+            score_dict = event['data']['score']
+            await self.send_json({
+                'type': 'update_status',
+                'data': {
+                    'match': match_dict,
+                    'score': score_dict,
+                }
+            })
+        except Exception as e:
+            print(f'Error sending message: {e}')

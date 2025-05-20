@@ -7,17 +7,18 @@ import TournamentCreateView from "../views/TournamentCreateView";
 import TournamentListView from "../views/TournamentListView";
 import UserUpdataView from "../views/UserUpdateView";
 import UserView from "../views/UserView";
+import UrlPattern from "url-pattern";
 
-const pathToRegex = (path: string) => new RegExp("^" + path.replace(/\//g, "\\/").replace(/:\w+/g, "(.+)") + "$");
+// const pathToRegex = (path: string) => new RegExp("^" + path.replace(/\//g, "\\/").replace(/:\w+/g, "(.+)") + "$");
 
-const getParams = (match) => {
-    const values = match.result.slice(1);
-    const keys = Array.from(match.route.path.matchAll(/:(\w+)/g)).map(result => result[1]);
+// const getParams = (match) => {
+//     const values = match.result.slice(1);
+//     const keys = Array.from(match.route.path.matchAll(/:(\w+)/g)).map(result => result[1]);
 
-    return Object.fromEntries(keys.map((key, i) => {
-        return [key, values[i]];
-    }));
-};
+//     return Object.fromEntries(keys.map((key, i) => {
+//         return [key, values[i]];
+//     }));
+// };
 
 export const navigateTo = (url: string) => {
 	history.pushState(null, "", url);
@@ -31,32 +32,46 @@ export const router = async() => {
 		{path: "/user/me/update", view: UserUpdataView},
 		{path: "/login", view: LoginView },
 		{path: "/friends", view: FriendsView},
-		{path: "/pong/:id", view: PongView},
+		// {path: "/pong/:pong_id", view: PongView},
 		{path: "/tournament", view: TournamentListView},
 		{path: "/tournament/create", view: TournamentCreateView},
-		{path: "/tournament/:id", view: TournamentDetailView},
+		{path: "/tournament/:tournament_id", view: TournamentDetailView},
+		{path: "/tournament/:tournament_id/pong/:pong_id", view: PongView},
 		// {path: "/posts", view: Posts },
 		// {path: "/posts/:id", view: PostView },
 		// {path: "/settings", view: Settings }
 	];
 
-	const potentialMatches = routes.map(route => {
-		return {
-			route: route,
-			result: location.pathname.match(pathToRegex(route.path))
-		}
-	})
+	 // マッチング処理を明示的に行う
+  const currentPath = location.pathname.replace(/\/$/, '');
+//   console.log("Current path:", currentPath);
 
-	let match = potentialMatches.find(potentialMatch => potentialMatch.result != null);
+  let match = null;
+  let params = {};
 
-	if (!match) {
-		match = {
-			route: routes[0],
-			result: [location.pathname]
-		};
-	}
+  // 各ルートを確認
+  for (const route of routes) {
+    const pattern = new UrlPattern(route.path, { segmentNameCharset: 'a-zA-Z0-9_' });
+    const result = pattern.match(currentPath);
 
-	const view = new match.route.view(getParams(match));
+    // console.log(`Testing ${route.path} against ${currentPath}:`, result);
+
+    if (result) {
+      match = { route, result };
+      params = result;
+      break;
+    }
+  }
+
+  // マッチしなければデフォルトルート
+  if (!match) {
+    match = { route: routes[0], result: {} };
+  }
+
+//   console.log("Final params:", params);
+
+  // パラメータをビューに渡す
+  const view = new match.route.view(params);
 
 	const body = document.getElementById("body");
 	const header = document.getElementById('header');

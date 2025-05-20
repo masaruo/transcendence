@@ -1,7 +1,7 @@
 import AbstractView from "./AbstractView";
 
 export default class IndexView extends AbstractView {
-	constructor (params: string) {
+	constructor (params: Record<string, string>) {
 		super(params);
 		this.setTitle("Index");
 	}

@@ -1,8 +1,8 @@
 import HeaderView from "./HeaderView";
 
 export default abstract class View {
-	protected params: string;
-	constructor(params: string) {
+	protected params: Record<string, string>;
+	constructor(params: Record<string, string> = {}) {
 		this.params = params;
 	}
 
