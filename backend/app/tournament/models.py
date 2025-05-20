@@ -38,7 +38,7 @@ class RoundType(models.IntegerChoices):
 class MatchSizeType(models.IntegerChoices):
     TWO = 2
     FOUR = 4
-    EIGHT = 8
+    # EIGHT = 8
 
 class TournamentManager(models.Manager):
     def get_or_create_tournament(self, player, match_type = MatchModeType.SINGLES, match_size = MatchSizeType.FOUR):
@@ -79,7 +79,11 @@ class Tournament(models.Model):
         }
 
     def add_player(self, player, round=RoundType.PRELIMINARY) -> 'TournamentPlayer':
-        return TournamentPlayer.objects.create(player=player, tournament=self, final_round=round)
+        is_player_in_tournament = self.players.filter(id=player.id).exists()
+        if is_player_in_tournament:
+            return self.player_entries.get(player=player)
+        else:
+            return TournamentPlayer.objects.create(player=player, tournament=self, final_round=round)
 
     def start_tournament(self) -> bool:
         if self.status != MatchStatusType.WAITING:
@@ -98,7 +102,7 @@ class Tournament(models.Model):
         import random
         random.shuffle(players)
 
-#* refactor : team creationのリファクタ
+        #* refactor : team creationのリファクタ
         if self.match_type == MatchModeType.DOUBLES:
             for i in range(0, len(players), 4):
                 if i + 3 < len(players):
@@ -221,6 +225,7 @@ class Match(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     match_status = models.IntegerField(choices=MatchStatusType.choices, default=MatchStatusType.WAITING)
     round = models.IntegerField(choices=RoundType.choices, default=RoundType.SEMIFINAL)
+    match_size = models.IntegerField(choices=MatchSizeType.choices, default=MatchSizeType.FOUR)
 
     objects = MatchManager()
 
@@ -305,6 +310,7 @@ class TournamentPlayer(models.Model):
     player = models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='tournament_entries')
     tournament = models.ForeignKey(to='Tournament', on_delete=models.CASCADE, related_name='player_entries')
     final_round = models.IntegerField(choices=RoundType.choices)
+    #todo final_round logic not correct
 
 
 class Score(models.Model):
