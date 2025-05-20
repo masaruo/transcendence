@@ -38,7 +38,7 @@ class RoundType(models.IntegerChoices):
 class MatchSizeType(models.IntegerChoices):
     TWO = 2
     FOUR = 4
-    EIGHT = 8
+    # EIGHT = 8
 
 class TournamentManager(models.Manager):
     def get_or_create_tournament(self, player, match_type = MatchModeType.SINGLES, match_size = MatchSizeType.FOUR):
@@ -79,7 +79,11 @@ class Tournament(models.Model):
         }
 
     def add_player(self, player, round=RoundType.PRELIMINARY) -> 'TournamentPlayer':
-        return TournamentPlayer.objects.create(player=player, tournament=self, final_round=round)
+        is_player_in_tournament = self.players.filter(id=player.id).exists()
+        if is_player_in_tournament:
+            return self.player_entries.get(player=player)
+        else:
+            return TournamentPlayer.objects.create(player=player, tournament=self, final_round=round)
 
     def start_tournament(self) -> bool:
         if self.status != MatchStatusType.WAITING:
@@ -98,7 +102,7 @@ class Tournament(models.Model):
         import random
         random.shuffle(players)
 
-#* refactor : team creationのリファクタ
+        #* refactor : team creationのリファクタ
         if self.match_type == MatchModeType.DOUBLES:
             for i in range(0, len(players), 4):
                 if i + 3 < len(players):
@@ -106,6 +110,9 @@ class Tournament(models.Model):
                     team2 = Team.objects.create(player1=players[i + 2], player2=players[i + 3])
                     match = Match.objects.create(tournament=self, team1=team1, team2=team2)
                     score = Score.objects.create(match=match)
+                    if self.match_size == MatchSizeType.TWO:
+                        match.round = RoundType.FINAL
+                        match.save()
                     self._notify_match_start(match)
         else:
             remaining_players = players.copy()
@@ -114,6 +121,9 @@ class Tournament(models.Model):
                 team2 = Team.objects.create(player1=remaining_players.pop(0))
                 match = Match.objects.create(tournament=self, team1=team1, team2=team2)
                 score = Score.objects.create(match=match)
+                if self.match_size == MatchSizeType.TWO:
+                    match.round = RoundType.FINAL
+                    match.save()
                 self._notify_match_start(match)
 
     def _notify_match_start(self, match):
@@ -178,7 +188,6 @@ class Tournament(models.Model):
         self.generate_next_round(prev_round)
 
     def generate_next_round(self, prev_round:RoundType):
-        # breakpoint()
         won_teams = Match.objects.get_winners(tournament=self, prev_round=prev_round)
         for i in range(0, len(won_teams),2):
             if i + 1 < len(won_teams):
@@ -190,7 +199,6 @@ class Tournament(models.Model):
                     round=prev_round + 1)
                 score = Score.objects.create(match=new_match)
                 self._notify_match_start(match=new_match)
-                print(f'generate new round at {new_match.id}')
 
 class MatchManager(models.Manager):
     def is_round_complete(self, tournament: 'Tournament') -> bool:
@@ -221,6 +229,7 @@ class Match(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     match_status = models.IntegerField(choices=MatchStatusType.choices, default=MatchStatusType.WAITING)
     round = models.IntegerField(choices=RoundType.choices, default=RoundType.SEMIFINAL)
+    match_size = models.IntegerField(choices=MatchSizeType.choices, default=MatchSizeType.FOUR)
 
     objects = MatchManager()
 
@@ -228,7 +237,6 @@ class Match(models.Model):
         return f"Match #{self.id}: {self.team1} vs {self.team2}"
 
     def to_dict(self):
-        # ids = [self.team1.to_dict()['playerIds'], self.team2.to_dict()['playerIds']]
         team1Ids = self.team1.to_dict()['playerIds']
         team2Ids = self.team2.to_dict()['playerIds']
         ids = team1Ids + team2Ids
@@ -305,6 +313,7 @@ class TournamentPlayer(models.Model):
     player = models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='tournament_entries')
     tournament = models.ForeignKey(to='Tournament', on_delete=models.CASCADE, related_name='player_entries')
     final_round = models.IntegerField(choices=RoundType.choices)
+    #todo final_round logic not correct
 
 
 class Score(models.Model):

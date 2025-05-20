@@ -27,7 +27,7 @@ class Manager:
         self.objs: list[PongObj] = [
             Ball(),
             #todo add multiple balls and paddles
-            Ball(y=150, color='yellow'),
+            # Ball(y=150, color='yellow'),
             # Ball(y=100, color='red'),
             # Ball(y=100, color='red'),
             # Ball(y=100, color='red'),

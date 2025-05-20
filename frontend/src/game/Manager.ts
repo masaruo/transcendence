@@ -21,7 +21,7 @@ export class Manager {
 	}
 
 	update(event: WebSocketEvent): void {
-		console.log("Recieved Event", event);
+		// console.log("Recieved Event", event);
 		if (!event || !event.data) {
 			console.error("Unexpected data type from backend.");
 			return;
@@ -30,7 +30,7 @@ export class Manager {
 		this.ctx.clearRect(0, 0, 900, 600);
 
 		const data = event.data;
-		console.log("thisis data: ",data);
+		// console.log("thisis data: ",data);
 
 		if (data.balls) {
 			for (const ball of data.balls) {

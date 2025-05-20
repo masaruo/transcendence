@@ -22,7 +22,7 @@ class TournamentViewSet(
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
-        tournament = serializer.save()
+        serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @action(detail=True, methods=['post'])
@@ -33,9 +33,8 @@ class TournamentViewSet(
 
         if user.is_authenticated:
             tournament.add_player(user)
-            #todo only SINGLES so far
-            # Only start tournament if we have enough players after adding this one
-            if tournament.player_entries.count() >= 4:  # For singles tournament
+
+            if tournament.is_tournament_players_ready():
                 # tournament.start_tournament()
                 tournament.is_ready_to_start = True
                 tournament.save()
