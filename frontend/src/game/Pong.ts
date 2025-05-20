@@ -1,3 +1,4 @@
+import { PassThrough } from "stream";
 import { Manager, WebSocketEvent } from "./Manager";
 import { navigateTo } from "@/services/router";
 
@@ -73,7 +74,7 @@ export default class Pong {
 		  }
 
 		this.socket_.onmessage = (event) => {
-			console.log("received data: ", event.data);
+			// console.log("received data: ", event.data);
 			const parsedData = JSON.parse(event.data);
 			this.handleEvent(parsedData)
 			//todo 試合状況の表示
@@ -85,8 +86,20 @@ export default class Pong {
 			console.log("websocket on close");
 			clearInterval(this.intervalID);
 			this.intervalID = null;
-			const parent_path = location.pathname.replace(/\pong\/.*$/, '');
-			navigateTo(parent_path);
+
+			setTimeout(() => {
+				if (sessionStorage.getItem('navigatingToNextMatch') === 'true') {
+					;
+				} else {
+					const parent_path = location.pathname.replace(/\/pong\/.*$/, '');
+					navigateTo(parent_path);
+				}
+				sessionStorage.removeItem('navigatingToNextMatch');
+			}, 1500);
+			// await new Promise(resolve => setTimeout(resolve, 5000));
+
+			// const parent_path = location.pathname.replace(/\pong\/.*$/, '');
+			// navigateTo(parent_path);
 		}
 
 		this.socket_.onerror = (error) => {
@@ -95,7 +108,7 @@ export default class Pong {
 	}
 
 	handleEvent(event: WebSocketEvent): void {
-		console.log("Gamets.Received Event= ", event)
+		// console.log("Gamets.Received Event= ", event)
 		switch (event.type) {
 			case 'game_initialization':
 				if (event.data) {

@@ -44,7 +44,7 @@ export const router = async() => {
 
 	 // マッチング処理を明示的に行う
   const currentPath = location.pathname.replace(/\/$/, '');
-  console.log("Current path:", currentPath);
+//   console.log("Current path:", currentPath);
 
   let match = null;
   let params = {};
@@ -54,7 +54,7 @@ export const router = async() => {
     const pattern = new UrlPattern(route.path, { segmentNameCharset: 'a-zA-Z0-9_' });
     const result = pattern.match(currentPath);
 
-    console.log(`Testing ${route.path} against ${currentPath}:`, result);
+    // console.log(`Testing ${route.path} against ${currentPath}:`, result);
 
     if (result) {
       match = { route, result };
@@ -68,54 +68,10 @@ export const router = async() => {
     match = { route: routes[0], result: {} };
   }
 
-  console.log("Final params:", params);
+//   console.log("Final params:", params);
 
   // パラメータをビューに渡す
   const view = new match.route.view(params);
-//   return view;
-
-	// const potentialMatches = routes.map(route => {
-	// 	return {
-	// 		route: route,
-	// 		pattern: new UrlPattern(route.path)
-	// 	};
-	// });
-
-	// let match = potentialMatches.find(p => p.pattern.match(location.pathname));
-	// let params: Record<string, string> = {}
-
-	// if (match) {
-	// 	const matchResult = match.pattern.match(location.pathname);
-	// 	if (matchResult) {
-	// 		params = matchResult as Record<string, string>
-	// 	}
-	// } else {
-	// 	match = {
-	// 		route: routes[0],
-	// 		pattern: new UrlPattern(routes[0].path)
-	// 	};
-	// }
-
-	// const view = new match.route.view(params);
-
-	// const potentialMatches = routes.map(route => {
-	// 	return {
-	// 		route: route,
-	// 		result: location.pathname.match(pathToRegex(route.path))
-	// 	}
-	// })
-
-	// let match = potentialMatches.find(potentialMatch => potentialMatch.result != null);
-
-	// if (!match) {
-	// 	match = {
-	// 		route: routes[0],
-	// 		result: [location.pathname]
-	// 	};
-	// }
-
-	// const view = new match.route.view(getParams(match));
-	// const view = new match.route.view()
 
 	const body = document.getElementById("body");
 	const header = document.getElementById('header');

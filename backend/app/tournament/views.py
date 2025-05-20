@@ -33,9 +33,8 @@ class TournamentViewSet(
 
         if user.is_authenticated:
             tournament.add_player(user)
-            #todo only SINGLES so far
-            # Only start tournament if we have enough players after adding this one
-            if tournament.player_entries.count() >= 4:  # For singles tournament
+
+            if tournament.is_tournament_players_ready():
                 # tournament.start_tournament()
                 tournament.is_ready_to_start = True
                 tournament.save()

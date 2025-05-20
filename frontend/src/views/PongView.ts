@@ -46,6 +46,10 @@ export default class PongView extends AbstractView {
 		if (!canvas)
 			throw Error("Failed to find canvas element.")
 		const pong = new Pong(canvas, this.params.pong_id);
+		// window.alert("pong is starting in 5 secs.");
+
+		// await new Promise(resolve => setTimeout(resolve, 5000));
+
 		pong.start();
 	}
 }
