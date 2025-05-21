@@ -225,6 +225,7 @@ class MatchManager(models.Manager):
     def get_my_matches(self, user):
         user_teams = Team.objects.get_user_teams(user)
         matches = self.filter(Q(team1__in=user_teams) | Q(team2__in=user_teams)).order_by('-created_at')
+        return matches
 
 class Match(models.Model):
     tournament = models.ForeignKey(to='Tournament', on_delete=models.CASCADE)
