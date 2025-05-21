@@ -26,35 +26,6 @@ class ManageUserView(generics.RetrieveUpdateAPIView):
         return self.request.user
 
 
-# class FriendsListView(APIView):
-#     serializer_class = FriendshipSerializer
-#     authentication_classes = [JWTAuthentication]
-#     permission_classes = [permissions.IsAuthenticated]
-
-#     def get(self, request):
-#         try:
-#             user = request.user
-#             friends = user.friends.all().order_by("nickname")
-#             serializer = self.serializer_class(friends, many=True)
-#             return Response(serializer.data, status=status.HTTP_200_OK)
-#         except Exception as e:
-#             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
-# class FriendCreateView(APIView):
-#     serializer_class = FriendshipSerializer
-#     authentication_classes = [JWTAuthentication]
-#     permission_classes = [permissions.IsAuthenticated]
-
-#     def post(self, request):
-#         try:
-#             friend_id = request.data.get("user_id")
-#             friend = User.objects.get(pk=friend_id)
-#             request.user.make_friend(friend)
-#             return Response(status=status.HTTP_201_CREATED)
-#         except Exception as e:
-#             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
-
 class FriendListView(APIView):
     serializer_class = FriendshipSerializer
     authentication_classes = [JWTAuthentication]

@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'user',
     # 'game',
     'tournament',
+    'match_history',
     'chat',
     # 3rd party apps
     'rest_framework',

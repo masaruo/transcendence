@@ -1,7 +1,7 @@
-import AbstructView from "./AbstractView"
+import AbstractView from "./AbstractView";
 
-export default class UserUpdataView extends AbstructView {
-	constructor (params: string) {
+export default class UserUpdateView extends AbstractView {
+	constructor (params: Record<string, string>) {
 		super(params);
 		this.setTitle("User Update");
 	}

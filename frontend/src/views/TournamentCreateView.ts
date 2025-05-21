@@ -4,15 +4,31 @@ import { PATH } from "../services/constants"
 import { navigateTo } from "@/services/router";
 
 export default class TournamentCreateView extends AbstractView {
-	constructor (params: string) {
+	constructor (params: Record<string, string>) {
 		super(params);
 		this.setTitle("Tournament Create");
 	}
 	async getBody(): Promise<string> {
+      console.log("Params:", this.params); // パラメータ確認
 		return `
 	<form id="tournament-settings-form" class="settings-form">
   <div class="form-group">
     <h3>トーナメント設定</h3>
+
+    <div class="setting-section">
+      <h4>Tournament Size</h4>
+      <div class="radio-options">
+        <label>
+          <input type="radio" name="tournament-size" value="2" checked>
+          TWO
+        </label>
+        <label>
+          <input type="radio" name="tournament-size" value="4">
+          FOUR
+        </label>
+      </div>
+    </div>
+    <div class="setting-section">
 
     <div class="setting-section">
       <h4>Play Type</h4>
@@ -92,6 +108,7 @@ function handleFormSubmission() {
 
 		// フォームの値を取得
 		const formData = new FormData(form as HTMLFormElement);
+		const tournamentSize = formData.get('tournament-size');
 		const playType = formData.get('play-type');
 		// const tournamentSize = formData.get('tournament-size');
 		const ballCount = formData.get('ball-count');
@@ -99,8 +116,8 @@ function handleFormSubmission() {
 
 		// APIに送信するデータを準備
 		const tournamentData = {
-		  playType: parseInt(playType as string),
-		  // size: parseInt(tournamentSize as string),
+      match_size: parseInt(tournamentSize as string),
+		  match_type: parseInt(playType as string),
 		  ball_count: parseInt(ballCount as string),
 		  ball_speed: ballSpeed
 		};
@@ -109,7 +126,7 @@ function handleFormSubmission() {
 		  // APIリクエストを送信
 		  const fetcher = new Fetch(`${PATH}/api/tournament/`, 'POST');
 		  const response = await fetcher.fetch_with_auth(tournamentData);
-      // const res_json = await response.json();
+      console.log("response", response)
       const tournament_id = response.id;
 
 		  // console.log('トーナメント作成成功:', response);

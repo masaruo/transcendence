@@ -21,19 +21,16 @@ export default class Tournament {
 		}
 
 		this.socket.onmessage = (e) => {
-			console.log("[DEBUG] Received WebSocket message:", e.data);
 			const data = JSON.parse(e.data);
 			if (data.type === 'match_start') {
 				console.log("[DEBUG] Match start notification received:", data.match);
 				const match = data.match;
 				const ids = match.playerIds;
 				const currentUserId = parseInt(sessionStorage.getItem('user_id'));
-				console.log("[DEBUG] Current user ID:", currentUserId, "Match player IDs:", ids);
 				if (ids.includes(currentUserId)) {
-					console.log("[DEBUG] User is in match, navigating to game");
-					navigateTo(`/pong/${match.id}`)
-				} else {
-					console.log("[DEBUG] User is not in this match");
+					console.log("[DEBUG] User is in this match");
+					sessionStorage.setItem('navigatingToNextMatch', 'true');
+					navigateTo(`/tournament/${this.tournamentId}/pong/${match.id}`)
 				}
 			} else if (data.type === 'tournament_update') {
 				console.log("[DEBUG] Tournament update received:", data);
