@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import permissions
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.shortcuts import get_object_or_404
-from tournament.models import Tournament, Match, Team, Score, TournamentPlayer
+from tournament.models import Match
 from django.contrib.auth import get_user_model
 from tournament.serializers import MatchSerializer
 
