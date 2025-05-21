@@ -7,6 +7,7 @@ import TournamentCreateView from "../views/TournamentCreateView";
 import TournamentListView from "../views/TournamentListView";
 import UserUpdateView from "../views/UserUpdateView";
 import UserView from "../views/UserView";
+import MatchHistoryView from "@/views/MatchHistoryView";
 import UrlPattern from "url-pattern";
 
 // const pathToRegex = (path: string) => new RegExp("^" + path.replace(/\//g, "\\/").replace(/:\w+/g, "(.+)") + "$");
@@ -30,6 +31,7 @@ export const router = async() => {
 		{path: "/", view: IndexView},
 		{path: "/user/me", view: UserView},
 		{path: "/user/me/update", view: UserUpdateView},
+		{path: "/user/:user_id/matches", view: MatchHistoryView},
 		{path: "/login", view: LoginView },
 		{path: "/friends", view: FriendsView},
 		// {path: "/pong/:pong_id", view: PongView},
