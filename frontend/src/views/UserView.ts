@@ -1,5 +1,6 @@
 import AbstractView from "./AbstractView"
 import Fetch from "../classes/JsonFetch";
+import { navigateTo } from "@/services/router";
 
 export default class UserView extends AbstractView {
     me: any;
@@ -125,9 +126,9 @@ export default class UserView extends AbstractView {
             if (new_email && new_email.value) {
               payload.email = new_email.value;
             }
-            // if (file_input && file_input.files && file_input.files.length > 0) {
-            //   payload.avatar = file_input.files[0];
-            // }
+            if (file_input && file_input.files && file_input.files.length > 0) {
+              payload.avatar = file_input.files[0];
+            }
 
             const fetcher = new Fetch(
               "http://localhost:8000/api/user/me/",
@@ -136,12 +137,10 @@ export default class UserView extends AbstractView {
               payload,
             );
             const res = await fetcher.fetch_with_auth();
-            if (res.ok) {
+            if (res) {
               window.location.reload();
             } else {
-            //   const errorData = await res.json();
-            console.error("error updating nickname");
-            //   alert(`error: ${errorData.detail || 'some error'}`);
+              console.error("error updating nickname");
             }
           });
         } catch (error) {
