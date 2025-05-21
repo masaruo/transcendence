@@ -1,7 +1,7 @@
-import AbstructView from "./AbstractView"
+import AbstractView from "./AbstractView"
 import Fetch from "../classes/JsonFetch";
 
-export default class UserView extends AbstructView {
+export default class UserView extends AbstractView {
     me: any;
     constructor (params: Record<string, string>) {
         super(params);

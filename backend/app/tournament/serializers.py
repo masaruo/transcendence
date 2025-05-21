@@ -44,15 +44,42 @@ class MatchSerializer(serializers.ModelSerializer):
     tournament = TournamentSerializer(read_only=True)
     team1 = TeamSerializer(read_only=True)
     team2 = TeamSerializer(read_only=True)
+    team1_score = serializers.SerializerMethodField(read_only=True)
+    team2_score = serializers.SerializerMethodField(read_only=True)
+    winner = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Match
-        fields = '__all__'
+        fields = ['id', 'tournament', 'team1', 'team2', 'created_at', 'match_status', 'round', 'match_size',
+                 'team1_score', 'team2_score', 'winner']
+
+    def get_team1_score(self, obj):
+        try:
+            score = Score.objects.get(match=obj)
+            return score.team1_score
+        except Score.DoesNotExist:
+            return 0
+
+    def get_team2_score(self, obj):
+        try:
+            score = Score.objects.get(match=obj)
+            return score.team2_score
+        except Score.DoesNotExist:
+            return 0
+
+    def get_winner(self, obj):
+        try:
+            score = Score.objects.get(match=obj)
+            if score.winner:
+                return TeamSerializer(score.winner).data
+            return None
+        except Score.DoesNotExist:
+            return None
 
 
 class ScoreSerializer(serializers.ModelSerializer):
-    match = MatchSerializer(read_only=True)
     winner = TeamSerializer(read_only=True)
+
     class Meta:
         model = Score
         fields = '__all__'

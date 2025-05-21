@@ -209,7 +209,7 @@ class MatchManager(models.Manager):
         else:
             return True
 
-    def get_current_round(self, tournament: 'Tournament'):
+    def get_current_round(self, tournament: 'Tournament') -> int | None:
         latest_match = Match.objects.filter(tournament=tournament).order_by('-round').first()
         return latest_match.round if latest_match else None
 
@@ -221,6 +221,11 @@ class MatchManager(models.Manager):
             won_team = Score.objects.get(match=match).winner
             won_teams.append(won_team)
         return won_teams
+
+    def get_my_matches(self, user):
+        user_teams = Team.objects.get_user_teams(user)
+        matches = self.filter(Q(team1__in=user_teams) | Q(team2__in=user_teams)).order_by('-created_at')
+        return matches
 
 class Match(models.Model):
     tournament = models.ForeignKey(to='Tournament', on_delete=models.CASCADE)
@@ -286,9 +291,15 @@ class Match(models.Model):
         if Match.objects.is_round_complete(self.tournament):
             self.tournament.update_tournament_status()
 
+class TeamManager(models.Manager):
+    def get_user_teams(self, user):
+        return self.filter(Q(player1=user) | Q(player2=user))
+
 class Team(models.Model):
     player1 = models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING, related_name='teams_as_player1')
     player2 = models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING, null=True, blank=True, related_name='teams_as_player2')
+
+    objects = TeamManager()
 
     def __str__(self):
         if self.player2:
