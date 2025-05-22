@@ -137,23 +137,25 @@ export default class UserView extends AbstractView {
           update_submit.addEventListener('click', async (event) => {
             event.preventDefault();
 
-            const payload:Payload = {};
+            // const payload:Payload = {};
+
+            const formData = new FormData();
 
             if (new_nickname && new_nickname.value) {
-              payload.nickname = new_nickname.value;
+              formData.append('nickname', new_nickname.value);
             }
             if (new_email && new_email.value) {
-              payload.email = new_email.value;
+              formData.append('email', new_email.value);
             }
             if (new_password && new_password.value) {
-              payload.password = new_password.value;
+              formData.append('password', new_password.value);
             }
-            // if (file_input && file_input.files && file_input.files.length > 0) {
-            //   payload.avatar = file_input.files[0];
-            // }
+            if (file_input && file_input.files && file_input.files.length > 0) {
+              formData.append('avatar', file_input.files[0]);
+            }
 
             const fetcher = new Fetch(`${PATH}/api/user/me/`, "PATCH");
-            fetcher.add_body(payload);
+            fetcher.add_form_data(formData);
             const res = await fetcher.fetch_with_auth();
             if (res) {
               window.location.reload();

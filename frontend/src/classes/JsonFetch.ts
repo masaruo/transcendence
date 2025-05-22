@@ -2,7 +2,7 @@ export default class Fetch {
 	private url: string;
 	private method: string;
 	private headers: { [key: string]: string } = {};
-	private body?: string;
+	private body?: any;
 
 	constructor(url: string, method: string = "GET") {
 		this.url = url;
@@ -30,6 +30,11 @@ export default class Fetch {
 
 	add_body(body: object): void {
 		this.body = JSON.stringify(body);
+	}
+
+	add_form_data(formData: FormData): void {
+		this.body = formData;
+		this.delete_header("Content-Type");
 	}
 
 	async fetch_without_auth(): Promise<any> {
