@@ -1,9 +1,10 @@
 """
 Custom model for user
 """
+from datetime import timedelta
 import os
 import uuid
-
+from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
@@ -32,7 +33,6 @@ class UserManager(BaseUserManager):
     def create_superuser(self, email, password):
         """create new superuser"""
         user = self.create_user(email=email, nickname="root", password=password)
-        user.is_online = True
         user.is_active = True
         user.is_staff = True
         user.is_superuser = True
@@ -54,10 +54,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(verbose_name="Email", max_length=255, unique=True, blank=False, null=False)
     nickname = models.CharField(verbose_name="Nickname", max_length=255, blank=False, null=False)
     avatar = models.ImageField(verbose_name="Avatar", null=True, blank=True, upload_to=get_avatar_image_path, default="default_avatar.jpeg")
-    is_online = models.BooleanField(verbose_name="Online Status", default=True)
     is_active = models.BooleanField(verbose_name="Active User", default=True)
     is_staff = models.BooleanField(default=False)
     friends = models.ManyToManyField('self', symmetrical=True, blank=True)
+    last_seen = models.DateTimeField(default=timezone.now)
 
     # register UserManager class for this User model
     objects = UserManager()
@@ -67,6 +67,10 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
+
+    @property
+    def is_online(self):
+        return timezone.now() - self.last_seen < timedelta(seconds=60)
 
     def make_friend(self, friend):
         if self == friend:
@@ -83,3 +87,7 @@ class User(AbstractBaseUser, PermissionsMixin):
             raise ValueError("You guys are not friends.")
 
         self.friends.remove(friend)
+
+    def update_timestamp(self):
+        self.last_seen = timezone.now()
+        self.save()

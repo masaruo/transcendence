@@ -73,6 +73,14 @@ export default class UserView extends AbstractView {
                           <span class="font-weight-bold">${this.me.email}</span>
                         </div>
                       </div>
+                      <div class="row w-100">
+                        <div class="col-5 text-start">
+                          <div>status: </div>
+                        </div>
+                        <div class="col-7 text-start">
+                          <span class="font-weight-bold">${this.me.is_online ? 'Online' : 'Offline'}</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                   <div class="col-md-6">
@@ -99,15 +107,17 @@ export default class UserView extends AbstractView {
                           <label for="emailInput" class="form-label">e-mail</label>
                         </div>
                         <div class="col-8">
-                          <input type="text" id="emailInput" placeholder="new e-mail" class="form-control">
+                          <input type="email" id="emailInput" placeholder="new e-mail" class="form-control">
                         </div>
                       <div class="row g-5 align-items-center mb-3">
                         <div class="col-4">
                           <label for="passwordInput" class="form-label">password</label>
                         </div>
                         <div class="col-8">
-                          <input type="text" id="passwordInput" placeholder="new password" class="form-control">
+                          <input type="password" id="passwordInput" placeholder="new password" class="form-control">
                         </div>
+                      </div>
+                      <div class="row g-5 align-items-center mb-3">
                       </div>
                     </div>
                     <button id="updateButton" class="btn btn-outline-secondary">Submit</button>
@@ -131,13 +141,12 @@ export default class UserView extends AbstractView {
           const new_email = document.getElementById('emailInput') as HTMLInputElement;
           const new_password = document.getElementById('passwordInput') as HTMLInputElement;
           const file_input = document.getElementById('avatarInput') as HTMLInputElement;
+          const is_online_input = document.getElementById('isOnlineInput') as HTMLInputElement;
           const update_submit = document.getElementById('updateButton');
 
           if (!update_submit){ throw Error("update submit not found");}
           update_submit.addEventListener('click', async (event) => {
             event.preventDefault();
-
-            // const payload:Payload = {};
 
             const formData = new FormData();
 
@@ -154,13 +163,18 @@ export default class UserView extends AbstractView {
               formData.append('avatar', file_input.files[0]);
             }
 
+            // is_onlineチェックボックスの値を追加
+            if (is_online_input) {
+              formData.append('is_online', is_online_input.checked.toString());
+            }
+
             const fetcher = new Fetch(`${PATH}/api/user/me/`, "PATCH");
             fetcher.add_form_data(formData);
             const res = await fetcher.fetch_with_auth();
             if (res) {
               window.location.reload();
             } else {
-              console.error("error updating nickname");
+              console.error("error updating profile");
             }
           });
         } catch (error) {
