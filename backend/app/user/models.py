@@ -4,13 +4,10 @@ Custom model for user
 import os
 import uuid
 
-# from django.contrib.auth import get_user_model
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
 AVATAR_DEFAULT = "defalt"
-
-# User = get_user_model()
 
 class UserManager(BaseUserManager):
     """manager for User model"""

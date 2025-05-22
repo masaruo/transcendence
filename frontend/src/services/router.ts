@@ -7,6 +7,7 @@ import TournamentCreateView from "../views/TournamentCreateView";
 import TournamentListView from "../views/TournamentListView";
 import UserView from "../views/UserView";
 import MatchHistoryView from "@/views/MatchHistoryView";
+import UserRegisterView from "@/views/UserRegisterView";
 import UrlPattern from "url-pattern";
 
 export const navigateTo = (url: string) => {
@@ -18,6 +19,7 @@ export const router = async() => {
 	const routes = [
 		{path: "/", view: IndexView},
 		{path: "/user", view: UserView},
+		{path: "/user/register", view: UserRegisterView},
 		{path: "/user/:user_id/matches", view: MatchHistoryView},
 		{path: "/login", view: LoginView },
 		{path: "/friends", view: FriendsView},
