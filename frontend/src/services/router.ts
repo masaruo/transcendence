@@ -9,6 +9,27 @@ import UserView from "../views/UserView";
 import MatchHistoryView from "@/views/MatchHistoryView";
 import UserRegisterView from "@/views/UserRegisterView";
 import UrlPattern from "url-pattern";
+import { StatusManager } from "./StatusManager"
+
+let statusManager: StatusManager | null = null;
+
+export const initStatusManager = () => {
+    if (!statusManager && isAuthenticated()) {
+        statusManager = new StatusManager();
+        statusManager.connect();
+    }
+};
+
+export const cleanupStatusManager = () => {
+    if (statusManager) {
+        statusManager.disconnect();
+        statusManager = null;
+    }
+};
+
+function isAuthenticated(): boolean {
+    return sessionStorage.getItem('is_authenticated') == 'true';
+}
 
 export const navigateTo = (url: string) => {
 	history.pushState(null, "", url);
@@ -65,4 +86,7 @@ export const router = async() => {
 	body.innerHTML = await view.getBody();
 
 	await view.loadScripts();
+	if (isAuthenticated()) {
+		initStatusManager();
+	}
 };

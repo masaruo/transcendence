@@ -2,7 +2,7 @@ import asyncio
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from channels.db import database_sync_to_async
 import json
-from tournament.models import Match, MatchModeType, Tournament, Score
+from tournament.models import Match, MatchModeType, Tournament
 from tournament.pong.manager import Manager
 from tournament.pong.paddle import Paddle
 from asgiref.sync import sync_to_async
