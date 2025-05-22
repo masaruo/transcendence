@@ -57,10 +57,6 @@ export default class TournamentCreateView extends AbstractView {
           <input type="radio" name="ball-count" value="2">
           2個
         </label>
-        <label>
-          <input type="radio" name="ball-count" value="3">
-          3個
-        </label>
       </div>
     </div>
 
@@ -110,31 +106,23 @@ function handleFormSubmission() {
 		const formData = new FormData(form as HTMLFormElement);
 		const tournamentSize = formData.get('tournament-size');
 		const playType = formData.get('play-type');
-		// const tournamentSize = formData.get('tournament-size');
 		const ballCount = formData.get('ball-count');
-		const ballSpeed = formData.get('ball-speed');
+		// const ballSpeed = formData.get('ball-speed');
 
-		// APIに送信するデータを準備
 		const tournamentData = {
       match_size: parseInt(tournamentSize as string),
 		  match_type: parseInt(playType as string),
-		  ball_count: parseInt(ballCount as string),
-		  ball_speed: ballSpeed
+		  ball_number: parseInt(ballCount as string),
+		  // ball_speed: parseInt(ballSpeed as string),
 		};
 
 		try {
-		  // APIリクエストを送信
 		  const fetcher = new Fetch(`${PATH}/api/tournament/`, 'POST');
 		  const response = await fetcher.fetch_with_auth(tournamentData);
-      console.log("response", response)
       const tournament_id = response.id;
 
-		  // console.log('トーナメント作成成功:', response);
 		  alert('トーナメントが作成されました！');
       navigateTo(`/tournament/${tournament_id}`);
-		  // 成功したらページをリロードするか、新しいトーナメントを表示
-		  // window.location.href = '/tournaments';
-
 		} catch (error) {
 		  console.error('トーナメント作成エラー:', error);
 		  alert('トーナメント作成に失敗しました。もう一度お試しください。');

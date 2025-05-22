@@ -96,10 +96,6 @@ export default class Pong {
 				}
 				sessionStorage.removeItem('navigatingToNextMatch');
 			}, 1500);
-			// await new Promise(resolve => setTimeout(resolve, 5000));
-
-			// const parent_path = location.pathname.replace(/\pong\/.*$/, '');
-			// navigateTo(parent_path);
 		}
 
 		this.socket_.onerror = (error) => {

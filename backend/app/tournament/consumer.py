@@ -63,7 +63,7 @@ class MatchConsumer(AsyncJsonWebsocketConsumer):
 
         self.paddle = await sync_to_async(self.assign_paddle)()
         self.match_group_name = f'match_{self.match_id}'
-        self.manager = Manager.get_instance(self.match_id)
+        self.manager = await Manager.get_instance(self.match_id)
 
         await self.channel_layer.group_add(
             self.match_group_name,

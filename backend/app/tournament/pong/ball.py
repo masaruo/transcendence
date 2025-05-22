@@ -16,8 +16,8 @@ class Ball(PongObj):
         self.y: int = y
         self.radius: int = radius
         self.color: str = color
-        self.dx: int = self.getRandomDx()
-        self.dy: int = self.getRandomDy()
+        self.dx: int = self.getRandomDx()#todo game speed
+        self.dy: int = self.getRandomDy()#todo game speed
 
     @staticmethod
     def getRandomDx() -> int:

@@ -25,18 +25,17 @@ class TournamentSerializer(serializers.ModelSerializer):
     players = UserSerializer(many=True, read_only=True)
     class Meta:
         model = Tournament
-        fields = ['id', 'players', 'status', 'created_at', 'match_type', 'match_size']
+        fields = ['id', 'players', 'status', 'created_at', 'match_type', 'match_size', 'ball_number']
         read_only_fields = ['id', 'players', 'status', 'created_at']
 
     def create(self, validated_data):
         match_size = to_int(validated_data.get('match_size', MatchSizeType.FOUR))
         match_type = to_int(validated_data.get('match_type', MatchModeType.SINGLES))
-        ball_count = to_int(validated_data.get('ball_count', 1))
-        ball_speed = to_int(validated_data.get('ball_speed', 1))#? option
+        ball_number = to_int(validated_data.get('ball_number', 1))
+        # ball_speed = to_int(validated_data.get('ball_speed', 1))#? option
 
         user = self.context['request'].user
-
-        tournament = Tournament.objects.create(match_type=match_type, match_size=match_size)
+        tournament = Tournament.objects.create(match_type=match_type, match_size=match_size, ball_number=ball_number)
         tournament.add_player(user)
         return tournament
 
