@@ -21,7 +21,7 @@ class UserSerializer(serializers.ModelSerializer):
 
         if password:
             user.set_password(password)
-        # breakpoint()
+        
         if avatar:
             user.avatar = avatar
         if password or avatar:
