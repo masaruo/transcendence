@@ -101,6 +101,13 @@ export default class UserView extends AbstractView {
                         <div class="col-8">
                           <input type="text" id="emailInput" placeholder="new e-mail" class="form-control">
                         </div>
+                      <div class="row g-5 align-items-center mb-3">
+                        <div class="col-4">
+                          <label for="passwordInput" class="form-label">password</label>
+                        </div>
+                        <div class="col-8">
+                          <input type="text" id="passwordInput" placeholder="new password" class="form-control">
+                        </div>
                       </div>
                     </div>
                     <button id="updateButton" class="btn btn-outline-secondary">Submit</button>
@@ -122,6 +129,7 @@ export default class UserView extends AbstractView {
         try {
           const new_nickname = document.getElementById('nicknameInput') as HTMLInputElement;
           const new_email = document.getElementById('emailInput') as HTMLInputElement;
+          const new_password = document.getElementById('passwordInput') as HTMLInputElement;
           const file_input = document.getElementById('avatarInput') as HTMLInputElement;
           const update_submit = document.getElementById('updateButton');
 
@@ -136,6 +144,9 @@ export default class UserView extends AbstractView {
             }
             if (new_email && new_email.value) {
               payload.email = new_email.value;
+            }
+            if (new_password && new_password.value) {
+              payload.password = new_password.value;
             }
             // if (file_input && file_input.files && file_input.files.length > 0) {
             //   payload.avatar = file_input.files[0];
