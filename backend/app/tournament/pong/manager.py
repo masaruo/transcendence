@@ -29,7 +29,6 @@ class Manager:
     def __init__(self, match_id) -> None:
         self.objs: list[PongObj] = [
             Ball(),
-            # Ball(y=100, color='red'),#todo number ball option
             Paddle(side=Paddle.SIDE.R1, color="green"),
             Paddle(side=Paddle.SIDE.L1, color="blue"),
         ]
