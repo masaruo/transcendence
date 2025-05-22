@@ -18,7 +18,7 @@ export default class Pong {
 	private manager: Manager | null = null;
 
 	scene: THREE.Scene;
-	camera: THREE.PerspectiveCamera;
+	camera: THREE.OrthographicCamera;
 
 	constructor(canvas: HTMLCanvasElement, matchId: number) {
 		if (!canvas) {
@@ -33,7 +33,14 @@ export default class Pong {
 
 		this.scene = new THREE.Scene();
 
-		this.camera = new THREE.PerspectiveCamera(75, this.width / this.height);
+		const left = this.width * -1;
+		const right = this.width;
+		const top = this.height;
+		const bottom = this.height * -1;
+		const near = -1000;
+		const far = 1000;
+
+		this.camera = new THREE.OrthographicCamera(left, right, top, bottom, near, far);
 		this.camera.position.set(this.width / 2, this.height / 2, +1000);
 		this.camera.lookAt(this.width / 2, this.height / 2, 0);
 

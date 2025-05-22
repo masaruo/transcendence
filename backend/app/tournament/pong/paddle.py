@@ -59,13 +59,13 @@ class Paddle(PongObj):
     def reset(self)-> None:
         self.y = SCREEN_HEIGHT // 2
 
-    def moveUp(self):
+    def moveDown(self):
         amt = MOVE_VALUE
         if (self.top - amt <= 0):
             amt = self.top
         self.y -= amt
 
-    def moveDown(self):
+    def moveUp(self):
         amt = MOVE_VALUE
         if (self.bottom + amt >= SCREEN_HEIGHT):
             amt = SCREEN_HEIGHT - self.bottom
