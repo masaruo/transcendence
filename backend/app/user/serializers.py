@@ -36,5 +36,4 @@ class FriendshipSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
     def get_is_online(self, obj) -> bool:
-        print(obj.is_online)
         return obj.is_online

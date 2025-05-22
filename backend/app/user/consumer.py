@@ -20,7 +20,6 @@ class StatusConsumer(AsyncJsonWebsocketConsumer):
 
     async def receive_json(self, content, **kwargs):
         if content.get('type') == 'ping':
-            breakpoint()
             await self.send_json({'type':'pong'})
             await self.update_last_seen()
 

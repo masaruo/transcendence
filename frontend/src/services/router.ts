@@ -90,3 +90,7 @@ export const router = async() => {
 		initStatusManager();
 	}
 };
+
+window.addEventListener('beforeunload', () => {
+	cleanupStatusManager();
+})
