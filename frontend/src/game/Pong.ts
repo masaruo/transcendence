@@ -1,9 +1,10 @@
 import { PassThrough } from "stream";
 import { Manager, WebSocketEvent } from "./Manager";
 import { navigateTo } from "@/services/router";
+import * as THREE from 'three';
 
 export default class Pong {
-	readonly ctx: CanvasRenderingContext2D;
+	readonly renderer: THREE.WebGLRenderer;
 	readonly matchId: number = 0;
 	readonly width: number;
 	readonly height: number;
@@ -16,16 +17,25 @@ export default class Pong {
 	private keyMovements: {[key: string]: boolean} = {};
 	private manager: Manager | null = null;
 
+	scene: THREE.Scene;
+	camera: THREE.PerspectiveCamera;
+
 	constructor(canvas: HTMLCanvasElement, matchId: number) {
 		if (!canvas) {
 			throw Error('failed to get canvas element.');
 		}
-		const ctx = canvas.getContext('2d');
-		if (!ctx)
-			throw Error('failed to get context.');
-		this.ctx = ctx;
 		this.width = canvas.width;
 		this.height = canvas.height;
+
+		this.renderer = new THREE.WebGLRenderer({ canvas });
+		this.renderer.setPixelRatio(window.devicePixelRatio);
+		this.renderer.setSize(this.width, this.height);
+
+		this.scene = new THREE.Scene();
+
+		this.camera = new THREE.PerspectiveCamera(75, this.width / this.height);
+		this.camera.position.set(this.width / 2, this.height / 2, +1000);
+		this.camera.lookAt(this.width / 2, this.height / 2, 0);
 
 		this.matchId = matchId;
 		document.addEventListener('keydown', (e) => {
@@ -84,8 +94,6 @@ export default class Pong {
 			//todo 試合終了のお知らせ
 			// setTimeout(() => this.connectWebSocket(), 3000);
 			console.log("websocket on close");
-			clearInterval(this.intervalID);
-			this.intervalID = null;
 
 			setTimeout(() => {
 				if (sessionStorage.getItem('navigatingToNextMatch') === 'true') {
@@ -112,7 +120,7 @@ export default class Pong {
 		switch (event.type) {
 			case 'game_initialization':
 				if (event.data) {
-					this.manager = new Manager(this.ctx);
+					this.manager = new Manager(this.renderer, this.scene);
 					this.manager.update(event);
 					// this.state_ = new State(parsedData.data);
 				} else {
@@ -155,7 +163,9 @@ export default class Pong {
 	}
 
 	draw(): void {
+		requestAnimationFrame(() => this.draw());
 		this.check_and_notify_keymove();
+		this.renderer.render(this.scene, this.camera);
 		return;
 	}
 

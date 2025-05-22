@@ -17,6 +17,7 @@ export class Game {
 		if (!canvas) {
 			throw Error('failed to get canvas element.');
 		}
+		console.log("Game constructor is called");
 		this.width = canvas.width;
 		this.height = canvas.height;
 
@@ -26,8 +27,9 @@ export class Game {
 
 		this.scene = new THREE.Scene();
 		
-		this.camera = new THREE.PerspectiveCamera(35, this.width / this.height);
-    this.camera.position.set(this.width / 2, this.height / 2, +1000);
+		this.camera = new THREE.PerspectiveCamera(75, this.width / this.height);
+    this.camera.position.set(this.width / 2, this.height / 2, +300);
+		this.camera.lookAt(this.width / 2, this.height / 2, 0);
 
 		this.matchId = matchId;
 		document.addEventListener('keydown', (e) => {
@@ -80,6 +82,8 @@ export class Game {
 		switch (event.type) {
 			case 'game_initialization':
 				if (event.data) {
+					//console.log("this.scene in Game manager init:", this.scene);
+					console.log("Game constructor is called");
 					this.manager = new Manager(this.renderer, this.scene);
 					this.manager.update(event);
 					// this.state_ = new State(parsedData.data);
@@ -88,6 +92,7 @@ export class Game {
 				}
 				break;
 			case 'game_update':
+					console.log("this.scene in Game manager.update:", this.scene);
 				if (this.manager)
 					this.manager.update(event);
 				else

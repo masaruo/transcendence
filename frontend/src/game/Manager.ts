@@ -35,6 +35,14 @@ export class Manager {
 		const data = event.data;
 		// console.log("thisis data: ",data);
 
+		const ambient = new THREE.AmbientLight(0x404040); 
+		this.scene.add(ambient);
+		const geometry = new THREE.PlaneGeometry(1000, 1000);
+		const material = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide });
+		const plane = new THREE.Mesh(geometry, material);
+		plane.position.set(0, 0, -10);
+		this.scene.add(plane);
+
 		if (data.balls) {
 			for (const ball of data.balls) {
 				const { x, y, radius, color } = ball;
