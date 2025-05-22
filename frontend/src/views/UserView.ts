@@ -1,6 +1,14 @@
 import AbstractView from "./AbstractView"
 import Fetch from "../classes/JsonFetch";
 import { navigateTo } from "@/services/router";
+import { PATH } from "@/services/constants";
+
+interface Payload {
+  nickname?: string,
+  email?: string,
+  password?: string,
+  avatar?: string,
+}
 
 export default class UserView extends AbstractView {
     me: any;
@@ -11,7 +19,7 @@ export default class UserView extends AbstractView {
 
     async getBody(): Promise<string> {
         try {
-            const fetcher = new Fetch("http://localhost:8000/api/user/me/");
+            const fetcher = new Fetch(`${PATH}/api/user/me/`);
             this.me = await fetcher.fetch_with_auth();
             return `
             <style>
@@ -77,7 +85,7 @@ export default class UserView extends AbstractView {
                           <label for="fileInput" class="form-label">image</label>
                         </div>
                         <div class="col-8">
-                          <input type="file" class="form-control" id="fileInput">
+                          <input type="file" class="form-control" id="avatarInput">
                         </div>
                         <div class="col-4">
                           <label for="nicknameInput" class="form-label">nick name</label>
@@ -97,8 +105,8 @@ export default class UserView extends AbstractView {
                     </div>
                     <button id="updateButton" class="btn btn-outline-secondary">Submit</button>
                   </div>
-                  <a href="/user/me/" class="link-dark link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
-                    Back to Profile
+                  <a href="/" class="link-dark link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
+                    Back to Home
                   </a>
                 </div>
               </div>
@@ -114,28 +122,27 @@ export default class UserView extends AbstractView {
         try {
           const new_nickname = document.getElementById('nicknameInput') as HTMLInputElement;
           const new_email = document.getElementById('emailInput') as HTMLInputElement;
-          const file_input = document.getElementById('fileInput') as HTMLInputElement;
+          const file_input = document.getElementById('avatarInput') as HTMLInputElement;
           const update_submit = document.getElementById('updateButton');
 
           if (!update_submit){ throw Error("update submit not found");}
           update_submit.addEventListener('click', async (event) => {
-            const payload = {};
+            event.preventDefault();
+
+            const payload:Payload = {};
+
             if (new_nickname && new_nickname.value) {
               payload.nickname = new_nickname.value;
             }
             if (new_email && new_email.value) {
               payload.email = new_email.value;
             }
-            if (file_input && file_input.files && file_input.files.length > 0) {
-              payload.avatar = file_input.files[0];
-            }
+            // if (file_input && file_input.files && file_input.files.length > 0) {
+            //   payload.avatar = file_input.files[0];
+            // }
 
-            const fetcher = new Fetch(
-              "http://localhost:8000/api/user/me/",
-              "PATCH",
-              undefined,
-              payload,
-            );
+            const fetcher = new Fetch(`${PATH}/api/user/me/`, "PATCH");
+            fetcher.add_body(payload);
             const res = await fetcher.fetch_with_auth();
             if (res) {
               window.location.reload();
