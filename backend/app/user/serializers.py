@@ -16,12 +16,16 @@ class UserSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         password = validated_data.pop("password", None)
+        avatar = validated_data.pop("avatar", None)
         user = super().update(instance, validated_data)
 
         if password:
             user.set_password(password)
+        # breakpoint()
+        if avatar:
+            user.avatar = avatar
+        if password or avatar:
             user.save()
-
         return user
 
 

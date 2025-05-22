@@ -118,7 +118,8 @@ function handleFormSubmission() {
 
 		try {
 		  const fetcher = new Fetch(`${PATH}/api/tournament/`, 'POST');
-		  const response = await fetcher.fetch_with_auth(tournamentData);
+      fetcher.add_body(tournamentData);
+		  const response = await fetcher.fetch_with_auth();
       const tournament_id = response.id;
 
 		  alert('トーナメントが作成されました！');

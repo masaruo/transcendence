@@ -5,21 +5,9 @@ import LoginView from "../views/LoginView";
 import PongView from "../views/PongView";
 import TournamentCreateView from "../views/TournamentCreateView";
 import TournamentListView from "../views/TournamentListView";
-import UserUpdateView from "../views/UserUpdateView";
 import UserView from "../views/UserView";
 import MatchHistoryView from "@/views/MatchHistoryView";
 import UrlPattern from "url-pattern";
-
-// const pathToRegex = (path: string) => new RegExp("^" + path.replace(/\//g, "\\/").replace(/:\w+/g, "(.+)") + "$");
-
-// const getParams = (match) => {
-//     const values = match.result.slice(1);
-//     const keys = Array.from(match.route.path.matchAll(/:(\w+)/g)).map(result => result[1]);
-
-//     return Object.fromEntries(keys.map((key, i) => {
-//         return [key, values[i]];
-//     }));
-// };
 
 export const navigateTo = (url: string) => {
 	history.pushState(null, "", url);
@@ -29,19 +17,14 @@ export const navigateTo = (url: string) => {
 export const router = async() => {
 	const routes = [
 		{path: "/", view: IndexView},
-		{path: "/user/me", view: UserView},
-		{path: "/user/me/update", view: UserUpdateView},
+		{path: "/user", view: UserView},
 		{path: "/user/:user_id/matches", view: MatchHistoryView},
 		{path: "/login", view: LoginView },
 		{path: "/friends", view: FriendsView},
-		// {path: "/pong/:pong_id", view: PongView},
 		{path: "/tournament", view: TournamentListView},
 		{path: "/tournament/create", view: TournamentCreateView},
 		{path: "/tournament/:tournament_id", view: TournamentDetailView},
 		{path: "/tournament/:tournament_id/pong/:pong_id", view: PongView},
-		// {path: "/posts", view: Posts },
-		// {path: "/posts/:id", view: PostView },
-		// {path: "/settings", view: Settings }
 	];
 
 	 // マッチング処理を明示的に行う
@@ -69,8 +52,6 @@ export const router = async() => {
   if (!match) {
     match = { route: routes[0], result: {} };
   }
-
-//   console.log("Final params:", params);
 
   // パラメータをビューに渡す
   const view = new match.route.view(params);

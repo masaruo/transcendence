@@ -1,25 +1,43 @@
 export default class Fetch {
 	private url: string;
 	private method: string;
-	private headers: { [key: string]: string };
-	private body?: string;
+	private headers: { [key: string]: string } = {};
+	private body?: any;
 
-	constructor(url: string, method: string = "GET", header?: {[key: string]: string}, body?: object) {
+	constructor(url: string, method: string = "GET") {
 		this.url = url;
 		this.method = method;
-		this.headers = header || {};
-		if (!this.headers["Content-Type"])
-			this.headers["Content-Type"] = "application/json";
-		if (!this.headers["Accept"])
-			this.headers["Accept"] = "application/json";
-		this.body = body ? JSON.stringify(body) : undefined;
+		this.headers["Content-Type"] = "application/json";
+		this.headers["Accept"] = "application/json";
+	}
+
+	add_method(method: string): void {
+		this.method = method;
 	}
 
 	add_header(key:string, value:string): void {
 		this.headers[key] = value;
 	}
 
-	async fetch_without_auth(data?: any): Promise<any> {
+	delete_header(key:string): void {
+		delete this.headers[key];
+	}
+
+	replace_header(key: string, value: string): void {
+		this.delete_header(key);
+		this.add_header(key, value);
+	}
+
+	add_body(body: object): void {
+		this.body = JSON.stringify(body);
+	}
+
+	add_form_data(formData: FormData): void {
+		this.body = formData;
+		this.delete_header("Content-Type");
+	}
+
+	async fetch_without_auth(): Promise<any> {
 		try {
 			const requestOptions: RequestInit = {
 				method: this.method,
@@ -28,11 +46,6 @@ export default class Fetch {
 
 			if (this.body) {
 				requestOptions.body = this.body;
-			}
-
-			if (data) {
-				requestOptions.body = JSON.stringify(data);
-				this.headers['Content-Type'] = 'application/json';
 			}
 
 			const res = await fetch(this.url, requestOptions);
@@ -45,14 +58,14 @@ export default class Fetch {
 		}
 	}
 
-	async fetch_with_auth(data?: any): Promise<any> {
+	async fetch_with_auth(): Promise<any> {
 		try {
 			const token = sessionStorage.getItem('access');
 			if (!token) {
 				throw new Error("No auth token found.");
 			}
 			this.headers["Authorization"] = "Bearer " + token;
-			return this.fetch_without_auth(data);
+			return this.fetch_without_auth();
 		} catch (error) {
 			throw error;
 		}

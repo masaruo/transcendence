@@ -1,11 +1,9 @@
-from rest_framework import generics, permissions, viewsets, mixins
+from rest_framework import generics, permissions
 from rest_framework.views import APIView
-from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 from rest_framework import status
-# from rest_framework.authtoken.views import ObtainAuthToken
-# from rest_framework.settings import api_settings
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
@@ -21,6 +19,7 @@ class ManageUserView(generics.RetrieveUpdateAPIView):
     serializer_class = UserSerializer
     authentication_classes = [JWTAuthentication]
     permission_classes = [permissions.IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
 
     def get_object(self):
         return self.request.user
