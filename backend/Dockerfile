@@ -12,7 +12,7 @@ COPY ./app /app
 
 WORKDIR /app
 
-EXPOSE 8000
+EXPOSE 8000 443
 
 RUN	apt-get update && apt-get upgrade -y && apt-get install -y postgresql-client tree curl lsof make && \
 	python -m venv /venv && \

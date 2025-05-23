@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 import os
+from urllib.parse import DefragResultBytes
 import dotenv
 from datetime import timedelta
 from pathlib import Path
@@ -184,10 +185,10 @@ SPECTACULAR_SETTINGS = {
 }
 
 # cors - only true for dev
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = not DEBUG
 
 # use cookie for credentials
-CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_CREDENTIALS = not DEBUG
 
 # JWT settings
 SIMPLE_JWT = {
@@ -202,3 +203,10 @@ CSRF_COOKIE_SECURE = not DEBUG
 SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0
 SECURE_HSTS_PRELOAD = not DEBUG
 SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
+
+#! XSS
+SECURE_BROWSER_XSS_FILTER = not DEBUG
+SECURE_CONTENT_TYPE_NOSNIFF = not DEBUG
+
+#! CSRF
+CSRF_COOKIE_HTTPONLY = not DEBUG

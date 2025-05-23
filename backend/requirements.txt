@@ -16,3 +16,4 @@ django-nested-admin>=4.1.1,<4.2
 ipdb
 whitenoise
 dotenv
+Twisted[tls,http2]
