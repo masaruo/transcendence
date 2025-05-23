@@ -14,8 +14,7 @@ WORKDIR /app
 
 EXPOSE 8000 443
 
-RUN	apt-get update && apt-get upgrade -y && apt-get install -y postgresql-client tree curl lsof make && \
-	python -m venv /venv && \
+RUN	apt-get update && apt-get upgrade -y && apt-get install -y postgresql-client openssl tree curl lsof make && \
 	/venv/bin/pip install --upgrade pip && /venv/bin/pip install --no-cache-dir -r /tmp/requirements.txt && \
 	rm -rf /tmp/requirements.txt && \
 	adduser --disabled-password --no-create-home django-user && \
@@ -24,7 +23,4 @@ RUN	apt-get update && apt-get upgrade -y && apt-get install -y postgresql-client
 	chown -R django-user:django-user /vol && \
 	chmod -R 755 /vol
 
-# RUN adduser --disabled-password --no-create-home django-user
 COPY ./default_avatar.jpeg /vol/web/media/default_avatar.jpeg
-
-ENV PATH="/venv/bin:$PATH"

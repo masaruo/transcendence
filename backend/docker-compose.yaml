@@ -22,7 +22,12 @@ services:
       redis:
         condition: service_healthy
     command:
-      /bin/bash -c "cd /app/app && python manage.py migrate && python manage.py collectstatic --noinput && daphne -b 0.0.0.0 -p 8000 app.asgi:application"
+      /bin/bash -c "cd /app/app && \
+      mkdir -p certs && \
+      openssl req -x509 -newkey rsa:4096 -keyout ./certs/key.pem -out ./certs/cert.pem -days 365 -nodes -batch -subj '/CN=localhost' && \
+      python manage.py migrate && \
+      python manage.py collectstatic --noinput && \
+      daphne -e ssl:443:privateKey=./certs/key.pem:certKey=./certs/cert.pem app.asgi:application"
 
   db:
     image: postgres:15
