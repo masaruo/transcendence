@@ -24,7 +24,7 @@ services:
     command:
       /bin/bash -c "cd /app/app && \
       mkdir -p certs && \
-      openssl req -x509 -newkey rsa:4096 -keyout ./certs/key.pem -out ./certs/cert.pem -days 365 -nodes -batch -subj '/CN=localhost' && \
+      openssl req -x509 -newkey rsa:4096 -keyout ./certs/key.pem -out ./certs/cert.pem -days 365 -nodes -batch -subj '/CN=localhost' -addext 'subjectAltName=DNS:localhost,IP:127.0.0.1' && \
       python manage.py migrate && \
       python manage.py collectstatic --noinput && \
       daphne -e ssl:443:privateKey=./certs/key.pem:certKey=./certs/cert.pem app.asgi:application"

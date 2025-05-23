@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 import os
-from urllib.parse import DefragResultBytes
+# from urllib.parse import DefragResultBytes
 import dotenv
 from datetime import timedelta
 from pathlib import Path
@@ -24,12 +24,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = dotenv.load_dotenv()
+dotenv.load_dotenv()
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 # DEBUG=True
 
+#! security
 ALLOWED_HOSTS = ['django', 'localhost', '*']
 
 INTERNAL_IPS = [
@@ -157,7 +159,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = '/static/static/'
+STATIC_URL = '/static/'
 MEDIA_URL = '/static/media/'
 
 MEDIA_ROOT = '/vol/web/media'
@@ -184,11 +186,39 @@ SPECTACULAR_SETTINGS = {
     'COMPONENT_SPLIT_REQUEST': True,
 }
 
-# cors - only true for dev
-CORS_ALLOW_ALL_ORIGINS = not DEBUG
+# COR# CORS
+CORS_ALLOW_ALL_ORIGINS = False
 
-# use cookie for credentials
-CORS_ALLOW_CREDENTIALS = not DEBUG
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "https://localhost:3000",
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'authorization',
+    'content-type',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
+CORS_EXPOSE_HEADERS = [
+    'content-type',
+    'content-length',
+    'content-disposition',  # 追加
+]
+
+# staticファイル用
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
 
 # JWT settings
 SIMPLE_JWT = {
