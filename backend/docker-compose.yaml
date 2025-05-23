@@ -3,6 +3,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    environment:
+      - DEBUG=${DEBUG:-False}
     ports: #open for https?
       - "8000:8000"
     restart:

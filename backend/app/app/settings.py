@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 import os
+import dotenv
 from datetime import timedelta
 from pathlib import Path
 
@@ -22,11 +23,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure--=pij7phva!t*6#6^-9=a8a+wb%t#%_-&&vgarmmd6ccg81kl!'
+SECRET_KEY = dotenv.load_dotenv()
 
 # SECURITY WARNING: don't run with debug turned on in production!
-
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+# DEBUG=True
 
 ALLOWED_HOSTS = ['django', 'localhost', '*']
 
@@ -195,6 +196,9 @@ SIMPLE_JWT = {
 }
 
 #! securities!
-# SECURE_SSL_REDIRECT = True
-# SESSION_COOKIE_SECURE = True
-# CSRF_COOKIE_SECURE = True
+SECURE_SSL_REDIRECT = not DEBUG
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0
+SECURE_HSTS_PRELOAD = not DEBUG
+SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
