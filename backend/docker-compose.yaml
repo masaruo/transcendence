@@ -18,9 +18,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-    command: >
-        /bin/bash -c " python /app/app/manage.py migrate && \
-        python /app/app/manage.py runserver 0.0.0.0:8000"
+    command:
+      /bin/bash -c "cd /app/app && python manage.py migrate && daphne -b 0.0.0.0 -p 8000 app.asgi:application"
 
   db:
     image: postgres:15
