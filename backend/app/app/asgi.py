@@ -20,6 +20,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'app.settings')
 from chat.routing import chat_urlpatterns
 from tournament.routing import tournament_urlpatterns
 from user.routing import status_urlpatterns
+from ai_battle.routing import websocket_urlpatterns as ai_battle_urlpatterns
 
 
 # Add this class before your application definition
@@ -39,7 +40,7 @@ application = ProtocolTypeRouter(
             AllowedHostsOriginValidator(
                 JWTAuthMiddleware(
                     AuthMiddlewareStack(
-                        URLRouter(chat_urlpatterns + tournament_urlpatterns + status_urlpatterns)
+                        URLRouter(chat_urlpatterns + tournament_urlpatterns + status_urlpatterns + ai_battle_urlpatterns)
                     )
                 )
             )
