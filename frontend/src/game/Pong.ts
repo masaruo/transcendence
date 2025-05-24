@@ -38,7 +38,7 @@ export default class Pong {
 		const far = 1000;
 
 		this.camera = new THREE.OrthographicCamera(display_width * -1, display_width, display_height, display_height * -1, near, far);
-		this.camera.position.set(this.width / 2, this.height / 2, 10);
+		this.camera.position.set(this.width / 2, this.height / 2, 200);
 		this.camera.lookAt(this.width / 2, this.height / 2, 0);
 
 		this.matchId = matchId;
