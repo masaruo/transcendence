@@ -31,9 +31,9 @@ class Manager:
             # Ball(y=100, color='red'),
             # Ball(y=100, color='red'),
             # Ball(y=100, color='red'),
-            Paddle(side=Paddle.SIDE.R1, color="green"),
+            Paddle(side=Paddle.SIDE.R1, color="#ef3d2d"),
             # Paddle(side=Paddle.SIDE.R2, color="white"),
-            Paddle(side=Paddle.SIDE.L1, color="blue"),
+            Paddle(side=Paddle.SIDE.L1, color="#1a15b1"),
             # Paddle(side=Paddle.SIDE.L2, color="red"),
         ]
         self.wall = Wall()

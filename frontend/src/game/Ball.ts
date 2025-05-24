@@ -15,7 +15,7 @@ export default class Ball implements IGameObj {
 		this.radius = radius;
 		this.color = color;
 		const geometry = new THREE.SphereGeometry(radius, 32, 32);
-		const material = new THREE.MeshBasicMaterial({ color: color });
+		const material = new THREE.MeshPhongMaterial({ color: color });
 		this.mesh = new THREE.Mesh(geometry, material);
 		this.mesh.position.set(x, y, 0);
 	}

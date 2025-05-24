@@ -37,10 +37,15 @@ export class Manager {
 
 		const ambient = new THREE.AmbientLight(0x404040); 
 		this.scene.add(ambient);
-		const geometry = new THREE.PlaneGeometry(1000, 1000);
-		const material = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide });
+		
+		const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+		directionalLight.position.set(0, 0, 1);
+		this.scene.add(directionalLight);
+
+		const geometry = new THREE.PlaneGeometry(900, 600);
+		const material = new THREE.MeshPhongMaterial({ color: 0x264f46, side: THREE.DoubleSide });
 		const plane = new THREE.Mesh(geometry, material);
-		plane.position.set(0, 0, -10);
+		plane.position.set(900 / 2, 600 / 2, -10);
 		this.scene.add(plane);
 
 		if (data.balls) {

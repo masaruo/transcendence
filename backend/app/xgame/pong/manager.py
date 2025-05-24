@@ -24,10 +24,10 @@ class Manager:
             Ball(),
             Ball(y=150, color='yellow'),
             Ball(y=100, color='red'),
-            Paddle(side=Paddle.SIDE.R1, color="green"),
-            Paddle(side=Paddle.SIDE.R2, color="white"),
-            Paddle(side=Paddle.SIDE.L1, color="blue"),
-            Paddle(side=Paddle.SIDE.L2, color="red"),
+            Paddle(side=Paddle.SIDE.R1, color="#ef3d2d"),
+            Paddle(side=Paddle.SIDE.R2, color="#fca3a2"),
+            Paddle(side=Paddle.SIDE.L1, color="#1a15b1"),
+            Paddle(side=Paddle.SIDE.L2, color="#c3bffe"),
         ]
         self.wall = Wall()
         self._group_name: str = group_name

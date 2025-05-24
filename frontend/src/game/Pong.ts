@@ -12,7 +12,6 @@ export default class Pong {
 	readonly state_elem: HTMLElement | null;
 	readonly score_elem: HTMLElement | null;
 
-	private intervalID: NodeJS.Timeout | null = null;
 	private socket_: WebSocket | null = null;
 	private keyMovements: {[key: string]: boolean} = {};
 	private manager: Manager | null = null;
@@ -33,15 +32,13 @@ export default class Pong {
 
 		this.scene = new THREE.Scene();
 
-		const left = this.width * -1;
-		const right = this.width;
-		const top = this.height;
-		const bottom = this.height * -1;
+		const display_width = this.width / 2 + 100;
+		const display_height = this.height / 2 + 100;
 		const near = -1000;
 		const far = 1000;
 
-		this.camera = new THREE.OrthographicCamera(left, right, top, bottom, near, far);
-		this.camera.position.set(this.width / 2, this.height / 2, +1000);
+		this.camera = new THREE.OrthographicCamera(display_width * -1, display_width, display_height, display_height * -1, near, far);
+		this.camera.position.set(this.width / 2, this.height / 2, 10);
 		this.camera.lookAt(this.width / 2, this.height / 2, 0);
 
 		this.matchId = matchId;
@@ -72,10 +69,7 @@ export default class Pong {
 
 	start(): void {
 		this.connectWebSocket();
-		if (this.intervalID == null)
-			this.intervalID = setInterval(() => {
-				this.draw();
-			}, 16);
+		this.draw();
 	}
 
 	connectWebSocket(): void {
