@@ -63,6 +63,11 @@ export default class AIBattleView extends AbstractView {
     private lastAIUpdate: number = 0;
     private readonly AI_UPDATE_INTERVAL = 1000; // 1秒ごとの更新
     private aiTargetPosition: number | null = null;
+    private aiKeys: { [key: string]: boolean } = {};
+    private readonly USER_UP_KEY = 'w';
+    private readonly USER_DOWN_KEY = 's';
+    private readonly AI_UP_KEY = 'ArrowUp';
+    private readonly AI_DOWN_KEY = 'ArrowDown';
 
     constructor(params: Record<string, string>) {
         super(params);
@@ -195,12 +200,30 @@ export default class AIBattleView extends AbstractView {
     }
 
     private setupKeyboardControls(): void {
+        // ユーザーのキー操作
         window.addEventListener('keydown', (e) => {
-            this.keys[e.key] = true;
+            if (e.key === this.USER_UP_KEY || e.key === this.USER_DOWN_KEY) {
+                this.keys[e.key] = true;
+            }
         });
 
         window.addEventListener('keyup', (e) => {
-            this.keys[e.key] = false;
+            if (e.key === this.USER_UP_KEY || e.key === this.USER_DOWN_KEY) {
+                this.keys[e.key] = false;
+            }
+        });
+
+        // AIのキー操作
+        window.addEventListener('keydown', (e) => {
+            if (e.key === this.AI_UP_KEY || e.key === this.AI_DOWN_KEY) {
+                this.aiKeys[e.key] = true;
+            }
+        });
+
+        window.addEventListener('keyup', (e) => {
+            if (e.key === this.AI_UP_KEY || e.key === this.AI_DOWN_KEY) {
+                this.aiKeys[e.key] = false;
+            }
         });
     }
 
@@ -209,9 +232,9 @@ export default class AIBattleView extends AbstractView {
 
         // パドルの移動速度を設定
         const paddleSpeed = 8;
-        if (this.keys['ArrowUp']) {
+        if (this.keys[this.USER_UP_KEY]) {
             this.userPaddle.dy = -paddleSpeed;
-        } else if (this.keys['ArrowDown']) {
+        } else if (this.keys[this.USER_DOWN_KEY]) {
             this.userPaddle.dy = paddleSpeed;
         } else {
             this.userPaddle.dy = 0;
@@ -240,20 +263,62 @@ export default class AIBattleView extends AbstractView {
             this.lastAIUpdate = currentTime;
         }
 
-        // 目標位置に向かってパドルを移動
+        // キー操作をシミュレート
         if (this.aiTargetPosition !== null) {
-            const diff = this.aiTargetPosition - this.aiPaddle.y;
-            this.aiPaddle.dy = Math.min(Math.max(diff, -this.AI_PADDLE_SPEED), this.AI_PADDLE_SPEED);
+            const currentY = this.aiPaddle.y + (this.aiPaddle.height / 2);
+            const targetY = this.aiTargetPosition + (this.aiPaddle.height / 2);
             
-            // パドルの位置を更新
-            this.aiPaddle.y += this.aiPaddle.dy;
-
-            // パドルが画面外に出ないように制限
-            if (this.aiPaddle.y < 0) {
-                this.aiPaddle.y = 0;
-            } else if (this.aiPaddle.y + this.aiPaddle.height > this.canvas.height) {
-                this.aiPaddle.y = this.canvas.height - this.aiPaddle.height;
+            // 目標位置に基づいてキー操作を決定
+            if (Math.abs(currentY - targetY) > 5) { // 5ピクセルの誤差を許容
+                if (currentY < targetY) {
+                    // 下キーを押す
+                    this.simulateKeyPress(this.AI_DOWN_KEY);
+                    this.simulateKeyRelease(this.AI_UP_KEY);
+                } else {
+                    // 上キーを押す
+                    this.simulateKeyPress(this.AI_UP_KEY);
+                    this.simulateKeyRelease(this.AI_DOWN_KEY);
+                }
+            } else {
+                // 目標位置に近づいたらキーを離す
+                this.simulateKeyRelease(this.AI_UP_KEY);
+                this.simulateKeyRelease(this.AI_DOWN_KEY);
             }
+        }
+
+        // キー操作に基づいてパドルを移動
+        if (this.aiKeys[this.AI_UP_KEY]) {
+            this.aiPaddle.dy = -this.AI_PADDLE_SPEED;
+        } else if (this.aiKeys[this.AI_DOWN_KEY]) {
+            this.aiPaddle.dy = this.AI_PADDLE_SPEED;
+        } else {
+            this.aiPaddle.dy = 0;
+        }
+
+        // パドルの位置を更新
+        this.aiPaddle.y += this.aiPaddle.dy;
+
+        // パドルが画面外に出ないように制限
+        if (this.aiPaddle.y < 0) {
+            this.aiPaddle.y = 0;
+        } else if (this.aiPaddle.y + this.aiPaddle.height > this.canvas.height) {
+            this.aiPaddle.y = this.canvas.height - this.aiPaddle.height;
+        }
+    }
+
+    private simulateKeyPress(key: string): void {
+        if (!this.aiKeys[key]) {
+            this.aiKeys[key] = true;
+            // キーイベントを発火
+            window.dispatchEvent(new KeyboardEvent('keydown', { key }));
+        }
+    }
+
+    private simulateKeyRelease(key: string): void {
+        if (this.aiKeys[key]) {
+            this.aiKeys[key] = false;
+            // キーイベントを発火
+            window.dispatchEvent(new KeyboardEvent('keyup', { key }));
         }
     }
 
@@ -381,6 +446,7 @@ export default class AIBattleView extends AbstractView {
         // AIの状態をリセット
         this.lastAIUpdate = Date.now();
         this.aiTargetPosition = null;
+        this.aiKeys = {};
         
         // ボールをリセット
         this.resetBall();
@@ -493,10 +559,20 @@ export default class AIBattleView extends AbstractView {
         }
         // キーボードイベントリスナーを削除
         window.removeEventListener('keydown', (e) => {
-            this.keys[e.key] = true;
+            if (e.key === this.USER_UP_KEY || e.key === this.USER_DOWN_KEY) {
+                this.keys[e.key] = true;
+            }
+            if (e.key === this.AI_UP_KEY || e.key === this.AI_DOWN_KEY) {
+                this.aiKeys[e.key] = true;
+            }
         });
         window.removeEventListener('keyup', (e) => {
-            this.keys[e.key] = false;
+            if (e.key === this.USER_UP_KEY || e.key === this.USER_DOWN_KEY) {
+                this.keys[e.key] = false;
+            }
+            if (e.key === this.AI_UP_KEY || e.key === this.AI_DOWN_KEY) {
+                this.aiKeys[e.key] = false;
+            }
         });
     }
 
