@@ -1,4 +1,6 @@
 import AbstractView from "./AbstractView"
+import { PATH } from "@/services/constants";
+import Fetch from "../classes/JsonFetch";
 
 export default class FriendsView extends AbstractView {
 	constructor (params: Record<string, string>){
@@ -47,22 +49,12 @@ export default class FriendsView extends AbstractView {
 	async loadScripts(): Promise<void> {
 		const friendsList = document.getElementById('friends-list');
 		try {
-			const token = sessionStorage.getItem('access'); // Retrieve token from localStorage
-			// console.log('Retrieved token:', token); // Debugging log
-			if (!token) {
-				throw new Error('No authentication token found.');
-			}
-			const response = await fetch("http://localhost:8000/api/user/friends/", {
-				headers: {
-					"Content-Type": "application/json",
-					"accept": "application/json", // Fixed: Removed trailing colon
-					"Authorization": "Bearer " + token // Use the dynamically retrieved token
-				}
-			});
-			const friends = await response.json();
+			const fetcher = new Fetch(`${PATH}/api/user/friends/`);
+			const friends = await fetcher.fetch_with_auth()
 			friends.forEach(friend => {
 				const friendItem = document.createElement('div');
 				friendItem.setAttribute("class", "card");
+				console.log('friends', friend.is_online);
 				friendItem.innerHTML = `
 				<div class="card-body">
 				    <h5 class="card-title">${friend.nickname}</h5>

@@ -120,7 +120,7 @@ export class Manager {
 	}
 
 	update(event: WebSocketEvent): void {
-		// console.log("Recieved Event", event);
+		console.log("Received Event", event);
 		if (!event || !event.data) {
 			console.error("Unexpected data type from backend.");
 			return;
@@ -129,7 +129,6 @@ export class Manager {
 		this.scene.clear();
 
 		const data = event.data;
-		// console.log("thisis data: ",data);
 
 		this.renderer.shadowMap.enabled = true;
 		this.renderer.shadowMap.type = THREE.PCFSoftShadowMap

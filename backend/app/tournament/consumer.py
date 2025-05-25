@@ -2,7 +2,7 @@ import asyncio
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from channels.db import database_sync_to_async
 import json
-from tournament.models import Match, MatchModeType, Tournament, Score
+from tournament.models import Match, MatchModeType, Tournament
 from tournament.pong.manager import Manager
 from tournament.pong.paddle import Paddle
 from asgiref.sync import sync_to_async
@@ -63,7 +63,7 @@ class MatchConsumer(AsyncJsonWebsocketConsumer):
 
         self.paddle = await sync_to_async(self.assign_paddle)()
         self.match_group_name = f'match_{self.match_id}'
-        self.manager = Manager.get_instance(self.match_id)
+        self.manager = await Manager.get_instance(self.match_id)
 
         await self.channel_layer.group_add(
             self.match_group_name,

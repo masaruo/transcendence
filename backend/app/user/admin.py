@@ -8,7 +8,7 @@ from . import models
 class UserAdmin(BaseUserAdmin):
     """Define the admin pages for users."""
     ordering = ['id']
-    list_display = ['id', 'email', 'nickname', 'is_online', 'is_active', 'is_staff', 'is_superuser']
+    list_display = ['id', 'email', 'nickname', 'is_active', 'is_staff', 'is_superuser', 'last_seen']
     filter_horizontal = ('friends',)
     search_fields = ['email', 'nickname']
     fieldsets = (
@@ -21,7 +21,6 @@ class UserAdmin(BaseUserAdmin):
                     'is_active',
                     'is_staff',
                     'is_superuser',
-                    'is_online',
                 )
             }
         ),

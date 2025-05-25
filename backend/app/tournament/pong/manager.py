@@ -2,20 +2,23 @@ import asyncio
 from re import I, Match
 from asgiref.sync import sync_to_async, async_to_sync
 
-from tournament.models import MatchStatusType, TeamType, Match, Score
+from tournament.models import MatchStatusType, TeamType, Match, Score, Tournament, MatchModeType
 from .APongObj import PongObj
 from .ball import Ball, LOSER
 from .paddle import Paddle
 from .wall import Wall
-from channels.layers import get_channel_layer # type: ignore
+from channels.layers import get_channel_layer
+from channels.db import database_sync_to_async
 
 class Manager:
     _instances: dict[str, 'Manager'] = {}
 
     @classmethod
-    def get_instance(cls, match_id)-> 'Manager':
+    async def get_instance(cls, match_id)-> 'Manager':
         if match_id not in cls._instances:
-            cls._instances[match_id] = cls(match_id)
+            instance = cls(match_id)
+            await instance.initialize_with_db()
+            cls._instances[match_id] = instance
         return cls._instances[match_id]
 
     @classmethod
@@ -26,15 +29,8 @@ class Manager:
     def __init__(self, match_id) -> None:
         self.objs: list[PongObj] = [
             Ball(),
-            #todo add multiple balls and paddles
-            # Ball(y=150, color='yellow'),
-            # Ball(y=100, color='red'),
-            # Ball(y=100, color='red'),
-            # Ball(y=100, color='red'),
             Paddle(side=Paddle.SIDE.R1, color="#ef3d2d"),
-            # Paddle(side=Paddle.SIDE.R2, color="white"),
             Paddle(side=Paddle.SIDE.L1, color="#1a15b1"),
-            # Paddle(side=Paddle.SIDE.L2, color="red"),
         ]
         self.wall = Wall()
         self._match_id = match_id
@@ -58,7 +54,7 @@ class Manager:
                         'data': self.to_dict()
                     }
                 )
-                await asyncio.sleep(1/10)#! game speed?
+                await asyncio.sleep(1/60)
         except asyncio.CancelledError:
             print("Game loop cancelled")
             self.is_continue = False
@@ -154,3 +150,21 @@ class Manager:
 
     def finish(self):
         self.task.cancel()
+
+    async def initialize_with_db(self):
+        own_tournament = await self._get_own_tournament()
+
+        if own_tournament.match_type == MatchModeType.DOUBLES:
+            self.objs.append(Paddle(side=Paddle.SIDE.R2, color="white"))
+            self.objs.append(Paddle(side=Paddle.SIDE.L2, color="red"))
+
+        ball_number = own_tournament.ball_number
+        if ball_number >= 2:
+            self.objs.append(Ball(color='red'))
+
+
+    @database_sync_to_async
+    def _get_own_tournament(self):
+        own_match = Match.objects.get(id=self._match_id)
+        own_tournament = own_match.tournament
+        return own_tournament

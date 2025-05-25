@@ -1,6 +1,6 @@
-from django.contrib.auth import get_user_model, authenticate
-
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
+
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -16,18 +16,24 @@ class UserSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         password = validated_data.pop("password", None)
+        avatar = validated_data.pop("avatar", None)
         user = super().update(instance, validated_data)
 
         if password:
             user.set_password(password)
+        if avatar:
+            user.avatar = avatar
+        if password or avatar:
             user.save()
-
         return user
 
 
 class FriendshipSerializer(serializers.ModelSerializer):
+    is_online = serializers.SerializerMethodField()
     class Meta:
         model = get_user_model()
         fields = ['id', 'nickname', 'is_online']
         read_only_fields = fields
 
+    def get_is_online(self, obj) -> bool:
+        return obj.is_online

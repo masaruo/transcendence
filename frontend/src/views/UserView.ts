@@ -1,5 +1,14 @@
 import AbstractView from "./AbstractView"
 import Fetch from "../classes/JsonFetch";
+import { navigateTo } from "@/services/router";
+import { PATH } from "@/services/constants";
+
+interface Payload {
+  nickname?: string,
+  email?: string,
+  password?: string,
+  avatar?: string,
+}
 
 export default class UserView extends AbstractView {
     me: any;
@@ -10,7 +19,7 @@ export default class UserView extends AbstractView {
 
     async getBody(): Promise<string> {
         try {
-            const fetcher = new Fetch("http://localhost:8000/api/user/me/");
+            const fetcher = new Fetch(`${PATH}/api/user/me/`);
             this.me = await fetcher.fetch_with_auth();
             return `
             <style>
@@ -64,6 +73,14 @@ export default class UserView extends AbstractView {
                           <span class="font-weight-bold">${this.me.email}</span>
                         </div>
                       </div>
+                      <div class="row w-100">
+                        <div class="col-5 text-start">
+                          <div>status: </div>
+                        </div>
+                        <div class="col-7 text-start">
+                          <span class="font-weight-bold">${this.me.is_online ? 'Online' : 'Offline'}</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                   <div class="col-md-6">
@@ -76,7 +93,7 @@ export default class UserView extends AbstractView {
                           <label for="fileInput" class="form-label">image</label>
                         </div>
                         <div class="col-8">
-                          <input type="file" class="form-control" id="fileInput">
+                          <input type="file" class="form-control" id="avatarInput">
                         </div>
                         <div class="col-4">
                           <label for="nicknameInput" class="form-label">nick name</label>
@@ -90,14 +107,23 @@ export default class UserView extends AbstractView {
                           <label for="emailInput" class="form-label">e-mail</label>
                         </div>
                         <div class="col-8">
-                          <input type="text" id="emailInput" placeholder="new e-mail" class="form-control">
+                          <input type="email" id="emailInput" placeholder="new e-mail" class="form-control">
                         </div>
+                      <div class="row g-5 align-items-center mb-3">
+                        <div class="col-4">
+                          <label for="passwordInput" class="form-label">password</label>
+                        </div>
+                        <div class="col-8">
+                          <input type="password" id="passwordInput" placeholder="new password" class="form-control">
+                        </div>
+                      </div>
+                      <div class="row g-5 align-items-center mb-3">
                       </div>
                     </div>
                     <button id="updateButton" class="btn btn-outline-secondary">Submit</button>
                   </div>
-                  <a href="/user/me/" class="link-dark link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
-                    Back to Profile
+                  <a href="/" class="link-dark link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
+                    Back to Home
                   </a>
                 </div>
               </div>
@@ -113,35 +139,42 @@ export default class UserView extends AbstractView {
         try {
           const new_nickname = document.getElementById('nicknameInput') as HTMLInputElement;
           const new_email = document.getElementById('emailInput') as HTMLInputElement;
-          const file_input = document.getElementById('fileInput') as HTMLInputElement;
+          const new_password = document.getElementById('passwordInput') as HTMLInputElement;
+          const file_input = document.getElementById('avatarInput') as HTMLInputElement;
+          const is_online_input = document.getElementById('isOnlineInput') as HTMLInputElement;
           const update_submit = document.getElementById('updateButton');
 
           if (!update_submit){ throw Error("update submit not found");}
           update_submit.addEventListener('click', async (event) => {
-            const payload = {};
+            event.preventDefault();
+
+            const formData = new FormData();
+
             if (new_nickname && new_nickname.value) {
-              payload.nickname = new_nickname.value;
+              formData.append('nickname', new_nickname.value);
             }
             if (new_email && new_email.value) {
-              payload.email = new_email.value;
+              formData.append('email', new_email.value);
             }
-            // if (file_input && file_input.files && file_input.files.length > 0) {
-            //   payload.avatar = file_input.files[0];
-            // }
+            if (new_password && new_password.value) {
+              formData.append('password', new_password.value);
+            }
+            if (file_input && file_input.files && file_input.files.length > 0) {
+              formData.append('avatar', file_input.files[0]);
+            }
 
-            const fetcher = new Fetch(
-              "http://localhost:8000/api/user/me/",
-              "PATCH",
-              undefined,
-              payload,
-            );
+            // is_onlineチェックボックスの値を追加
+            if (is_online_input) {
+              formData.append('is_online', is_online_input.checked.toString());
+            }
+
+            const fetcher = new Fetch(`${PATH}/api/user/me/`, "PATCH");
+            fetcher.add_form_data(formData);
             const res = await fetcher.fetch_with_auth();
-            if (res.ok) {
+            if (res) {
               window.location.reload();
             } else {
-            //   const errorData = await res.json();
-            console.error("error updating nickname");
-            //   alert(`error: ${errorData.detail || 'some error'}`);
+              console.error("error updating profile");
             }
           });
         } catch (error) {

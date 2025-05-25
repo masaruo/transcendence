@@ -23,12 +23,12 @@ export default class Tournament {
 		this.socket.onmessage = (e) => {
 			const data = JSON.parse(e.data);
 			if (data.type === 'match_start') {
-				console.log("[DEBUG] Match start notification received:", data.match);
+				// console.log("[DEBUG] Match start notification received:", data.match);
 				const match = data.match;
 				const ids = match.playerIds;
 				const currentUserId = parseInt(sessionStorage.getItem('user_id'));
 				if (ids.includes(currentUserId)) {
-					console.log("[DEBUG] User is in this match");
+					// console.log("[DEBUG] User is in this match");
 					sessionStorage.setItem('navigatingToNextMatch', 'true');
 					navigateTo(`/tournament/${this.tournamentId}/pong/${match.id}`)
 				}

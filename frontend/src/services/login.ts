@@ -1,4 +1,4 @@
-import { navigateTo } from "./router";
+import { initStatusManager, navigateTo } from "./router";
 import Fetch from "@/classes/JsonFetch";
 import { PATH } from "@services/constants"
 
@@ -12,7 +12,7 @@ export async function handleLoginFormSubmission(form: HTMLFormElement): Promise<
         console.log("Submitted password:", password);
 
         try {
-            const response = await fetch("http://localhost:8000/api/token/", {
+            const response = await fetch(`${PATH}/api/token/`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -34,8 +34,9 @@ export async function handleLoginFormSubmission(form: HTMLFormElement): Promise<
 
             const fetcher = new Fetch(`${PATH}/api/user/me/`);
             const res_json = await fetcher.fetch_with_auth()
-            // const res_json = await res.json()
             sessionStorage.setItem('user_id', res_json.id);
+
+            initStatusManager();
 
             navigateTo('/');
             console.log("Login successful:", data);

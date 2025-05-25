@@ -1,0 +1,40 @@
+export class StatusManager {
+    private websocket: WebSocket | null = null;
+    private reconnectInterval = 5000;
+    private pingInterval = 30000;
+    private pingTimer?: number;
+
+    connect() {
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+		const token = sessionStorage.getItem('access');
+        // const wsUrl = `${protocol}//${window.location.host}/ws/status/?token=${token}`;
+		const wsUrl = `${protocol}//localhost:8000/ws/status/?token=${token}`;
+
+        this.websocket = new WebSocket(wsUrl);
+
+        this.websocket.onopen = () => {
+            this.startPing();
+        };
+
+        this.websocket.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+        };
+
+        this.websocket.onclose = () => {
+            setTimeout(() => this.connect(), this.reconnectInterval);
+        };
+    }
+
+    disconnect() {
+        if (this.pingTimer) clearInterval(this.pingTimer);
+        if (this.websocket) this.websocket.close();
+    }
+
+    private startPing() {
+        this.pingTimer = window.setInterval(() => {
+            if (this.websocket?.readyState === WebSocket.OPEN) {
+                this.websocket.send(JSON.stringify({type: 'ping'}));
+            }
+        }, this.pingInterval);
+    }
+}

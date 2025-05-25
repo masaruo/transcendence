@@ -18,8 +18,8 @@ from app.middleware import JWTAuthMiddleware
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'app.settings')
 
 from chat.routing import chat_urlpatterns
-# from game.routing import game_urlpatterns
 from tournament.routing import tournament_urlpatterns
+from user.routing import status_urlpatterns
 
 
 # Add this class before your application definition
@@ -28,10 +28,7 @@ class LoggingOriginMiddleware:
         self.inner = inner
 
     async def __call__(self, scope, receive, send):
-        # print("Logging middleware running")
         headers_dict = dict(scope.get('headers', []))
-        # print(f"Headers: {headers_dict}")
-        # print(f"Origin: {headers_dict.get(b'origin', b'unknown')}")
         return await self.inner(scope, receive, send)
 
 # Then update your application definition to use this class
@@ -42,7 +39,7 @@ application = ProtocolTypeRouter(
             AllowedHostsOriginValidator(
                 JWTAuthMiddleware(
                     AuthMiddlewareStack(
-                        URLRouter(chat_urlpatterns + tournament_urlpatterns)
+                        URLRouter(chat_urlpatterns + tournament_urlpatterns + status_urlpatterns)
                     )
                 )
             )

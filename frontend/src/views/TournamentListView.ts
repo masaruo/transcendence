@@ -18,7 +18,7 @@ export default class TournamentListView extends AbstractView {
 	async loadScripts(): Promise<void> {
 		const tournamentCreateBtn = document.getElementById('create-tournament');
 		const tournamentsList = document.getElementById('tournaments-list');
-		const fetcher = new Fetch("http://localhost:8000/api/tournament");
+		const fetcher = new Fetch(`${PATH}/api/tournament`);
 		const tournaments = await fetcher.fetch_with_auth();
 
 		tournamentCreateBtn?.addEventListener('click', async (e) => {

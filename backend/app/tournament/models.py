@@ -60,6 +60,7 @@ class Tournament(models.Model):
     match_type = models.IntegerField(choices=MatchModeType.choices, default=MatchModeType.SINGLES)
     is_ready_to_start = models.BooleanField(default=False)
     match_size = models.IntegerField(choices=MatchSizeType.choices, default=MatchSizeType.FOUR)
+    ball_number = models.IntegerField(default=1, null=False, blank=False)
 
     objects = TournamentManager()
 
