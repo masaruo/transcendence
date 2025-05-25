@@ -60,6 +60,9 @@ export default class AIBattleView extends AbstractView {
     private readonly WINNING_SCORE = 10;
     private readonly RESTART_DELAY = 10000; // 10 seconds
     private readonly AI_PADDLE_SPEED = 5;
+    private lastAIUpdate: number = 0;
+    private readonly AI_UPDATE_INTERVAL = 1000; // 1秒ごとの更新
+    private aiTargetPosition: number | null = null;
 
     constructor(params: Record<string, string>) {
         super(params);
@@ -147,7 +150,7 @@ export default class AIBattleView extends AbstractView {
         
         // ランダムな方向にボールを発射
         const angle = (Math.random() * Math.PI / 2) - Math.PI / 4; // -45度から45度の範囲
-        const speed = 5;
+        const speed = 10;
         this.ball.dx = speed * Math.cos(angle) * (Math.random() > 0.5 ? 1 : -1);
         this.ball.dy = speed * Math.sin(angle);
     }
@@ -228,34 +231,59 @@ export default class AIBattleView extends AbstractView {
     private updateAIPaddle(): void {
         if (!this.canvas) return;
 
-        // ボールが右側に来ている場合のみ追従
-        if (this.ball.dx > 0) {
-            // ボールの予測位置を計算
-            const timeToReachPaddle = (this.aiPaddle.x - this.ball.x) / this.ball.dx;
-            const predictedY = this.ball.y + (this.ball.dy * timeToReachPaddle);
-            
-            // パドルの目標位置を設定（パドルの中心がボールの予測位置に来るように）
-            const targetY = predictedY - (this.aiPaddle.height / 2);
-            
-            // パドルの移動速度を計算
-            const diff = targetY - this.aiPaddle.y;
+        const currentTime = Date.now();
+        
+        // 1秒ごとにAIの判断を更新
+        if (currentTime - this.lastAIUpdate >= this.AI_UPDATE_INTERVAL) {
+            // 盤面の状態を取得して判断
+            this.makeAIDecision();
+            this.lastAIUpdate = currentTime;
+        }
+
+        // 目標位置に向かってパドルを移動
+        if (this.aiTargetPosition !== null) {
+            const diff = this.aiTargetPosition - this.aiPaddle.y;
             this.aiPaddle.dy = Math.min(Math.max(diff, -this.AI_PADDLE_SPEED), this.AI_PADDLE_SPEED);
             
             // パドルの位置を更新
             this.aiPaddle.y += this.aiPaddle.dy;
-        } else {
-            // ボールが左側にある場合は中央に戻る
-            const centerY = (this.canvas.height - this.aiPaddle.height) / 2;
-            const diff = centerY - this.aiPaddle.y;
-            this.aiPaddle.dy = Math.min(Math.max(diff, -this.AI_PADDLE_SPEED), this.AI_PADDLE_SPEED);
-            this.aiPaddle.y += this.aiPaddle.dy;
-        }
 
-        // パドルが画面外に出ないように制限
-        if (this.aiPaddle.y < 0) {
-            this.aiPaddle.y = 0;
-        } else if (this.aiPaddle.y + this.aiPaddle.height > this.canvas.height) {
-            this.aiPaddle.y = this.canvas.height - this.aiPaddle.height;
+            // パドルが画面外に出ないように制限
+            if (this.aiPaddle.y < 0) {
+                this.aiPaddle.y = 0;
+            } else if (this.aiPaddle.y + this.aiPaddle.height > this.canvas.height) {
+                this.aiPaddle.y = this.canvas.height - this.aiPaddle.height;
+            }
+        }
+    }
+
+    private makeAIDecision(): void {
+        if (!this.canvas) return;
+
+        // ボールの現在位置と速度を考慮
+        const ballY = this.ball.y;
+        const ballDY = this.ball.dy;
+        const ballX = this.ball.x;
+        const ballDX = this.ball.dx;
+
+        // ボールがAI側に向かって来ている場合のみ判断を更新
+        if (ballDX > 0) {
+            // ボールの予測位置を計算
+            const timeToReachPaddle = (this.aiPaddle.x - ballX) / ballDX;
+            const predictedBallY = ballY + (ballDY * timeToReachPaddle);
+
+            // パドルの中心が予測位置に来るように目標位置を設定
+            this.aiTargetPosition = predictedBallY - (this.aiPaddle.height / 2);
+
+            // 画面外に出ないように制限
+            if (this.aiTargetPosition < 0) {
+                this.aiTargetPosition = 0;
+            } else if (this.aiTargetPosition + this.aiPaddle.height > this.canvas.height) {
+                this.aiTargetPosition = this.canvas.height - this.aiPaddle.height;
+            }
+        } else {
+            // ボールがAI側に向かって来ていない場合は中央に戻る
+            this.aiTargetPosition = (this.canvas.height - this.aiPaddle.height) / 2;
         }
     }
 
@@ -263,49 +291,39 @@ export default class AIBattleView extends AbstractView {
         // ユーザーのパドルとの衝突判定
         if (
             this.ball.x - this.ball.radius < this.userPaddle.x + this.userPaddle.width &&
+            this.ball.x + this.ball.radius > this.userPaddle.x &&
             this.ball.y + this.ball.radius > this.userPaddle.y &&
             this.ball.y - this.ball.radius < this.userPaddle.y + this.userPaddle.height &&
             this.ball.dx < 0
         ) {
-            // ボールがパドルに当たった位置を計算（0.0 から 1.0 の範囲）
+            // 衝突時の位置補正
+            this.ball.x = this.userPaddle.x + this.userPaddle.width + this.ball.radius;
+            
+            // 反射角度の計算
             const hitPosition = (this.ball.y - this.userPaddle.y) / this.userPaddle.height;
-            
-            // ボールの速度を計算
+            const angle = (hitPosition - 0.5) * Math.PI / 3;
             const speed = Math.sqrt(this.ball.dx * this.ball.dx + this.ball.dy * this.ball.dy);
-            
-            // パドルの当たった位置に応じて角度を計算（-45度から45度の範囲）
-            const angle = (hitPosition - 0.5) * Math.PI / 2;
-            
-            // 新しい速度を設定
             this.ball.dx = speed * Math.cos(angle);
             this.ball.dy = speed * Math.sin(angle);
-            
-            // ボールがパドルにめり込まないように位置を調整
-            this.ball.x = this.userPaddle.x + this.userPaddle.width + this.ball.radius;
         }
 
         // AIのパドルとの衝突判定
         if (
             this.ball.x + this.ball.radius > this.aiPaddle.x &&
+            this.ball.x - this.ball.radius < this.aiPaddle.x + this.aiPaddle.width &&
             this.ball.y + this.ball.radius > this.aiPaddle.y &&
             this.ball.y - this.ball.radius < this.aiPaddle.y + this.aiPaddle.height &&
             this.ball.dx > 0
         ) {
-            // ボールがパドルに当たった位置を計算（0.0 から 1.0 の範囲）
+            // 衝突時の位置補正
+            this.ball.x = this.aiPaddle.x - this.ball.radius;
+            
+            // 反射角度の計算
             const hitPosition = (this.ball.y - this.aiPaddle.y) / this.aiPaddle.height;
-            
-            // ボールの速度を計算
+            const angle = (hitPosition - 0.5) * Math.PI / 3;
             const speed = Math.sqrt(this.ball.dx * this.ball.dx + this.ball.dy * this.ball.dy);
-            
-            // パドルの当たった位置に応じて角度を計算（-45度から45度の範囲）
-            const angle = (hitPosition - 0.5) * Math.PI / 2;
-            
-            // 新しい速度を設定（左方向に反転）
             this.ball.dx = -speed * Math.cos(angle);
             this.ball.dy = speed * Math.sin(angle);
-            
-            // ボールがパドルにめり込まないように位置を調整
-            this.ball.x = this.aiPaddle.x - this.ball.radius;
         }
     }
 
@@ -359,6 +377,10 @@ export default class AIBattleView extends AbstractView {
         // ゲーム状態をリセット
         this.gameOver = false;
         this.isGameRunning = true;
+        
+        // AIの状態をリセット
+        this.lastAIUpdate = Date.now();
+        this.aiTargetPosition = null;
         
         // ボールをリセット
         this.resetBall();
