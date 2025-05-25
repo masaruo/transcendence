@@ -4,25 +4,25 @@ import * as THREE from 'three';
 export default class Paddle implements IGameObj {
 	readonly x: number;
 	readonly y: number;
+	readonly z: number;
 	readonly width: number;
 	readonly height: number;
+	readonly depth: number;
 	readonly color: string;
 	mesh: THREE.Mesh;
 
 	constructor(x: number, y: number, width: number, height: number, color: string) {
-		this.x = x;
-		this.y = y;
+		this.x = x + width / 2;
+		this.y = y + height / 2;
+		this.z = 3;
 		this.width = width;
 		this.height = height;
+		this.depth = 3;
 		this.color = color;
-		const geometry = new THREE.BoxGeometry(width, height, 3);
+		const geometry = new THREE.BoxGeometry(this.width, this.height, this.depth);
 		const material = new THREE.MeshPhongMaterial({ color: color });
 		this.mesh = new THREE.Mesh(geometry, material);
-		this.mesh.position.set(x + width / 2, y + height / 2, 0);
+		this.mesh.position.set(this.x, this.y, this.z);
 		this.mesh.castShadow = true;
 	}
-
-	// update(new_x: number, new_y: number): IGameObj {
-	// 	return new Paddle(new_x, new_y, this.width, this.height, this.color);
-	// }
 }

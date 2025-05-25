@@ -22,18 +22,18 @@ export class Manager {
 	floor_material: THREE.MeshStandardMaterial; 
 
   constructor(renderer: THREE.WebGLRenderer, scene: THREE.Scene) {
-    this.renderer = renderer;
+		this.renderer = renderer;
 		this.scene = scene;
 		const textureLoader = new THREE.TextureLoader();
 		const floor_color = textureLoader.load('/src/texture/Wood/WoodFloor046_1K-JPG_Color.jpg');
 		const floor_normal = textureLoader.load('/src/texture/Wood/WoodFloor046_1K-JPG_NormalGL.jpg');
 		const floor_roughness = textureLoader.load('/src/texture/Wood/WoodFloor046_1K-JPG_Roughness.jpg');
 		this.floor_material = new THREE.MeshStandardMaterial({
-		  map: floor_color,
-		  normalMap: floor_normal,
-		  roughnessMap: floor_roughness,
+			map: floor_color,
+			normalMap: floor_normal,
+			roughnessMap: floor_roughness,
 		});
-  }
+	}
 
 	add_table(table_width: number, table_height: number) {
 		const table_geometry = new THREE.PlaneGeometry(table_width, table_height);
@@ -76,7 +76,7 @@ export class Manager {
 		line5.receiveShadow = true;
 		this.scene.add(line5);
 	}
-
+	
 	add_floor(table_width: number, table_height: number){
 		const floor_width = table_width + 200;
 		const floor_height = table_height + 200;
@@ -86,7 +86,7 @@ export class Manager {
 		floor.position.set(table_width / 2,  table_height/ 2, -10);
 		this.scene.add(floor);
 	}
-
+	
 	add_corner_spot_light(x: number, y: number, color: number){
 		const spot = new THREE.SpotLight(color, 30, 0, Math.PI, 1.0, 0.5);
 		spot.position.set(x, y, 100);
@@ -128,11 +128,8 @@ export class Manager {
 			console.error("Unexpected data type from backend.");
 			return;
 		}
-
 		this.scene.clear();
-
 		const data = event.data;
-
 		this.renderer.shadowMap.enabled = true;
 		this.renderer.shadowMap.type = THREE.PCFSoftShadowMap
 

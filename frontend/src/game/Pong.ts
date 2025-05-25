@@ -16,8 +16,8 @@ export default class Pong {
 	private keyMovements: {[key: string]: boolean} = {};
 	private manager: Manager | null = null;
 
-	scene: THREE.Scene;
-	camera: THREE.OrthographicCamera;
+	public scene: THREE.Scene;
+	public camera: THREE.OrthographicCamera;
 
 	constructor(canvas: HTMLCanvasElement, matchId: number) {
 		if (!canvas) {
@@ -52,19 +52,6 @@ export default class Pong {
 
 		this.state_elem = document.getElementById('match-data');
 		this.score_elem = document.getElementById('score-data');
-
-		// const join = document.getElementById('join');
-		// //todo end && start??
-		// if (!join) {
-		// 	throw Error("Keys are not found.");
-		// }
-		// join.addEventListener('click', async() => {
-		// 	this.connectWebSocket();
-		// 	if (this.intervalID == null)
-		// 		this.intervalID = setInterval(() => {
-		// 			this.draw();
-		// 		}, 16);
-		// })
 	}
 
 	start(): void {
