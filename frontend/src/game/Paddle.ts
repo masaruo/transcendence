@@ -25,8 +25,4 @@ export default class Paddle implements IGameObj {
 	// update(new_x: number, new_y: number): IGameObj {
 	// 	return new Paddle(new_x, new_y, this.width, this.height, this.color);
 	// }
-
-	update() {
-
-	}
 }

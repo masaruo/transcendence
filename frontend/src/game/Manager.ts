@@ -104,7 +104,8 @@ export class Manager {
 		directionalLight.castShadow = true;
 		this.scene.add(directionalLight);
 
-		const center_light = new THREE.SpotLight(0xFFFFFF, 15, 0, Math.PI / 2, 1.0, 0.5);
+		const while_light_color = 0xffffff;
+		const center_light = new THREE.SpotLight(while_light_color, 15, 0, Math.PI / 2, 1.0, 0.5);
 		center_light.position.set(table_width / 2, table_height / 2, 100);
 		center_light.target.position.set(table_width / 2, table_height / 2, 0);
 		this.scene.add(center_light);
@@ -115,8 +116,10 @@ export class Manager {
 		const right_light_color = 0xFF5F00;
 		this.add_corner_spot_light(0, 0, left_light_color);
 		this.add_corner_spot_light(0, table_height, left_light_color);
+		this.add_corner_spot_light(0, table_height / 2, while_light_color);
 		this.add_corner_spot_light(table_width, 0, right_light_color);
 		this.add_corner_spot_light(table_width, table_height, right_light_color);
+		this.add_corner_spot_light(table_width, table_height / 2, while_light_color);
 	}
 
 	update(event: WebSocketEvent): void {

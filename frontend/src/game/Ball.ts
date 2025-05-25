@@ -24,8 +24,4 @@ export default class Ball implements IGameObj {
 	// update(new_x: number, new_y: number): IGameObj {
 	// 	return new Ball(new_x, new_y, this.radius, this.color);
 	// }
-
-	update() {
-
-	}
 }
