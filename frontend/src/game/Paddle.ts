@@ -15,10 +15,10 @@ export default class Paddle implements IGameObj {
 		this.width = width;
 		this.height = height;
 		this.color = color;
-		const geometry = new THREE.BoxGeometry(width, height, 5);
+		const geometry = new THREE.BoxGeometry(width, height, 3);
 		const material = new THREE.MeshPhongMaterial({ color: color });
 		this.mesh = new THREE.Mesh(geometry, material);
-		this.mesh.position.set(x + width / 2, y, 0);
+		this.mesh.position.set(x + width / 2, y + height / 2, 0);
 		this.mesh.castShadow = true;
 	}
 

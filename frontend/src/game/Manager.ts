@@ -19,10 +19,20 @@ type GameData = {
 export class Manager {
 	readonly renderer: THREE.WebGLRenderer;
 	scene: THREE.Scene;
+	floor_material: THREE.MeshStandardMaterial; 
 
   constructor(renderer: THREE.WebGLRenderer, scene: THREE.Scene) {
     this.renderer = renderer;
 		this.scene = scene;
+		const textureLoader = new THREE.TextureLoader();
+		const floor_color = textureLoader.load('/src/texture/Wood/WoodFloor046_1K-JPG_Color.jpg');
+		const floor_normal = textureLoader.load('/src/texture/Wood/WoodFloor046_1K-JPG_NormalGL.jpg');
+		const floor_roughness = textureLoader.load('/src/texture/Wood/WoodFloor046_1K-JPG_Roughness.jpg');
+		this.floor_material = new THREE.MeshStandardMaterial({
+		  map: floor_color,
+		  normalMap: floor_normal,
+		  roughnessMap: floor_roughness,
+		});
   }
 
 	add_table(table_width: number, table_height: number) {
@@ -71,14 +81,14 @@ export class Manager {
 		const floor_width = table_width + 200;
 		const floor_height = table_height + 200;
 		const floor_geometry = new THREE.PlaneGeometry(floor_width, floor_height);
-		const floor_material = new THREE.MeshPhongMaterial({ color: 0x555555, side: THREE.DoubleSide });
-		const floor = new THREE.Mesh(floor_geometry, floor_material);
+
+		const floor = new THREE.Mesh(floor_geometry, this.floor_material);
 		floor.position.set(table_width / 2,  table_height/ 2, -10);
 		this.scene.add(floor);
 	}
 
 	add_corner_spot_light(x: number, y: number, color: number){
-		const spot = new THREE.SpotLight(color, 20, 0, Math.PI, 1.0, 0.5);
+		const spot = new THREE.SpotLight(color, 30, 0, Math.PI, 1.0, 0.5);
 		spot.position.set(x, y, 100);
 		spot.target.position.set(x, y, 0);
 		this.scene.add(spot);
@@ -101,10 +111,12 @@ export class Manager {
 		this.scene.add(center_light.target);
 		center_light.castShadow = true;
 
-		this.add_corner_spot_light(0, 0, 0x4169E1);
-		this.add_corner_spot_light(0, table_height, 0x007FFF);
-		this.add_corner_spot_light(table_width, 0, 0xFF5F00);
-		this.add_corner_spot_light(table_width, table_height, 0xFF2400);
+		const left_light_color = 0x4169E1;
+		const right_light_color = 0xFF5F00;
+		this.add_corner_spot_light(0, 0, left_light_color);
+		this.add_corner_spot_light(0, table_height, left_light_color);
+		this.add_corner_spot_light(table_width, 0, right_light_color);
+		this.add_corner_spot_light(table_width, table_height, right_light_color);
 	}
 
 	update(event: WebSocketEvent): void {
