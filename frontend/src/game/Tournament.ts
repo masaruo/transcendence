@@ -1,5 +1,3 @@
-import { WS_PATH } from "@/services/constants";
-// import Pong from "@/game/Pong";
 import { navigateTo } from "@/services/router";
 
 export default class Tournament {

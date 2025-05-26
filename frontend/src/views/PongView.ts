@@ -44,7 +44,7 @@ export default class PongView extends AbstractView {
 		const canvas = document.getElementById("canvas") as HTMLCanvasElement | null;
 		if (!canvas)
 			throw Error("Failed to find canvas element.")
-		const pong = new Pong(canvas, this.params.pong_id);
+		const pong = new Pong(canvas, Number(this.params.pong_id));
 		pong.start();
 	}
 }

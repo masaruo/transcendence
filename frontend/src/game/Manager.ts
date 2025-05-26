@@ -2,7 +2,7 @@ import { clone } from "three/examples/jsm/utils/SkeletonUtils.js";
 import Ball from "./Ball";
 import Paddle from "./Paddle";
 import * as THREE from 'three';
-import { mx_bilerp_0 } from "three/src/nodes/materialx/lib/mx_noise.js";
+// import { mx_bilerp_0 } from "three/src/nodes/materialx/lib/mx_noise.js";
 
 export type WebSocketEvent = {
 	type: string;
@@ -19,7 +19,7 @@ type GameData = {
 export class Manager {
 	readonly renderer: THREE.WebGLRenderer;
 	scene: THREE.Scene;
-	floor_material: THREE.MeshStandardMaterial; 
+	floor_material: THREE.MeshStandardMaterial;
 
   constructor(renderer: THREE.WebGLRenderer, scene: THREE.Scene) {
 		this.renderer = renderer;
@@ -43,7 +43,7 @@ export class Manager {
 		table.receiveShadow = true;
 		table.castShadow = true;
 		this.scene.add(table);
-		
+
 		const line_width = 10;
 		const vertical_line_geometry = new THREE.PlaneGeometry(line_width, table_height);
 		const vertical_line_material = new THREE.MeshPhongMaterial({color: 0xffffff});
@@ -57,7 +57,7 @@ export class Manager {
 		line2.position.set(line_width / 2, table_height / 2, 1);
 		line2.receiveShadow = true;
 		this.scene.add(line2);
-		
+
 		const line3 = clone(line1);
 		line3.position.set(table_width - line_width / 2, table_height / 2, 1);
 		line3.receiveShadow = true;
@@ -76,7 +76,7 @@ export class Manager {
 		line5.receiveShadow = true;
 		this.scene.add(line5);
 	}
-	
+
 	add_floor(table_width: number, table_height: number){
 		const floor_width = table_width + 200;
 		const floor_height = table_height + 200;
@@ -86,7 +86,7 @@ export class Manager {
 		floor.position.set(table_width / 2,  table_height/ 2, -10);
 		this.scene.add(floor);
 	}
-	
+
 	add_corner_spot_light(x: number, y: number, color: number){
 		const spot = new THREE.SpotLight(color, 30, 0, Math.PI, 1.0, 0.5);
 		spot.position.set(x, y, 100);
@@ -96,9 +96,9 @@ export class Manager {
 	}
 
 	add_lights(table_width: number, table_height: number){
-		const ambient = new THREE.AmbientLight(0x404040, 0.3); 
+		const ambient = new THREE.AmbientLight(0x404040, 0.3);
 		this.scene.add(ambient);
-		
+
 		const directionalLight = new THREE.DirectionalLight(0xffffff, 0.3);
 		directionalLight.position.set(0, 0, 10);
 		directionalLight.castShadow = true;
