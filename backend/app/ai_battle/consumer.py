@@ -35,7 +35,7 @@ class AIBattleConsumer(AsyncWebsocketConsumer):
                         'message': 'Battle ID is required'
                     }))
         except Exception as e:
-            print(f"Error in WebSocket receive: {str(e)}")
+            logger.error(f"Error in WebSocket receive: {str(e)}")
             await self.send(text_data=json.dumps({
                 'type': 'error',
                 'message': str(e)
