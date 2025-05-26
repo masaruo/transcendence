@@ -23,7 +23,7 @@ RUN	apt-get update && apt-get upgrade -y && apt-get install -y postgresql-client
 	chown -R django-user:django-user /vol && \
 	chmod -R 755 /vol
 
-COPY ./default_avatar.jpg /vol/web/media/default_avatar.jpg
+COPY ./app/user/default_user_photo/default_avatar.jpg /vol/web/media/default_avatar.jpg
 RUN chown django-user:django-user /vol/web/media/default_avatar.jpg
 
 USER django-user
