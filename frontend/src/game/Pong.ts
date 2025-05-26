@@ -1,6 +1,7 @@
 import { PassThrough } from "stream";
 import { Manager, WebSocketEvent } from "./Manager";
 import { navigateTo } from "@/services/router";
+import { WS_PATH } from "@/services/constants";
 
 export default class Pong {
 	readonly ctx: CanvasRenderingContext2D;
@@ -38,19 +39,6 @@ export default class Pong {
 
 		this.state_elem = document.getElementById('match-data');
 		this.score_elem = document.getElementById('score-data');
-
-		// const join = document.getElementById('join');
-		// //todo end && start??
-		// if (!join) {
-		// 	throw Error("Keys are not found.");
-		// }
-		// join.addEventListener('click', async() => {
-		// 	this.connectWebSocket();
-		// 	if (this.intervalID == null)
-		// 		this.intervalID = setInterval(() => {
-		// 			this.draw();
-		// 		}, 16);
-		// })
 	}
 
 	start(): void {
@@ -62,11 +50,11 @@ export default class Pong {
 	}
 
 	connectWebSocket(): void {
-		const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+		// const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
 
 		const token = sessionStorage.getItem('access');
-		// console.log("token ", token)
-		this.socket_ = new WebSocket(`${protocol}//localhost:8000/ws/match/${this.matchId}/?token=${token}`);
+		// this.socket_ = new WebSocket(`${protocol}//localhost:8000/ws/match/${this.matchId}/?token=${token}`);
+		this.socket_ = new WebSocket(`wss://localhost/ws/match/${this.matchId}/?token=${token}`);
 
 		this.socket_.onopen = () => {
 			console.log("WebSocket接続成功", new Date().toISOString());

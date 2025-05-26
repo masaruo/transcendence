@@ -11,10 +11,9 @@ export default class Tournament {
 	}
 
 	connect(): void {
-		const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
 		const token = sessionStorage.getItem('access');
-		console.log("[DEBUG] Connecting to tournament WebSocket");
-		this.socket = new WebSocket(`${protocol}://localhost:8000/ws/tournament/${this.tournamentId}/?token=${token}`);
+		// this.socket = new WebSocket(`${protocol}://localhost:8000/ws/tournament/${this.tournamentId}/?token=${token}`);
+		this.socket = new WebSocket(`wss://localhost/ws/tournament/${this.tournamentId}/?token=${token}`);
 
 		this.socket.onopen = () => {
 			console.log("[DEBUG] Connected to tournament WebSocket");
@@ -23,7 +22,6 @@ export default class Tournament {
 		this.socket.onmessage = (e) => {
 			const data = JSON.parse(e.data);
 			if (data.type === 'match_start') {
-				// console.log("[DEBUG] Match start notification received:", data.match);
 				const match = data.match;
 				const ids = match.playerIds;
 				const currentUserId = parseInt(sessionStorage.getItem('user_id'));

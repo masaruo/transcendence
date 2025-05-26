@@ -36,7 +36,6 @@ export default class PongView extends AbstractView {
 		`
 	}
 	async loadScripts(): Promise<void> {
-		// console.log("pongview activated")
 		const keyState: {[key: string]: boolean} = {};
 
 		document.addEventListener("keydown", (e) => {keyState[e.key] = true;})
