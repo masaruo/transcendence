@@ -1,8 +1,7 @@
 # 自己署名証明書
-location: app/app/certs/cert.pem
-at chrome:で登録
-プライバシーとセキュリティ/セキュリティ/証明書の管理/自分でインストール/信頼できる証明書
 
+in `./nginx/gen-certificate.sh`を実行して add `cert.pem` @ chrome / ...
+プライバシーとセキュリティ/セキュリティ/証明書の管理/自分でインストール/信頼できる証明書
 
 # start
 docker compose up

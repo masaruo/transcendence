@@ -5,13 +5,12 @@ services:
       dockerfile: Dockerfile
     environment:
       - DEBUG=${DEBUG:-False}
-    ports: #open for https?
-      - "8000:8000"
-      - "443:443"
     restart:
       always
-    volumes: #? need to change
+    volumes:
       - .:/app
+      - static_volumes:/vol/web/static
+      - media_volumes:/vol/web/media
     env_file:
       - .env
     networks:
@@ -23,11 +22,26 @@ services:
         condition: service_healthy
     command:
       /bin/bash -c "cd /app/app && \
-      mkdir -p certs && \
-      openssl req -x509 -newkey rsa:4096 -keyout ./certs/key.pem -out ./certs/cert.pem -days 365 -nodes -batch -subj '/CN=localhost' -addext 'subjectAltName=DNS:localhost,IP:127.0.0.1' && \
+      python manage.py makemigrations && \
       python manage.py migrate && \
       python manage.py collectstatic --noinput && \
-      daphne -e ssl:443:privateKey=./certs/key.pem:certKey=./certs/cert.pem app.asgi:application"
+      daphne -b 0.0.0.0 -p 8000 app.asgi:application"
+
+  nginx:
+    image: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/cert.pem:/etc/nginx/certs/cert.pem
+      - ./nginx/key.pem:/etc/nginx/certs/key.pem
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - static_volumes:/vol/web/static
+      - media_volumes:/vol/web/media
+    networks:
+      - backend
+    depends_on:
+      - django
 
   db:
     image: postgres:15
@@ -63,6 +77,10 @@ volumes:
     name: transcendence_db_volume
   redis_channel_layer:
     name: transcendence_channle_layer_volume
+  static_volumes:
+    name: transcendence_static_volume
+  media_volumes:
+    name: transcendence_media_volume
 
 networks:
   backend:

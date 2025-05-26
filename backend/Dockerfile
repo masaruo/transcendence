@@ -12,7 +12,7 @@ COPY ./app /app
 
 WORKDIR /app
 
-EXPOSE 8000 443
+# EXPOSE 8000 443
 
 RUN	apt-get update && apt-get upgrade -y && apt-get install -y postgresql-client openssl tree curl lsof make && \
 	/venv/bin/pip install --upgrade pip && /venv/bin/pip install --no-cache-dir -r /tmp/requirements.txt && \
@@ -23,4 +23,8 @@ RUN	apt-get update && apt-get upgrade -y && apt-get install -y postgresql-client
 	chown -R django-user:django-user /vol && \
 	chmod -R 755 /vol
 
-COPY ./default_avatar.jpeg /vol/web/media/default_avatar.jpeg
+COPY ./default_avatar.jpg /vol/web/media/default_avatar.jpg
+RUN chown django-user:django-user /vol/web/media/default_avatar.jpg
+
+USER django-user
+

@@ -28,8 +28,8 @@ dotenv.load_dotenv()
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', 'False') == 'True'
-# DEBUG=True
+# DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+DEBUG=True
 
 #! security
 ALLOWED_HOSTS = ['django', 'localhost', '*']
@@ -68,8 +68,8 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -160,9 +160,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = '/vol/web/static'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = '/vol/web/media'
-STATIC_ROOT = '/vol/web/static'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -226,17 +226,28 @@ CORS_ALLOW_METHODS = [
     'PUT',
 ]
 
-# Whitenoise設定
-WHITENOISE_USE_FINDERS = True
-WHITENOISE_AUTOREFRESH = True
-WHITENOISE_SKIP_COMPRESS_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'zip', 'gz', 'tgz', 'bz2', 'tbz', 'xz', 'br']
-WHITENOISE_ROOT = MEDIA_ROOT
-WHITENOISE_INDEX_FILE = True
+# WhiteNoise settings (optional but recommended)
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+WHITENOISE_USE_FINDERS = True  # For development
 
-# メディアファイル配信設定
-WHITENOISE_DIRECTORIES = [
-    ('media', MEDIA_ROOT),
-]
+# Whitenoise設定
+# STORAGES = {
+#     # ...
+#     "staticfiles": {
+#         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+#     },
+# }
+
+# WHITENOISE_USE_FINDERS = True
+# WHITENOISE_AUTOREFRESH = True
+# WHITENOISE_SKIP_COMPRESS_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'zip', 'gz', 'tgz', 'bz2', 'tbz', 'xz', 'br']
+# WHITENOISE_ROOT = MEDIA_ROOT
+# WHITENOISE_INDEX_FILE = True
+
+# # メディアファイル配信設定
+# WHITENOISE_DIRECTORIES = [
+#     ('media', MEDIA_ROOT),
+# ]
 
 # 起動時にディレクトリを作成
 import os
@@ -248,17 +259,17 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 }
 
-#! securities!
-SECURE_SSL_REDIRECT = not DEBUG
-SESSION_COOKIE_SECURE = not DEBUG
-CSRF_COOKIE_SECURE = not DEBUG
-SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0
-SECURE_HSTS_PRELOAD = not DEBUG
-SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
+# #! securities!
+# SECURE_SSL_REDIRECT = not DEBUG
+# SESSION_COOKIE_SECURE = not DEBUG
+# CSRF_COOKIE_SECURE = not DEBUG
+# SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0
+# SECURE_HSTS_PRELOAD = not DEBUG
+# SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
 
-#! XSS
-SECURE_BROWSER_XSS_FILTER = not DEBUG
-SECURE_CONTENT_TYPE_NOSNIFF = not DEBUG
+# #! XSS
+# SECURE_BROWSER_XSS_FILTER = not DEBUG
+# SECURE_CONTENT_TYPE_NOSNIFF = not DEBUG
 
-#! CSRF
-CSRF_COOKIE_HTTPONLY = not DEBUG
+# #! CSRF
+# CSRF_COOKIE_HTTPONLY = not DEBUG
