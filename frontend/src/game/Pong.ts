@@ -1,9 +1,10 @@
 import { PassThrough } from "stream";
 import { Manager, WebSocketEvent } from "./Manager";
 import { navigateTo } from "@/services/router";
+import * as THREE from 'three';
 
 export default class Pong {
-	readonly ctx: CanvasRenderingContext2D;
+	readonly renderer: THREE.WebGLRenderer;
 	readonly matchId: number = 0;
 	readonly width: number;
 	readonly height: number;
@@ -11,21 +12,34 @@ export default class Pong {
 	readonly state_elem: HTMLElement | null;
 	readonly score_elem: HTMLElement | null;
 
-	private intervalID: NodeJS.Timeout | null = null;
 	private socket_: WebSocket | null = null;
 	private keyMovements: {[key: string]: boolean} = {};
 	private manager: Manager | null = null;
+
+	public scene: THREE.Scene;
+	public camera: THREE.OrthographicCamera;
 
 	constructor(canvas: HTMLCanvasElement, matchId: number) {
 		if (!canvas) {
 			throw Error('failed to get canvas element.');
 		}
-		const ctx = canvas.getContext('2d');
-		if (!ctx)
-			throw Error('failed to get context.');
-		this.ctx = ctx;
 		this.width = canvas.width;
 		this.height = canvas.height;
+
+		this.renderer = new THREE.WebGLRenderer({ canvas });
+		this.renderer.setPixelRatio(window.devicePixelRatio);
+		this.renderer.setSize(this.width, this.height);
+
+		this.scene = new THREE.Scene();
+
+		const display_width = this.width / 2 + 100;
+		const display_height = this.height / 2 + 100;
+		const near = -1000;
+		const far = 1000;
+
+		this.camera = new THREE.OrthographicCamera(display_width * -1, display_width, display_height, display_height * -1, near, far);
+		this.camera.position.set(this.width / 2, this.height / 2, 200);
+		this.camera.lookAt(this.width / 2, this.height / 2, 0);
 
 		this.matchId = matchId;
 		document.addEventListener('keydown', (e) => {
@@ -38,27 +52,11 @@ export default class Pong {
 
 		this.state_elem = document.getElementById('match-data');
 		this.score_elem = document.getElementById('score-data');
-
-		// const join = document.getElementById('join');
-		// //todo end && start??
-		// if (!join) {
-		// 	throw Error("Keys are not found.");
-		// }
-		// join.addEventListener('click', async() => {
-		// 	this.connectWebSocket();
-		// 	if (this.intervalID == null)
-		// 		this.intervalID = setInterval(() => {
-		// 			this.draw();
-		// 		}, 16);
-		// })
 	}
 
 	start(): void {
 		this.connectWebSocket();
-		if (this.intervalID == null)
-			this.intervalID = setInterval(() => {
-				this.draw();
-			}, 16);
+		this.draw();
 	}
 
 	connectWebSocket(): void {
@@ -84,8 +82,6 @@ export default class Pong {
 			//todo 試合終了のお知らせ
 			// setTimeout(() => this.connectWebSocket(), 3000);
 			console.log("websocket on close");
-			clearInterval(this.intervalID);
-			this.intervalID = null;
 
 			setTimeout(() => {
 				if (sessionStorage.getItem('navigatingToNextMatch') === 'true') {
@@ -108,7 +104,7 @@ export default class Pong {
 		switch (event.type) {
 			case 'game_initialization':
 				if (event.data) {
-					this.manager = new Manager(this.ctx);
+					this.manager = new Manager(this.renderer, this.scene);
 					this.manager.update(event);
 					// this.state_ = new State(parsedData.data);
 				} else {
@@ -151,7 +147,9 @@ export default class Pong {
 	}
 
 	draw(): void {
+		requestAnimationFrame(() => this.draw());
 		this.check_and_notify_keymove();
+		this.renderer.render(this.scene, this.camera);
 		return;
 	}
 
