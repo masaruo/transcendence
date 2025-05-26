@@ -1,20 +1,24 @@
+import logging
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from .models import AIBattle
 
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
 class AIBattleConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         await self.accept()
-        print("WebSocket connection accepted")
+        logging.info("WebSocket connection accepted")
 
     async def disconnect(self, close_code):
-        print(f"WebSocket disconnected with code: {close_code}")
+        logging.info(f"WebSocket disconnected with code: {close_code}")
 
     async def receive(self, text_data):
         try:
             data = json.loads(text_data)
-            print(f"Received WebSocket message: {data}")
+            logging.info(f"Received WebSocket message: {data}")
 
             if data['type'] == 'start_battle':
                 battle_id = data.get('battle_id')
