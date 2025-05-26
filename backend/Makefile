@@ -6,3 +6,6 @@ dev:
 
 re:
 	docker compose down && docker compose up --build
+
+clean:
+	docker compose down

@@ -1,9 +1,3 @@
-# network between containers
-`docker container network add <networkname:transcendence> <container_name: node-frontend-1>`
-then
-`curl django:8000/admin`
-
-
 # List of modules (2 minor = 1 major)
 ## Web
 ◦ Major module: Use a Framework to build the backend.
