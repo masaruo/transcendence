@@ -29,8 +29,8 @@ class Manager:
     def __init__(self, match_id) -> None:
         self.objs: list[PongObj] = [
             Ball(),
-            Paddle(side=Paddle.SIDE.R1, color="green"),
-            Paddle(side=Paddle.SIDE.L1, color="blue"),
+            Paddle(side=Paddle.SIDE.R1, color="#ef3d2d"),
+            Paddle(side=Paddle.SIDE.L1, color="#2d80f3"),
         ]
         self.wall = Wall()
         self._match_id = match_id
@@ -155,12 +155,12 @@ class Manager:
         own_tournament = await self._get_own_tournament()
 
         if own_tournament.match_type == MatchModeType.DOUBLES:
-            self.objs.append(Paddle(side=Paddle.SIDE.R2, color="white"))
-            self.objs.append(Paddle(side=Paddle.SIDE.L2, color="red"))
+            self.objs.append(Paddle(side=Paddle.SIDE.R2, color="#f6a498"))
+            self.objs.append(Paddle(side=Paddle.SIDE.L2, color="#ccc8fd"))
 
         ball_number = own_tournament.ball_number
         if ball_number >= 2:
-            self.objs.append(Ball(color='red'))
+            self.objs.append(Ball(color='#ffb200'))
 
 
     @database_sync_to_async
