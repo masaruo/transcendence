@@ -10,7 +10,7 @@ COPY ./app /app
 
 WORKDIR /app
 
-RUN	apt-get update && apt-get upgrade -y && apt-get install -y postgresql-client openssl tree curl lsof make && \
+RUN	apt-get update && apt-get upgrade -y && apt-get install -y postgresql-client curl && \
 	/venv/bin/pip install --upgrade pip && /venv/bin/pip install --no-cache-dir -r /tmp/requirements.txt && \
 	rm -rf /tmp/requirements.txt && \
 	adduser --disabled-password --no-create-home django-user && \

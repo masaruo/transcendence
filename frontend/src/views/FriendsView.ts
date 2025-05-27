@@ -37,6 +37,19 @@ export default class FriendsView extends AbstractView {
 		}
 		</style>
 
+		<div class="add-friend-form">
+			<label for="friend-email">友達を追加</label>
+  				<input
+    				type="text"
+					id="friend-email"
+					name="friend email"
+					placeholder="emailを入力"
+					required
+					maxlength="20"
+				>
+  			<button type="button" id='addFriend'>追加</button>
+		</div>
+
 		<div class="container-fluid my-container p-lg-5">
       <div class="text-center mt-5 mb-3">
         <h2>Your Friends</h2>
@@ -68,5 +81,33 @@ export default class FriendsView extends AbstractView {
 			friendsList.textContent = 'Failed to load friends.';
 			console.error('Error fetching friends:', error);
 		}
+
+		//add friend
+		const add_friend_button = document.getElementById('addFriend') as HTMLInputElement;
+		const email = document.getElementById('friend-email') as HTMLInputElement;
+		if (!add_friend_button) { throw Error("add friend not found");}
+		add_friend_button.addEventListener('click', async (event) => {
+			event.preventDefault();
+			if (add_friend_button.disabled) return;
+			add_friend_button.disabled = true;
+			try {
+				const formData = new FormData();
+				if (email) {
+					formData.append('email', email.value);
+				}
+				const fetcher = new Fetch(`${PATH}/api/user/friends/create/`, "POST");
+				fetcher.add_form_data(formData);
+				const res_in_json = await fetcher.fetch_with_auth();
+				if (res_in_json) {
+					window.location.reload()
+				} else {
+					console.error("error adding a friend");
+				}
+			} catch (error) {
+				console.error("Request failed.", error);
+			} finally {
+				add_friend_button.disabled = false;
+			}
+		})
 	}
 }
