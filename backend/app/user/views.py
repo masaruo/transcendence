@@ -44,8 +44,8 @@ class FriendAddView(APIView):
 
     def post(self, request):
         try:
-            friend_id = request.data.get("id")
-            friend = User.objects.get(id=friend_id)
+            email = request.data.get("email")
+            friend = User.objects.get(email=email)
             request.user.make_friend(friend)
             serializer = self.serializer_class(friend)
             return Response(serializer.data, status=status.HTTP_201_CREATED)

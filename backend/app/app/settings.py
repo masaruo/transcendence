@@ -30,7 +30,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['django', 'localhost', 'nginx', '*']
+ALLOWED_HOSTS = ['django', 'localhost', 'nginx', '127.0.0.1']
 
 INTERNAL_IPS = [
     "127.0.0.1",
@@ -248,3 +248,7 @@ SIMPLE_JWT = {
 
 # #! CSRF
 # CSRF_COOKIE_HTTPONLY = not DEBUG
+
+CSRF_TRUSTED_ORIGINS = ['https://localhost', 'https://127.0.0.1']
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True

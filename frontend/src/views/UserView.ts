@@ -154,12 +154,6 @@ export default class UserView extends AbstractView {
             if (file_input && file_input.files && file_input.files.length > 0) {
               formData.append('avatar', file_input.files[0]);
             }
-
-            // is_onlineチェックボックスの値を追加
-            if (is_online_input) {
-              formData.append('is_online', is_online_input.checked.toString());
-            }
-
             const fetcher = new Fetch(`${PATH}/api/user/me/`, "PATCH");
             fetcher.add_form_data(formData);
             const res = await fetcher.fetch_with_auth();
