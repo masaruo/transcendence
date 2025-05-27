@@ -25,9 +25,9 @@ export class Manager {
 		this.renderer = renderer;
 		this.scene = scene;
 		const textureLoader = new THREE.TextureLoader();
-		const floor_color = textureLoader.load('/src/texture/Wood/WoodFloor046_1K-JPG_Color.jpg');
-		const floor_normal = textureLoader.load('/src/texture/Wood/WoodFloor046_1K-JPG_NormalGL.jpg');
-		const floor_roughness = textureLoader.load('/src/texture/Wood/WoodFloor046_1K-JPG_Roughness.jpg');
+		const floor_color = textureLoader.load('/images/texture/Wood/WoodFloor046_1K-JPG_Color.jpg');
+		const floor_normal = textureLoader.load('/images/texture/Wood/WoodFloor046_1K-JPG_NormalGL.jpg');
+		const floor_roughness = textureLoader.load('/images/texture/Wood/WoodFloor046_1K-JPG_Roughness.jpg');
 		this.floor_material = new THREE.MeshStandardMaterial({
 			map: floor_color,
 			normalMap: floor_normal,

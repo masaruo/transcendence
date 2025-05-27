@@ -14,7 +14,7 @@ export default class FriendsView extends AbstractView {
 		.my-container {
 			height: 85vh;
 			width: 100%;
-			background-image: url('src/image/friends.jpg');
+			background-image: url('/images/friends.jpg');
 			background-size: cover;
 			background-position: center;
 		}

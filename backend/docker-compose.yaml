@@ -36,7 +36,8 @@ services:
       - ./nginx/certs/cert.pem:/etc/nginx/certs/cert.pem
       - ./nginx/certs/key.pem:/etc/nginx/certs/key.pem
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./nginx/dist:/user/share/nginx/html
+      - ./nginx/dist:/usr/share/nginx/html
+      - /dev/null:/etc/nginx/conf.d/default.conf
       - static_volumes:/vol/web/static
       - media_volumes:/vol/web/media
     networks:

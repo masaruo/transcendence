@@ -10,6 +10,6 @@ dev: clean
 	make dev -C ./frontend
 	make dev -C ./backend
 
-re: clean all
+re: clean dev
 
 .PHONY: all clean dev re
