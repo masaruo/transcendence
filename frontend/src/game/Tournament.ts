@@ -24,7 +24,6 @@ export default class Tournament {
 				const ids = match.playerIds;
 				const currentUserId = parseInt(sessionStorage.getItem('user_id'));
 				if (ids.includes(currentUserId)) {
-					// console.log("[DEBUG] User is in this match");
 					sessionStorage.setItem('navigatingToNextMatch', 'true');
 					navigateTo(`/tournament/${this.tournamentId}/pong/${match.id}`)
 				}

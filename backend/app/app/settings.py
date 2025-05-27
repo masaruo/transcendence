@@ -29,10 +29,8 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
-# DEBUG=True
 
-#! security
-ALLOWED_HOSTS = ['django', 'localhost', '*']
+ALLOWED_HOSTS = ['django', 'localhost', 'nginx', '*']
 
 INTERNAL_IPS = [
     "127.0.0.1",
@@ -68,7 +66,6 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -226,33 +223,11 @@ CORS_ALLOW_METHODS = [
     'PUT',
 ]
 
-# WhiteNoise settings (optional but recommended)
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-WHITENOISE_USE_FINDERS = True  # For development
-
-# Whitenoise設定
-# STORAGES = {
-#     # ...
-#     "staticfiles": {
-#         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-#     },
-# }
-
-# WHITENOISE_USE_FINDERS = True
-# WHITENOISE_AUTOREFRESH = True
-# WHITENOISE_SKIP_COMPRESS_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'zip', 'gz', 'tgz', 'bz2', 'tbz', 'xz', 'br']
-# WHITENOISE_ROOT = MEDIA_ROOT
-# WHITENOISE_INDEX_FILE = True
-
-# # メディアファイル配信設定
-# WHITENOISE_DIRECTORIES = [
-#     ('media', MEDIA_ROOT),
-# ]
-
 # 起動時にディレクトリを作成
 import os
 os.makedirs(MEDIA_ROOT, exist_ok=True)
 os.makedirs(os.path.join(MEDIA_ROOT, 'uploads', 'avatar'), exist_ok=True)
+
 # JWT settings
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=300),

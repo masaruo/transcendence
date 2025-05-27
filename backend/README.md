@@ -3,6 +3,9 @@
 2. @chrome `chrome://certificate-manager/localcerts/usercerts`
 3. import `cert.pem`
 
+## generate SSL keys
+./backend/nginx/gen-certificate.sh
+
 ## start
 docker compose up --build
 
