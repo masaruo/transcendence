@@ -1,28 +1,28 @@
 export default class HeaderView {
 	static getHeader(): string {
 		const isAuth: boolean = sessionStorage.getItem("is_authenticated") === "true";
-
 		return `
-			<style>
-				.custom-navbar {
-					background-color: #3f392b !important;
-				}
+		<style>
+		.custom-navbar {
+			background-color: #3f392b !important;
+			}
 			</style>
 
 			<nav class="navbar navbar-expand-sm navbar-expand-lg bg-dark custom-navbar" data-bs-theme="dark">
-				<div class="container-fluid">
-					<div class="collapse navbar-collapse" id="navbarNav">
-						<ul class="navbar-nav nav-item-color">
-							${this.getNavItems(isAuth)}
-						</ul>
-					</div>
-				</div>
+			<div class="container-fluid">
+			<div class="collapse navbar-collapse" id="navbarNav">
+			<ul class="navbar-nav nav-item-color">
+			${this.getNavItems(isAuth)}
+			</ul>
+			</div>
+			</div>
 			</nav>
-		`;
-	}
+			`;
+		}
 
-	private static getNavItems(isAuth: boolean): string {
-		if (isAuth) {
+		private static getNavItems(isAuth: boolean): string {
+			if (isAuth) {
+				const user_id = sessionStorage.getItem("user_id");
 			return `
 				<li class="nav-item">
 					<a class="nav-link active nav__link" aria-current="page" href="/user" data-link>User</a>
@@ -34,10 +34,13 @@ export default class HeaderView {
 				<a class="nav-link active nav__link" aria-current="page" href="/tournament" data-link>Tournaments</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link active nav__link" aria-current="page" href="/logout" data-link>Logout</a>
+				<a class="nav-link active nav__link" aria-current="page" href="/user/${user_id}/matches" data-link>Match History</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link active nav__link" aria-current="page" href="/ai-battle" data-link>AI-Battle</a>
+				<a class="nav-link active nav__link" aria-current="page" href="/ai-battle" data-link>AI-Battle</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link active nav__link" aria-current="page" href="/logout" data-link>Logout</a>
 				</li>
 			`
 		} else {
