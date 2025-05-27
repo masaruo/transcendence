@@ -2,6 +2,7 @@ from rest_framework import generics, permissions
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 
@@ -43,9 +44,11 @@ class FriendAddView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
+        email = request.data.get("email")
+        if not email:
+            return (Response({"detail": "Email is required"}, status=status.HTTP_400_BAD_REQUEST))
+        friend = get_object_or_404(User, email=email)
         try:
-            friend_id = request.data.get("id")
-            friend = User.objects.get(id=friend_id)
             request.user.make_friend(friend)
             serializer = self.serializer_class(friend)
             return Response(serializer.data, status=status.HTTP_201_CREATED)

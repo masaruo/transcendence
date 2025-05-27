@@ -1,29 +1,21 @@
-"""
-ASGI config for app project.
-
-It exposes the ASGI callable as a module-level variable named ``application``.
-
-For more information on this file, see
-https://docs.djangoproject.com/en/5.1/howto/deployment/asgi/
-"""
-
 import os
+import django
+from django.core.asgi import get_asgi_application
 
+# Django設定を先に初期化
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'app.settings')
+django.setup()
+
+# その後にDjangoアプリのインポート
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.auth import AuthMiddlewareStack
 from channels.security.websocket import AllowedHostsOriginValidator
-from django.core.asgi import get_asgi_application
 from app.middleware import JWTAuthMiddleware
-
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'app.settings')
-
 from chat.routing import chat_urlpatterns
 from tournament.routing import tournament_urlpatterns
 from user.routing import status_urlpatterns
 from ai_battle.routing import websocket_urlpatterns as ai_battle_urlpatterns
 
-
-# Add this class before your application definition
 class LoggingOriginMiddleware:
     def __init__(self, inner):
         self.inner = inner
@@ -32,7 +24,6 @@ class LoggingOriginMiddleware:
         headers_dict = dict(scope.get('headers', []))
         return await self.inner(scope, receive, send)
 
-# Then update your application definition to use this class
 application = ProtocolTypeRouter(
     {
         "http": get_asgi_application(),
@@ -47,5 +38,3 @@ application = ProtocolTypeRouter(
         )
     }
 )
-
-
