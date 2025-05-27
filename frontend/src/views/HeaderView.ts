@@ -24,7 +24,6 @@ export default class HeaderView {
 	private static getNavItems(isAuth: boolean): string {
 		if (isAuth) {
 			return `
-
 				<li class="nav-item">
 					<a class="nav-link active nav__link" aria-current="page" href="/user" data-link>User</a>
 				</li>
@@ -36,6 +35,9 @@ export default class HeaderView {
 				</li>
 				<li class="nav-item">
 					<a class="nav-link active nav__link" aria-current="page" href="/logout" data-link>Logout</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link active nav__link" aria-current="page" href="/ai-battle" data-link>AI-Battle</a>
 				</li>
 			`
 		} else {

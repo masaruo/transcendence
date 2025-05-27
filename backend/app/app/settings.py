@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'tournament',
     'match_history',
     'chat',
+    'ai_battle',
     # 3rd party apps
     'rest_framework',
     'rest_framework.authtoken',

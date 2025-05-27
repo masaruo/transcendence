@@ -8,6 +8,7 @@ import TournamentListView from "../views/TournamentListView";
 import UserView from "../views/UserView";
 import MatchHistoryView from "@/views/MatchHistoryView";
 import UserRegisterView from "@/views/UserRegisterView";
+import AIBattleView from "@/views/AIBattleView";
 import UrlPattern from "url-pattern";
 import { StatusManager } from "./StatusManager"
 import LogoutView from "@/views/LogoutView";
@@ -50,6 +51,7 @@ export const router = async() => {
 		{path: "/tournament/create", view: TournamentCreateView},
 		{path: "/tournament/:tournament_id", view: TournamentDetailView},
 		{path: "/tournament/:tournament_id/pong/:pong_id", view: PongView},
+		{path: "/ai-battle", view: AIBattleView},
 	];
 
 	 // マッチング処理を明示的に行う
