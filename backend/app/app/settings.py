@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 import os
+# from urllib.parse import DefragResultBytes
+import dotenv
 from datetime import timedelta
 from pathlib import Path
 
@@ -22,12 +24,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure--=pij7phva!t*6#6^-9=a8a+wb%t#%_-&&vgarmmd6ccg81kl!'
+dotenv.load_dotenv()
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['django', 'localhost', '*']
+ALLOWED_HOSTS = ['django', 'localhost', 'nginx', '*']
 
 INTERNAL_IPS = [
     "127.0.0.1",
@@ -46,7 +49,6 @@ INSTALLED_APPS = [
     # own apps
     'app',
     'user',
-    # 'game',
     'tournament',
     'match_history',
     'chat',
@@ -63,9 +65,9 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
-    'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -99,7 +101,6 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            # "hosts": ["redis://redis:6379"]
             "hosts": [("redis", 6379)]
         }
     }
@@ -155,11 +156,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = '/static/static/'
-MEDIA_URL = '/static/media/'
-
-MEDIA_ROOT = '/vol/web/media'
+STATIC_URL = '/static/'
 STATIC_ROOT = '/vol/web/static'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = '/vol/web/media'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -182,11 +182,51 @@ SPECTACULAR_SETTINGS = {
     'COMPONENT_SPLIT_REQUEST': True,
 }
 
-# cors - only true for dev
-CORS_ALLOW_ALL_ORIGINS = True
+# COR# CORS
+CORS_ALLOW_ALL_ORIGINS = False
 
-# use cookie for credentials
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "https://localhost:3000",
+    "http://localhost",
+    "https://localhost",
+]
+
 CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'authorization',
+    'content-type',
+    'x-csrftoken',
+    'x-requested-with',
+    'cache-control',
+    'pragma',
+]
+
+CORS_EXPOSE_HEADERS = [
+    'content-type',
+    'content-length',
+    'content-disposition',
+    'cache-control',      # 追加
+    'expires',            # 追加
+    'last-modified',      # 追加
+]
+
+# staticファイル用
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+
+# 起動時にディレクトリを作成
+import os
+os.makedirs(MEDIA_ROOT, exist_ok=True)
+os.makedirs(os.path.join(MEDIA_ROOT, 'uploads', 'avatar'), exist_ok=True)
 
 # JWT settings
 SIMPLE_JWT = {
@@ -194,7 +234,17 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 }
 
-#! securities!
-# SECURE_SSL_REDIRECT = True
-# SESSION_COOKIE_SECURE = True
-# CSRF_COOKIE_SECURE = True
+# #! securities!
+# SECURE_SSL_REDIRECT = not DEBUG
+# SESSION_COOKIE_SECURE = not DEBUG
+# CSRF_COOKIE_SECURE = not DEBUG
+# SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0
+# SECURE_HSTS_PRELOAD = not DEBUG
+# SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
+
+# #! XSS
+# SECURE_BROWSER_XSS_FILTER = not DEBUG
+# SECURE_CONTENT_TYPE_NOSNIFF = not DEBUG
+
+# #! CSRF
+# CSRF_COOKIE_HTTPONLY = not DEBUG

@@ -1,4 +1,4 @@
-import { PassThrough } from "stream";
+// import { PassThrough } from "stream";
 import { Manager, WebSocketEvent } from "./Manager";
 import { navigateTo } from "@/services/router";
 import * as THREE from 'three';
@@ -60,11 +60,11 @@ export default class Pong {
 	}
 
 	connectWebSocket(): void {
-		const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+		// const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
 
 		const token = sessionStorage.getItem('access');
-		// console.log("token ", token)
-		this.socket_ = new WebSocket(`${protocol}//localhost:8000/ws/match/${this.matchId}/?token=${token}`);
+		// this.socket_ = new WebSocket(`${protocol}//localhost:8000/ws/match/${this.matchId}/?token=${token}`);
+		this.socket_ = new WebSocket(`wss://localhost/ws/match/${this.matchId}/?token=${token}`);
 
 		this.socket_.onopen = () => {
 			console.log("WebSocket接続成功", new Date().toISOString());

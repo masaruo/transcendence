@@ -73,14 +73,6 @@ export default class UserView extends AbstractView {
                           <span class="font-weight-bold">${this.me.email}</span>
                         </div>
                       </div>
-                      <div class="row w-100">
-                        <div class="col-5 text-start">
-                          <div>status: </div>
-                        </div>
-                        <div class="col-7 text-start">
-                          <span class="font-weight-bold">${this.me.is_online ? 'Online' : 'Offline'}</span>
-                        </div>
-                      </div>
                     </div>
                   </div>
                   <div class="col-md-6">
