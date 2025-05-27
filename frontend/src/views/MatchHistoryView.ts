@@ -54,12 +54,12 @@ export default class MatchHistoryView extends AbstractView {
 
 		    // 統計情報要素を作成して追加
     	if (stats_div) {
-        	const statsElem = this.createStatsElem(this.matches, parseInt(user_id));
+        	const statsElem = this.createStatsElem(this.matches, parseInt(String(user_id)));
         	stats_div.appendChild(statsElem);
     	}
 
 		this.matches.forEach(match => {
-			const match_elem = this.createMatchElement(match, parseInt(user_id));
+			const match_elem = this.createMatchElement(match, parseInt(String(user_id)));
 			matches_div?.appendChild(match_elem);
 		});
 	}

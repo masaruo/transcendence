@@ -8,7 +8,7 @@ from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
-AVATAR_DEFAULT = "defalt"
+# AVATAR_DEFAULT = "defalt"
 
 class UserManager(BaseUserManager):
     """manager for User model"""
@@ -53,16 +53,14 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     email = models.EmailField(verbose_name="Email", max_length=255, unique=True, blank=False, null=False)
     nickname = models.CharField(verbose_name="Nickname", max_length=255, blank=False, null=False)
-    avatar = models.ImageField(verbose_name="Avatar", null=True, blank=True, upload_to=get_avatar_image_path, default="default_avatar.jpeg")
+    avatar = models.ImageField(verbose_name="Avatar", null=True, blank=True, upload_to=get_avatar_image_path, default="default_avatar.jpg")
     is_active = models.BooleanField(verbose_name="Active User", default=True)
     is_staff = models.BooleanField(default=False)
     friends = models.ManyToManyField('self', symmetrical=True, blank=True)
     last_seen = models.DateTimeField(default=timezone.now)
 
-    # register UserManager class for this User model
     objects = UserManager()
 
-    # primary key
     USERNAME_FIELD = 'email'
 
     def __str__(self):

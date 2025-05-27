@@ -5,10 +5,8 @@ export class StatusManager {
     private pingTimer?: number;
 
     connect() {
-        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
 		const token = sessionStorage.getItem('access');
-        // const wsUrl = `${protocol}//${window.location.host}/ws/status/?token=${token}`;
-		const wsUrl = `${protocol}//localhost:8000/ws/status/?token=${token}`;
+        const wsUrl = `wss://localhost/ws/status/?token=${token}`;
 
         this.websocket = new WebSocket(wsUrl);
 

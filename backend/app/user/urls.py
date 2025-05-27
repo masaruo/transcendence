@@ -10,6 +10,6 @@ urlpatterns = [
     path('matches/', include('match_history.urls')),
     path('<int:user_id>/matches/', include('match_history.urls')),
     path('friends/', FriendListView.as_view(), name="friends"),
-    path('friends/create', FriendAddView.as_view(), name="friends_create"),
+    path('friends/create/', FriendAddView.as_view(), name="friends_create"),
     path('friends/remove/<int:pk>/', FriendRemoveView.as_view(), name="friends_remove"),
 ]
