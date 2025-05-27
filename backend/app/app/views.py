@@ -21,5 +21,5 @@ def serve_media(request, path):
         response['Access-Control-Expose-Headers'] = '*'
 
         return response
-    except:
+    except (FileNotFoundError, PermissionError, IsADirectoryError):
         raise Http404()
