@@ -1,8 +1,13 @@
 all:
-	export PYTHONBREAKPOINT=ipdb.set_trace
-	python ./app/manage.py runserver 0.0.0.0:8000
+	docker compose up --build -d
 
-exec:
-	docker container exec -it backend-django-1 bash
+dev:
+	docker compose -f docker-compose.yaml -f docker-compose.debug.yaml up --build
 
-.PHONY: all
+re:
+	docker compose down && docker compose up --build -d
+
+clean:
+	docker compose down
+
+.PHONY: all dev re clean

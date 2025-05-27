@@ -16,7 +16,6 @@ from rest_framework_simplejwt.views import (
 
 from debug_toolbar.toolbar import debug_toolbar_urls
 
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/schema/', SpectacularAPIView.as_view(), name='api-schema'),
@@ -26,11 +25,12 @@ urlpatterns = [
     path('api/token/verify/', TokenVerifyView.as_view(), name="token_verfify"),
     path('api/user/', include("user.urls")),
     path('api/tournament/', include('tournament.urls')),
-] + debug_toolbar_urls()
+    path('api/ai_battle/', include('ai_battle.urls')),
+]
 
 
 if settings.DEBUG:
     urlpatterns += static(
         settings.MEDIA_URL,
         document_root=settings.MEDIA_ROOT,
-    )
+    ) + debug_toolbar_urls()

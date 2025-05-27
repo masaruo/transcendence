@@ -4,7 +4,7 @@ import { navigateTo } from "../services/router";
 import { PATH } from "../services/constants";
 
 export default class TournamentListView extends AbstractView {
-	constructor (params: string) {
+	constructor (params: Record<string, string>) {
 		super(params);
 		this.setTitle("Tournaments List");
 	}

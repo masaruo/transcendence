@@ -12,7 +12,7 @@ export default class IndexView extends AbstractView {
 				.my-container{
 					height: 85vh;
 					width: 100%;
-					background-image: url('src/image/index.jpg');
+					background-image: url('/images/index.jpg');
 					background-size: cover;
 					background-position: center;
 					font-family: "Bodoni Moda", serif;

@@ -1,0 +1,6 @@
+services:
+  django:
+    environment:
+      - DEBUG=true
+    ports:
+      - "8000:8000"

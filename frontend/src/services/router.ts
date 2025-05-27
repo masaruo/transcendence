@@ -8,8 +8,10 @@ import TournamentListView from "../views/TournamentListView";
 import UserView from "../views/UserView";
 import MatchHistoryView from "@/views/MatchHistoryView";
 import UserRegisterView from "@/views/UserRegisterView";
+import AIBattleView from "@/views/AIBattleView";
 import UrlPattern from "url-pattern";
 import { StatusManager } from "./StatusManager"
+import LogoutView from "@/views/LogoutView";
 
 let statusManager: StatusManager | null = null;
 
@@ -43,11 +45,13 @@ export const router = async() => {
 		{path: "/user/register", view: UserRegisterView},
 		{path: "/user/:user_id/matches", view: MatchHistoryView},
 		{path: "/login", view: LoginView },
+    {path: "/logout", view: LogoutView},
 		{path: "/friends", view: FriendsView},
 		{path: "/tournament", view: TournamentListView},
 		{path: "/tournament/create", view: TournamentCreateView},
 		{path: "/tournament/:tournament_id", view: TournamentDetailView},
 		{path: "/tournament/:tournament_id/pong/:pong_id", view: PongView},
+		{path: "/ai-battle", view: AIBattleView},
 	];
 
 	 // マッチング処理を明示的に行う

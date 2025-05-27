@@ -12,7 +12,7 @@ export default class LoginView extends AbstractView {
 		return `
 		<style>
 			.left-side {
-				background-image: url('src/image/login-pingpong.jpg');
+				background-image: url('/images/login-pingpong.jpg');
 				background-size: cover;
 				background-position: center;
 				position: relative;

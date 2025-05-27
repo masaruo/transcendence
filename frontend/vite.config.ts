@@ -21,6 +21,13 @@ export default defineConfig({
 		outDir: 'dist',
 		assetsDir: 'assets',
 		sourcemap: true,
+		rollupOptions: {
+			output: {
+				manualChunks: {
+					vendor: ['three'],
+				}
+			}
+		}
 	},
 	css: {
 		preprocessorOptions: {
