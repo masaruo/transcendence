@@ -34,12 +34,12 @@ export default class HeaderView {
 				<a class="nav-link active nav__link" aria-current="page" href="/tournament" data-link>Tournaments</a>
 				</li>
 				<li class="nav-item">
-				<a class="nav-link active nav__link" aria-current="page" href="/user/${user_id}/matches" data-link>Match History</a>
+				<a class="nav-link active nav__link" aria-current="page" href="/user/${user_id}/matches" data-link>My Matches</a>
 				</li>
 				<li class="nav-item">
 				<a class="nav-link active nav__link" aria-current="page" href="/ai-battle" data-link>AI-Battle</a>
 				</li>
-				<li class="nav-item">
+				<li class="nav-item ml-auto">
 					<a class="nav-link active nav__link" aria-current="page" href="/logout" data-link>Logout</a>
 				</li>
 			`

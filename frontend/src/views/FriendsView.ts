@@ -71,7 +71,9 @@ export default class FriendsView extends AbstractView {
 				friendItem.innerHTML = `
 				<div class="card-body">
 				    <h5 class="card-title">${friend.nickname}</h5>
-				    <p class="card-text">ID: ${friend.id}</p>
+				    <p class="card-text">
+						<a href="/user/${friend.id}/matches">See History</a>
+					</p>
 				    <p class="card-text">online: ${friend.is_online ? 'Yes' : 'No'}</p>
 				</div>
 				`; // Display id, nickname, and is_online
