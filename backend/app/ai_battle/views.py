@@ -5,9 +5,12 @@ from rest_framework.permissions import IsAuthenticated
 from .models import AIBattle
 from .serializers import AIBattleSerializer
 
+from rest_framework_simplejwt.authentication import JWTAuthentication
+
 class AIBattleViewSet(viewsets.ModelViewSet):
     queryset = AIBattle.objects.all()
     serializer_class = AIBattleSerializer
+    authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
@@ -41,4 +44,4 @@ class AIBattleViewSet(viewsets.ModelViewSet):
             return Response(
                 {'error': str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            ) 
+            )

@@ -80,7 +80,7 @@ export default class AIBattleView extends AbstractView {
             .ai-battle-container {
                 height: 85vh;
                 width: 100%;
-                background-image: url('src/image/ai-battle.jpg');
+                background-image: url('images/ai-battle.jpg');
                 background-size: cover;
                 background-position: center;
                 display: flex;
@@ -148,11 +148,11 @@ export default class AIBattleView extends AbstractView {
 
     private resetBall(): void {
         if (!this.canvas) return;
-        
+
         // ボールを中央に配置
         this.ball.x = this.canvas.width / 2;
         this.ball.y = this.canvas.height / 2;
-        
+
         // ランダムな方向にボールを発射
         const angle = (Math.random() * Math.PI / 2) - Math.PI / 4; // -45度から45度の範囲
         const speed = 10;
@@ -184,7 +184,7 @@ export default class AIBattleView extends AbstractView {
         // パドルを初期位置に配置
         this.userPaddle.x = 50;
         this.userPaddle.y = (this.canvas.height - this.userPaddle.height) / 2;
-        
+
         this.aiPaddle.x = this.canvas.width - 60; // 右端から少し離れた位置
         this.aiPaddle.y = (this.canvas.height - this.aiPaddle.height) / 2;
 
@@ -255,7 +255,7 @@ export default class AIBattleView extends AbstractView {
         if (!this.canvas) return;
 
         const currentTime = Date.now();
-        
+
         // 1秒ごとにAIの判断を更新
         if (currentTime - this.lastAIUpdate >= this.AI_UPDATE_INTERVAL) {
             // 盤面の状態を取得して判断
@@ -267,7 +267,7 @@ export default class AIBattleView extends AbstractView {
         if (this.aiTargetPosition !== null) {
             const currentY = this.aiPaddle.y + (this.aiPaddle.height / 2);
             const targetY = this.aiTargetPosition + (this.aiPaddle.height / 2);
-            
+
             // 目標位置に基づいてキー操作を決定
             if (Math.abs(currentY - targetY) > 5) { // 5ピクセルの誤差を許容
                 if (currentY < targetY) {
@@ -363,7 +363,7 @@ export default class AIBattleView extends AbstractView {
         ) {
             // 衝突時の位置補正
             this.ball.x = this.userPaddle.x + this.userPaddle.width + this.ball.radius;
-            
+
             // 反射角度の計算
             const hitPosition = (this.ball.y - this.userPaddle.y) / this.userPaddle.height;
             const angle = (hitPosition - 0.5) * Math.PI / 3;
@@ -382,7 +382,7 @@ export default class AIBattleView extends AbstractView {
         ) {
             // 衝突時の位置補正
             this.ball.x = this.aiPaddle.x - this.ball.radius;
-            
+
             // 反射角度の計算
             const hitPosition = (this.ball.y - this.aiPaddle.y) / this.aiPaddle.height;
             const angle = (hitPosition - 0.5) * Math.PI / 3;
@@ -438,19 +438,19 @@ export default class AIBattleView extends AbstractView {
         // スコアをリセット
         this.score.user = 0;
         this.score.ai = 0;
-        
+
         // ゲーム状態をリセット
         this.gameOver = false;
         this.isGameRunning = true;
-        
+
         // AIの状態をリセット
         this.lastAIUpdate = Date.now();
         this.aiTargetPosition = null;
         this.aiKeys = {};
-        
+
         // ボールをリセット
         this.resetBall();
-        
+
         // ゲームループを再開
         this.gameLoop();
     }
@@ -592,7 +592,7 @@ export default class AIBattleView extends AbstractView {
         this.gameContainer = document.getElementById('game-container');
         this.canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
         this.ctx = this.canvas?.getContext('2d');
-        
+
         if (startButton && this.gameContainer) {
             startButton.addEventListener('click', async () => {
                 try {
@@ -603,7 +603,7 @@ export default class AIBattleView extends AbstractView {
                     }
 
                     console.log('Attempting to start battle...');
-                    
+
                     // バックエンドにバトル開始をリクエスト
                     const response = await fetch(`${PATH}/api/ai_battle/battles/start_battle/`, {
                         method: 'POST',
@@ -614,7 +614,7 @@ export default class AIBattleView extends AbstractView {
                     });
 
                     console.log('Response status:', response.status);
-                    
+
                     if (!response.ok) {
                         const errorData = await response.json().catch(() => ({}));
                         throw new Error(`Failed to start battle: ${response.status} ${response.statusText} - ${JSON.stringify(errorData)}`);
@@ -624,12 +624,13 @@ export default class AIBattleView extends AbstractView {
                     console.log('Battle started successfully:', battleData);
 
                     // WebSocket接続を確立
-                    const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-                    const wsUrl = `${wsProtocol}//${WS_PATH}/ws/ai_battle/`;
+                    // const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+                    // const wsUrl = `${wsProtocol}//${WS_PATH}/ws/ai_battle/`;
+                    const wsUrl = `wss://localhost/ws/ai_battle/?token=${token}`
                     console.log('Connecting to WebSocket:', wsUrl);
-                    
+
                     this.ws = new WebSocket(wsUrl);
-                    
+
                     this.ws.onopen = () => {
                         console.log('WebSocket connection established');
                         this.ws?.send(JSON.stringify({
@@ -671,4 +672,4 @@ export default class AIBattleView extends AbstractView {
             });
         }
     }
-} 
+}
