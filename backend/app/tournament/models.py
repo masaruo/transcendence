@@ -76,7 +76,9 @@ class Tournament(models.Model):
             'id': self.id,
             'status': self.status,
             'match_type': self.match_type,
+            'match_size': self.match_size,
             'players': player_list,
+            'created_at': self.created_at,
         }
 
     def add_player(self, player, round=RoundType.PRELIMINARY) -> 'TournamentPlayer':
@@ -329,7 +331,7 @@ class TournamentPlayer(models.Model):
 
 
 class Score(models.Model):
-    match = models.ForeignKey(to='Match', on_delete=models.CASCADE)
+    match = models.OneToOneField(to='Match', on_delete=models.CASCADE)
     team1_score = models.IntegerField(default=0)
     team2_score = models.IntegerField(default=0)
     winner = models.ForeignKey(to='Team', on_delete=models.DO_NOTHING, blank=True, null=True)
