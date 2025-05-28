@@ -55,15 +55,30 @@ class TournamentViewSet(
                 'team1': {
                     'id': match.team1.id,
                     'player1': match.team1.player1.id,
-                    'player2': match.team1.player2.id if match.team1.player2 else None
+                    'player2': match.team1.player2.id if match.team1.player2 else None,
+                    'score': match.score.team1_score if hasattr(match, 'score') else 0
                 },
                 'team2': {
                     'id': match.team2.id,
                     'player1': match.team2.player1.id,
-                    'player2': match.team2.player2.id if match.team2.player2 else None
+                    'player2': match.team2.player2.id if match.team2.player2 else None,
+                    'score': match.score.team2_score if hasattr(match, 'score') else 0
                 },
                 'status': match.match_status,
                 'match_round': match.round,
+                'winner': {
+                    'team_id': match.score.winner.id if match.score.winner else None,
+                    'players': [
+                        {
+                            'id': match.score.winner.player1.id,
+                            'nickname': match.score.winner.player1.nickname
+                        },
+                        {
+                            'id': match.score.winner.player2.id if match.score.winner.player2 else None,
+                            'nickname': match.score.winner.player2.nickname if match.score.winner.player2 else None
+                        },
+                    ] if match.score.winner else []
+                }
             } for match in matches]
         }
         return Response(data)
