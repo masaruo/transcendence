@@ -2,6 +2,7 @@ import AbstractView from "./AbstractView";
 import Fetch from "../classes/JsonFetch";
 import { navigateTo } from "../services/router";
 import { PATH } from "../services/constants";
+import { finished } from "stream";
 
 export default class TournamentListView extends AbstractView {
 	constructor (params: Record<string, string>) {
@@ -81,7 +82,9 @@ export default class TournamentListView extends AbstractView {
 					  ${playersHTML}
 					</div>
 					<div class="d-grid gap-2">
-						<button class="join-tournament-btn btn btn-outline-primary" data-tournament-id="${tournament.id}" style="margin: 5px;">JOIN</button>
+						${tournament.status == 1 ?
+							`<button class="join-tournament-btn btn btn-outline-primary" data-tournament-id="${tournament.id}" style="margin: 6px;">JOIN</button>` :
+							`<button class="join-tournament-btn btn btn-outline-secondary" data-tournament-id="${tournament.id}" style="margin: 5px;">Show Results</button>`}
 					</div>
 			  </div>
 			</div>
