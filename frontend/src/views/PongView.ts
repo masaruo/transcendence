@@ -21,16 +21,61 @@ export default class PongView extends AbstractView {
 			    color: white;
 			    border: 2px solid #ecedd6;
 			  }
+				.teams-info{
+					display: flex;
+					justify-content: space-between;
+					gap: 6rem;
+					margin-top: 1rem;
+				}
+				.team-info{
+					flex: 1;
+					padding: 1rem;
+					border-radius: 10px;
+					background-color: #f9f9f9;
+					width: 400px;
+				}
+				.team1{
+					border: 1px solid #2d80f3;
+				}
+				.team2{
+					border: 1px solid #ef3d2d;
+				}
+				.color-box {
+					display: inline-block;
+					width: 16px;
+					height: 16px;
+					border-radius: 3px;
+					margin-right: 8px;
+					vertical-align: middle;
+				}
+				.match-state-container {
+					font-family: "Bodoni Moda", serif;
+					font-optical-sizing: auto;
+					font-weight: 700;
+					font-style: normal;
+				}
+				.match-header {
+					display: flex;
+					justify-content: center;
+					gap: 2rem;
+				}
+				.score-display {
+					display: flex;
+					justify-content: center;
+					align-items: center;
+					gap: 1rem;
+				}
 			</style>
 
+			<div class="d-flex justify-content-center">
+				<div id='match-data'></div>
+			</div>
 			<br>
 			<div class="container d-flex justify-content-center" height="85vh">
 				<canvas id="canvas" width="900" height="600"></canvas>
 			</div>
-				<div class="d-flex justify-content-center">
-					<br>
-					<div id='match-data'></div>
-					<div id='score-data'></div>
+			<div class="d-flex justify-content-center">
+					<div id='team-data'></div>
 				</div>
 			</div>
 			<br>

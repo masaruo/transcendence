@@ -83,8 +83,8 @@ export default class TournamentListView extends AbstractView {
 					</div>
 					<div class="d-grid gap-2">
 						${tournament.status == 1 ?
-							`<button class="join-tournament-btn btn btn-outline-primary" data-tournament-id="${tournament.id}" style="margin: 6px;">JOIN</button>` :
-							`<button class="join-tournament-btn btn btn-outline-secondary" data-tournament-id="${tournament.id}" style="margin: 5px;">Show Results</button>`}
+							`<button class="join-tournament-btn btn btn-primary" data-tournament-id="${tournament.id}" style="margin: 6px;">JOIN</button>` :
+							`<button class="join-tournament-btn btn btn-outline-primary" data-tournament-id="${tournament.id}" style="margin: 5px;">Show Results</button>`}
 					</div>
 			  </div>
 			</div>

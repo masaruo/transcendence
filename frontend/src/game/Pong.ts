@@ -10,7 +10,7 @@ export default class Pong {
 	readonly height: number;
 
 	readonly state_elem: HTMLElement | null;
-	readonly score_elem: HTMLElement | null;
+	readonly teams_elem: HTMLElement | null;
 
 	private socket_: WebSocket | null = null;
 	private keyMovements: {[key: string]: boolean} = {};
@@ -51,7 +51,7 @@ export default class Pong {
 		})
 
 		this.state_elem = document.getElementById('match-data');
-		this.score_elem = document.getElementById('score-data');
+		this.teams_elem = document.getElementById('team-data');
 	}
 
 	start(): void {
@@ -161,6 +161,9 @@ export default class Pong {
 		if (this.state_elem) {
 			this.state_elem.innerHTML = '';
 		}
+		if (this.teams_elem) {
+			this.teams_elem.innerHTML = '';
+		}
 
 		// 状態表示用のコンテナを作成
 		const matchContainer = document.createElement('div');
@@ -170,8 +173,8 @@ export default class Pong {
 		const matchHeader = document.createElement('div');
 		matchHeader.className = 'match-header';
 		matchHeader.innerHTML = `
-			<h3>マッチ #${match_info.id}</h3>
-			<p>ラウンド: ${match_info.round}</p>
+			<h2>Match #${match_info.id}  </h2>
+			<h2>Round ${match_info.round}</h2>
 		`;
 
 		// スコアボード
@@ -179,9 +182,9 @@ export default class Pong {
 		scoreBoard.className = 'score-board';
 		scoreBoard.innerHTML = `
 			<div class="score-display">
-			<span class="score team1-score">${score_info.team1_score}</span>
-			<span class="score-separator">-</span>
-			<span class="score team2-score">${score_info.team2_score}</span>
+			<h1 class="score team1-score">${score_info.team1_score}</h1>
+			<h1 class="score-separator">-</h1>
+			<h1 class="score team2-score">${score_info.team2_score}</h1>
 			</div>
 		`;
 
@@ -193,18 +196,32 @@ export default class Pong {
 		const team1Info = document.createElement('div');
 		team1Info.className = 'team-info team1';
 		team1Info.innerHTML = `
-			<h4>チーム1 (ID: ${match_info.team1.id})</h4>
-			<p>プレイヤー1: ${match_info.team1.player1_nickname || 'なし'}</p>
-			${match_info.team1.player2_nickname ? `<p>プレイヤー2: ${match_info.team1.player2_nickname}</p>` : ''}
+			<h5>Team1 (ID: ${match_info.team1.id})</h5>
+			<p>
+				<span class="color-box" style="background-color: #2d80f3"></span>
+				Player1: ${match_info.team1.player1_nickname || 'なし'}
+			</p>
+			${match_info.team1.player2_nickname ?
+				`<p>
+					<span class="color-box" style="background-color: #ccc8fd"></span>
+					Player2: ${match_info.team1.player2_nickname}
+				</p>` : ''}
 		`;
 
 		// チーム2情報
 		const team2Info = document.createElement('div');
 		team2Info.className = 'team-info team2';
 		team2Info.innerHTML = `
-			<h4>チーム2 (ID: ${match_info.team2.id})</h4>
-			<p>プレイヤー1: ${match_info.team2.player1_nickname || 'なし'}</p>
-			${match_info.team2.player2_nickname ? `<p>プレイヤー2: ${match_info.team2.player2_nickname}</p>` : ''}
+			<h5>Team2 (ID: ${match_info.team2.id})</h5>
+			<p>
+				<span class="color-box" style="background-color: #ef3d2d"></span>
+				Player1: ${match_info.team2.player1_nickname || 'なし'}
+			</p>
+			${match_info.team2.player2_nickname ?
+				`<p>
+					<span class="color-box" style="background-color: #f6a498"></span>
+					Player2: ${match_info.team2.player2_nickname}
+				</p>` : ''}
 		`;
 
 		// チーム情報をコンテナに追加
@@ -221,11 +238,10 @@ export default class Pong {
 		// すべての要素をコンテナに追加
 		matchContainer.appendChild(matchHeader);
 		matchContainer.appendChild(scoreBoard);
-		matchContainer.appendChild(teamsInfo);
-		matchContainer.appendChild(statusInfo);
 
 		// コンテナをDOMに追加
 		this.state_elem?.appendChild(matchContainer);
+		this.teams_elem?.appendChild(teamsInfo);
 		}
 
 		// ステータスコードをテキストに変換するヘルパー関数
