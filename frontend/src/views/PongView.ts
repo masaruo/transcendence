@@ -10,6 +10,7 @@ export default class PongView extends AbstractView {
 		this.setTitle("Pong");
 	}
 	async getBody(): Promise<string> {
+		const parent_path = location.pathname.replace(/\/pong\/.*$/, '');
 		return `
 			<style>
   			body {
@@ -33,6 +34,7 @@ export default class PongView extends AbstractView {
 				</div>
 			</div>
 			<br>
+			<a href=${parent_path}>Back to the tournament page</a>
 		`
 	}
 	async loadScripts(): Promise<void> {
