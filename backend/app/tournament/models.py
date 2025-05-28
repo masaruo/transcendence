@@ -266,31 +266,29 @@ class Match(models.Model):
         elif team_type == TeamType.TEAM2:
             score.team2_score += 1
         score.save()
+    
+    def check_finish(self) -> bool:
+        score, created = Score.objects.get_or_create(match=self)
+        flag : bool = False
+
         if score.team1_score >= WIN_SCORE or score.team2_score >= WIN_SCORE:
             score.set_winner()
             score.save()
             self.finish_match()
+            flag = True
 
         score.save()
+        return flag
 
     #* calling next round of the tournament
     def finish_match(self) -> None:
         self.match_status = MatchStatusType.FINISHED
         self.save()
 
-        channel_layer = get_channel_layer()
-        match_group_name = f'match_{self.id}'
-
-        async_to_sync(channel_layer.group_send)(
-            match_group_name,
-            {
-                'type': 'match_finished',
-            }
-        )
-
         # self.tournament._notify_match_end(self)
         if Match.objects.is_round_complete(self.tournament):
             self.tournament.update_tournament_status()
+        self.save()
 
 class TeamManager(models.Manager):
     def get_user_teams(self, user):

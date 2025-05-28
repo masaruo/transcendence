@@ -1,6 +1,5 @@
 import asyncio
 from re import I, Match
-from asgiref.sync import sync_to_async, async_to_sync
 
 from tournament.models import MatchStatusType, TeamType, Match, Score, Tournament, MatchModeType
 from .APongObj import PongObj
@@ -38,9 +37,20 @@ class Manager:
         self.channel_layer = get_channel_layer()
         self.task = None
         self.is_continue = True
+        self._need_update_score : bool = True # 最初に0 - 0のスコアを送信
 
-    async def start(self):
+    def start(self):
         self.task = asyncio.create_task(self.run_game_loop())
+        self.task.add_done_callback(lambda _:
+            asyncio.create_task(
+                self.channel_layer.group_send(
+                    self.group_name,
+                    {
+                        'type': 'match_finished'
+                    }
+                )
+            )
+        )
 
     async def run_game_loop(self):
         try:
@@ -54,6 +64,9 @@ class Manager:
                         'data': self.to_dict()
                     }
                 )
+                if self._need_update_score:
+                    await self.update_status(Match.objects.get(id=self._match_id))
+                    self._need_update_score = False
                 await asyncio.sleep(1/60)
         except asyncio.CancelledError:
             print("Game loop cancelled")
@@ -96,16 +109,12 @@ class Manager:
         balls: list[Ball] = [obj for obj in self.objs if isinstance(obj, Ball)]
         paddles: list[Paddle] = [obj for obj in self.objs if isinstance(obj, Paddle)]
 
-        to_continue: bool = True
-
         for ball in balls:
             loser = ball.check_to_continue_with_wall(wall=self.wall)
             if loser in [LOSER.LEFT, LOSER.RIGHT]:
-                await sync_to_async(self.update_score)(loser)
+                self.update_score(loser)
             for paddle in paddles:
                 ball.check_with_paddle(paddle=paddle)
-
-        self.is_continue: bool = to_continue
 
     async def init(self):
         await self.channel_layer.group_send(
@@ -127,17 +136,21 @@ class Manager:
         if match.match_status == MatchStatusType.FINISHED:
             return
 
-        self.update_status(match)
+        self._need_update_score = True
 
         if loser == LOSER.LEFT:
             match.add_score(team_type=TeamType.TEAM1)
         elif loser == LOSER.RIGHT:
             match.add_score(team_type=TeamType.TEAM2)
-        self.reset_match()
+        
+        self.is_continue = not match.check_finish()
 
-    def update_status(self, match: Match):
+        if self.is_continue:
+            self.reset_match()
+
+    async def update_status(self, match: Match):
         score = Score.objects.get(match=match)
-        async_to_sync(self.channel_layer.group_send)(
+        await self.channel_layer.group_send(
             self._group_name,
             {
                 'type': 'status_update',
@@ -149,7 +162,10 @@ class Manager:
         )
 
     def finish(self):
-        self.task.cancel()
+        if self.task is not None:
+            if not self.task.done():
+                self.task.cancel()
+            self.task = None
 
     async def initialize_with_db(self):
         own_tournament = await self._get_own_tournament()

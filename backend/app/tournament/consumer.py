@@ -70,10 +70,13 @@ class MatchConsumer(AsyncJsonWebsocketConsumer):
             self.channel_name
         )
 
+        self._is_finished : bool = False
+
         await self.manager.init()
-        await self.manager.start()
+        self.manager.start()
 
     async def disconnect(self, code):
+        self.manager.finish()
         await self.channel_layer.group_discard(
             self.match_group_name,
             self.channel_name
@@ -126,11 +129,10 @@ class MatchConsumer(AsyncJsonWebsocketConsumer):
         return None
 
     async def match_finished(self, event):
+        if self._is_finished:
+            return
+        self._is_finished = True
         try:
-            self.manager.finish()
-            await self.send_json({
-                'type': 'match_finished',
-            })
             await asyncio.sleep(0.5)
             await self.close(1000)
         except Exception as e:

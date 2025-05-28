@@ -100,15 +100,7 @@ class Ball(PongObj):
         self.y += self.dy
 
     def reverseDx(self) -> None:
-        abs_dx: int = abs(self.dx)
-        if self.dx < 0:
-            self.dx = abs_dx
-        else:
-            self.dx = abs_dx * -1
+        self.dx *= -1
 
     def reverseDy(self) -> None:
-        abs_dy: int = abs(self.dy)
-        if self.dy < 0:
-            self.dy = abs_dy
-        else:
-            self.dy = abs_dy * -1
+        self.dy *= -1
