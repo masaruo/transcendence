@@ -1,5 +1,6 @@
 import AbstractView from "./AbstractView"
 import { navigateTo } from "../services/router";
+import Auth from "@/services/Auth";
 
 export default class LogoutView extends AbstractView {
 	constructor (params: Record<string, string>) {
@@ -12,8 +13,9 @@ export default class LogoutView extends AbstractView {
 		`
 	}
 	async loadScripts(): Promise<void> {
+		Auth.removeInstance();
 		sessionStorage.clear()
-		navigateTo('/login');
+		navigateTo('/');
 	}
 
 }
