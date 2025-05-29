@@ -1,4 +1,6 @@
-all:
+all: up
+
+up:
 	make -C ./frontend
 	make -C ./backend
 
@@ -6,10 +8,12 @@ clean:
 	make clean -C ./frontend
 	make clean -C ./backend
 
+down: clean
+
 dev: clean
 	make dev -C ./frontend
 	make dev -C ./backend
 
 re: clean dev
 
-.PHONY: all clean dev re
+.PHONY: all clean dev re down

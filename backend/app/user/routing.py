@@ -4,4 +4,3 @@ from user.consumer import StatusConsumer
 status_urlpatterns = [
     path(r"ws/status/", StatusConsumer.as_asgi())
 ]
-#todo ws -> wss

@@ -187,8 +187,8 @@ SPECTACULAR_SETTINGS = {
 CORS_ALLOW_ALL_ORIGINS = False
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:2000",
-    "https://localhost:2001",
+    "http://localhost:8080",
+    "https://localhost:8443",
     "http://localhost",
     "https://localhost",
 ]
@@ -237,7 +237,7 @@ SIMPLE_JWT = {
 }
 
 # #! securities!
-SECURE_SSL_REDIRECT = not DEBUG
+# SECURE_SSL_REDIRECT = not DEBUG
 # SESSION_COOKIE_SECURE = not DEBUG
 # CSRF_COOKIE_SECURE = not DEBUG
 # SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0
@@ -251,6 +251,6 @@ SECURE_SSL_REDIRECT = not DEBUG
 # #! CSRF
 # CSRF_COOKIE_HTTPONLY = not DEBUG
 
-CSRF_TRUSTED_ORIGINS = ['https://localhost', 'https://127.0.0.1']
+CSRF_TRUSTED_ORIGINS = ['https://localhost:8443', 'http://localhost:8080' 'https://127.0.0.1:8443', 'http://127.0.0.1:8080']
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
