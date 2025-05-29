@@ -1,6 +1,6 @@
 import AbstractView from "./AbstractView";
-import { handleLoginFormSubmission } from "../services/login";
 import { navigateTo } from "../services/router";
+import Auth from "@/services/Auth";
 
 export default class LoginView extends AbstractView {
 	constructor (params: Record<string, string>) {
@@ -64,7 +64,15 @@ export default class LoginView extends AbstractView {
 
         const form = document.getElementById("loginForm") as HTMLFormElement;
         if (form) {
-            await handleLoginFormSubmission(form);
+			form.addEventListener('submit', async (e) => {
+				const email = (document.getElementById('login-email') as HTMLInputElement).value;
+				const password = (document.getElementById('login-password') as HTMLInputElement).value;
+				e.preventDefault();
+
+				const auth = Auth.getInstance();
+				await auth.login(email, password);
+				navigateTo('/');
+			})
         } else {
             console.error("Login form not found in DOM");
         }
