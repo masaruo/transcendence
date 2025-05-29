@@ -10,7 +10,6 @@ import MatchHistoryView from "@/views/MatchHistoryView";
 import UserRegisterView from "@/views/UserRegisterView";
 import AIBattleView from "@/views/AIBattleView";
 import UrlPattern from "url-pattern";
-import { StatusManager } from "./StatusManager"
 import LogoutView from "@/views/LogoutView";
 
 export const navigateTo = (url: string) => {

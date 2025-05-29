@@ -1,11 +1,9 @@
 import Fetch from "@/classes/JsonFetch";
 import { PATH, REFRESH_INTERVAL_MINS } from "@/services/constants";
 import { navigateTo } from "./router";
-import { StatusManager } from "./StatusManager";
 
 export default class Auth {
 	private static instance: Auth | null;
-	private status_manager: StatusManager = new StatusManager();
 	private access_token: string | null = null;
 	private refresh_token: string | null = null;
 	private refreshTimerId: NodeJS.Timeout | null = null;
@@ -21,7 +19,6 @@ export default class Auth {
 		if (!Auth.instance) {
 			return ;
 		}
-		Auth.instance.status_manager.disconnect()
 		Auth.instance = null;
 	}
 
@@ -37,7 +34,6 @@ export default class Auth {
 			this.access_token = res.access;
 			this.refresh_token = res.refresh;
 			await this.updateSessionStorage();
-			this.status_manager.connect();
 			this.startAutoRefresh(REFRESH_INTERVAL_MINS);
 		} catch {
 			this.failedLogin();
@@ -90,7 +86,6 @@ export default class Auth {
 
 	private failedLogin(): void {
 		sessionStorage.clear();
-		this.status_manager.disconnect();
 		window.alert('Login Failed.');
 		navigateTo('/login');
 	}

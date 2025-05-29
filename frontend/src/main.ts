@@ -1,9 +1,10 @@
 import './style.css';
 import './scss/styles.scss';
 import * as bootstrap from 'bootstrap';
-import { PATH } from '@services/constants'
 import { navigateTo, router } from '@services/router';
-import Auth from '@services/Auth';
+import StatusManager from '@services/StatusManager';
+
+const statusManager = new StatusManager();
 
 window.addEventListener("popstate", router);
 document.addEventListener("DOMContentLoaded", () => {
@@ -11,8 +12,13 @@ document.addEventListener("DOMContentLoaded", () => {
 		const target = e.target as HTMLAnchorElement;
 		if (target.matches("[data-link]") && target.href) {
 			e.preventDefault();
+			statusManager.startWatching();
 			navigateTo(target.href);
 		}
 	})
 	router();
+})
+
+window.addEventListener('beforeunload', () => {
+	statusManager.stopWatching();
 })
