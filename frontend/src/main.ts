@@ -1,7 +1,6 @@
 import './style.css';
 import './scss/styles.scss';
 import * as bootstrap from 'bootstrap';
-import axios from 'axios';
 import { PATH } from '@services/constants'
 import { navigateTo, router } from '@services/router';
 import Auth from '@services/Auth';
