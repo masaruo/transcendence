@@ -159,7 +159,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = '/vol/web/static'
-MEDIA_URL = '/media/'
+MEDIA_URL = 'https://localhost:8443/media/'
 MEDIA_ROOT = '/vol/web/media'
 
 # Default primary key field type
@@ -187,8 +187,8 @@ SPECTACULAR_SETTINGS = {
 CORS_ALLOW_ALL_ORIGINS = False
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "https://localhost:3000",
+    "http://localhost:8080",
+    "https://localhost:8443",
     "http://localhost",
     "https://localhost",
 ]
@@ -251,6 +251,6 @@ SIMPLE_JWT = {
 # #! CSRF
 # CSRF_COOKIE_HTTPONLY = not DEBUG
 
-CSRF_TRUSTED_ORIGINS = ['https://localhost', 'https://127.0.0.1']
+CSRF_TRUSTED_ORIGINS = ['https://localhost:8443', 'http://localhost:8080', 'https://127.0.0.1:8443', 'http://127.0.0.1:8080']
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
