@@ -188,7 +188,7 @@ CORS_ALLOW_ALL_ORIGINS = False
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:2000",
-    "https://localhost:2000",
+    "https://localhost:2001",
     "http://localhost",
     "https://localhost",
 ]
@@ -237,7 +237,7 @@ SIMPLE_JWT = {
 }
 
 # #! securities!
-# SECURE_SSL_REDIRECT = not DEBUG
+SECURE_SSL_REDIRECT = not DEBUG
 # SESSION_COOKIE_SECURE = not DEBUG
 # CSRF_COOKIE_SECURE = not DEBUG
 # SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0

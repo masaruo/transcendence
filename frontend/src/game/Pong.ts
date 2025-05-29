@@ -1,7 +1,7 @@
-// import { PassThrough } from "stream";
 import { Manager, WebSocketEvent } from "./Manager";
 import { navigateTo } from "@/services/router";
 import * as THREE from 'three';
+import { WS_PATH } from "@/services/constants";
 
 export default class Pong {
 	readonly renderer: THREE.WebGLRenderer;
@@ -64,7 +64,7 @@ export default class Pong {
 
 		const token = sessionStorage.getItem('access');
 		// this.socket_ = new WebSocket(`${protocol}//localhost:8000/ws/match/${this.matchId}/?token=${token}`);
-		this.socket_ = new WebSocket(`wss://localhost/ws/match/${this.matchId}/?token=${token}`);
+		this.socket_ = new WebSocket(`${WS_PATH}/ws/match/${this.matchId}/?token=${token}`);
 
 		this.socket_.onopen = () => {
 			console.log("WebSocket接続成功", new Date().toISOString());
