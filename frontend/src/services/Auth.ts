@@ -21,7 +21,7 @@ export default class Auth {
 			return ;
 		}
 		Auth.status_manager.disconnect();
-		delete Auth.instance;
+		Auth.instance = null;
 	}
 
 	async login(email:string, password:string): Promise<void> {
