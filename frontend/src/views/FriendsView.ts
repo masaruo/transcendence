@@ -26,9 +26,8 @@ export default class FriendsView extends AbstractView {
 		}
 		.card {
 			width: 18rem;
-			background-color: #dae2dc;
-			border: 2px solid #2a4d52;
-			color: #2a4d52;
+			background-color: #ffffff;
+			margin: 5px;
 		}
 		.friends-grid{
 			display: flex;
@@ -37,20 +36,24 @@ export default class FriendsView extends AbstractView {
 		}
 		</style>
 
-		<div class="add-friend-form">
-			<label for="friend-email">友達を追加</label>
-  				<input
-    				type="text"
-					id="friend-email"
-					name="friend email"
-					placeholder="emailを入力"
-					required
-					maxlength="20"
-				>
-  			<button type="button" id='addFriend'>追加</button>
-		</div>
-
 		<div class="container-fluid my-container p-lg-5">
+
+			<form class="row g-3 add-friend-form d-flex">
+			  <div class="col-auto">
+			    <input type="text"
+						id="friend-email"
+						name="friend email"
+						placeholder="Add friend by email!"
+						required
+						maxlength="20"
+						class="form-control"
+					>
+			  </div>
+			  <div class="col-auto">
+			    <button type="button" id='addFriend' class="btn btn-primary mb-3">Add</button>
+			  </div>
+			</form>
+
       <div class="text-center mt-5 mb-3">
         <h2>Your Friends</h2>
       </div>
@@ -70,11 +73,18 @@ export default class FriendsView extends AbstractView {
 				console.log('friends', friend.is_online);
 				friendItem.innerHTML = `
 				<div class="card-body">
-				    <h5 class="card-title">${friend.nickname}</h5>
-				    <p class="card-text">
+					<div class="friend-header">
+						<img src="${friend.avatar}"
+							alt="${friend.nickname}"
+							width="50" height="50"
+							class="rounded-circle"
+							style="object-fit: cover; margin: 15px;">
+						<h5 class="card-title">${friend.nickname}</h5>
+					</div>  
+					<p class="card-text">
 						<a href="/user/${friend.id}/matches">See History</a>
 					</p>
-				    <p class="card-text">online: ${friend.is_online ? 'Yes' : 'No'}</p>
+					<p class="card-text">online: ${friend.is_online ? 'Yes' : 'No'}</p>
 				</div>
 				`; // Display id, nickname, and is_online
 				friendsList.appendChild(friendItem);

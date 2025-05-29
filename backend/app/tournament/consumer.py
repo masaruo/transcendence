@@ -138,8 +138,6 @@ class MatchConsumer(AsyncJsonWebsocketConsumer):
 
 
     async def status_update(self, event):
-        # match = Match.objects.get(id=self.match_id)
-        # score = Score.objects.get(match=match)
         try:
             match_dict = event['data']['match']
             score_dict = event['data']['score']

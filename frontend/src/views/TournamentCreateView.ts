@@ -11,77 +11,101 @@ export default class TournamentCreateView extends AbstractView {
 	async getBody(): Promise<string> {
       console.log("Params:", this.params); // パラメータ確認
 		return `
-	<form id="tournament-settings-form" class="settings-form">
-  <div class="form-group">
-    <h3>トーナメント設定</h3>
-
-    <div class="setting-section">
-      <h4>Tournament Size</h4>
-      <div class="radio-options">
-        <label>
-          <input type="radio" name="tournament-size" value="2" checked>
-          TWO
-        </label>
-        <label>
-          <input type="radio" name="tournament-size" value="4">
-          FOUR
-        </label>
-      </div>
+    <style>
+  		.my-container {
+  			height: 85vh;
+  			width: 100%;
+  			background-image: url('/images/pongview.jpg');
+  			background-size: cover;
+  			background-position: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+  		}
+  		.my-container h2 {
+  			font-family: "Bodoni Moda", serif;
+        font-optical-sizing: auto;
+        font-weight: 700;
+        font-style: normal;
+        color: #ffffff;
+  		}
+      .settings-card {
+        background-color: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        max-width: 900px;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 1rem;
+      }
+      .setting-section h4 {
+        text-align: center;
+        margin-bottom: 1rem;
+      }
+      .radio-options {
+        display: flex;
+        gap: 3rem;
+        justify-content: center;
+        margin-bottom: 1rem;
+      }
+      .submit-btn {
+        margin 2px;
+      }
+    </style>
+		<div class="container-fluid my-container p-lg-5">
+    	<form id="tournament-settings-form" class="settings-form">
+        <div class="form-group">
+          <h2>Create Tournament</h2>
+          <div class="settings-card">
+            <div class="setting-section">
+              <h4>Tournament Size</h4>
+              <div class="radio-options">
+                <label>
+                  <input type="radio" name="tournament-size" value="2" checked>
+                  Two
+                </label>
+                <label>
+                  <input type="radio" name="tournament-size" value="4">
+                  Four
+                </label>
+              </div>
+            </div>
+            <div class="setting-section">
+              <h4>Play Type</h4>
+              <div class="radio-options">
+                <label>
+                  <input type="radio" name="play-type" value="1" checked>
+                  Singles
+                </label>
+                <label>
+                  <input type="radio" name="play-type" value="2">
+                  Doubles
+                </label>
+              </div>
+            </div>
+            <div class="setting-section">
+              <h4>Balls</h4>
+              <div class="radio-options">
+                <label>
+                  <input type="radio" name="ball-count" value="1" checked>
+                  One
+                </label>
+                <label>
+                  <input type="radio" name="ball-count" value="2">
+                  Two
+                </label>
+              </div>
+            </div>
+            <button type="submit" class="submit-btn btn btn-primary btn-lg">Start the Tournament!!</button>
+          </div>
+        </div>
+      </form>
     </div>
-    <div class="setting-section">
-
-    <div class="setting-section">
-      <h4>Play Type</h4>
-      <div class="radio-options">
-        <label>
-          <input type="radio" name="play-type" value="1" checked>
-          SINGLES
-        </label>
-        <label>
-          <input type="radio" name="play-type" value="2">
-          DOUBLES
-        </label>
-      </div>
-    </div>
-    <div class="setting-section">
-
-
-    <div class="setting-section">
-      <h4>ボールの数</h4>
-      <div class="radio-options">
-        <label>
-          <input type="radio" name="ball-count" value="1" checked>
-          1個
-        </label>
-        <label>
-          <input type="radio" name="ball-count" value="2">
-          2個
-        </label>
-      </div>
-    </div>
-
-    <div class="setting-section">
-      <h4>ボールの速度</h4>
-      <div class="radio-options">
-        <label>
-          <input type="radio" name="ball-speed" value="slow">
-          遅い
-        </label>
-        <label>
-          <input type="radio" name="ball-speed" value="normal" checked>
-          普通
-        </label>
-        <label>
-          <input type="radio" name="ball-speed" value="fast">
-          速い
-        </label>
-      </div>
-    </div>
-
-    <button type="submit" class="submit-btn">トーナメント作成</button>
-  </div>
-</form>
-		`
+	  `
 	}
 
 	async loadScripts(): Promise<void> {
