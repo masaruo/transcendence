@@ -251,6 +251,6 @@ SIMPLE_JWT = {
 # #! CSRF
 # CSRF_COOKIE_HTTPONLY = not DEBUG
 
-CSRF_TRUSTED_ORIGINS = ['https://localhost:8443', 'http://localhost:8080' 'https://127.0.0.1:8443', 'http://127.0.0.1:8080']
+CSRF_TRUSTED_ORIGINS = ['https://localhost:8443', 'http://localhost:8080', 'https://127.0.0.1:8443', 'http://127.0.0.1:8080']
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
