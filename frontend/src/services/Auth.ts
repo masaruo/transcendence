@@ -1,5 +1,5 @@
 import Fetch from "@/classes/JsonFetch";
-import { PATH, REFRESH_INTERVAL as REFRESH_INTERVAL_MINS } from "@/services/constants";
+import { PATH, REFRESH_INTERVAL_MINS } from "@/services/constants";
 import { navigateTo } from "./router";
 import { StatusManager } from "./StatusManager";
 
