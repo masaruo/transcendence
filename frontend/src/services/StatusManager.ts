@@ -1,3 +1,5 @@
+import { WS_PATH } from "./constants";
+
 export class StatusManager {
     private websocket: WebSocket | null = null;
     private reconnectInterval = 5000;
@@ -5,8 +7,8 @@ export class StatusManager {
     private pingTimer?: number;
 
     connect() {
-		const token = sessionStorage.getItem('access');
-        const wsUrl = `wss://localhost/ws/status/?token=${token}`;
+        const access_token = sessionStorage.getItem('access');
+        const wsUrl = `${WS_PATH}/ws/status/?token=${access_token}`;
 
         this.websocket = new WebSocket(wsUrl);
 

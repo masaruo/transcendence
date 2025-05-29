@@ -180,7 +180,6 @@ class Tournament(models.Model):
 
     #todo refactor
     def update_tournament_status(self) -> None:
-        # breakpoint()
         prev_round = Match.objects.get_current_round(tournament=self)
 
         if prev_round == RoundType.FINAL:
@@ -262,7 +261,6 @@ class Match(models.Model):
 
     def add_score(self, team_type: TeamType) -> None:
         score, created = Score.objects.get_or_create(match=self)
-        #todo　レースコンディション?
         if team_type == TeamType.TEAM1:
             score.team1_score += 1
         elif team_type == TeamType.TEAM2:

@@ -13,26 +13,6 @@ import UrlPattern from "url-pattern";
 import { StatusManager } from "./StatusManager"
 import LogoutView from "@/views/LogoutView";
 
-let statusManager: StatusManager | null = null;
-
-export const initStatusManager = () => {
-    if (!statusManager && isAuthenticated()) {
-        statusManager = new StatusManager();
-        statusManager.connect();
-    }
-};
-
-export const cleanupStatusManager = () => {
-    if (statusManager) {
-        statusManager.disconnect();
-        statusManager = null;
-    }
-};
-
-function isAuthenticated(): boolean {
-    return sessionStorage.getItem('is_authenticated') == 'true';
-}
-
 export const navigateTo = (url: string) => {
 	history.pushState(null, "", url);
 	router();
@@ -54,9 +34,7 @@ export const router = async() => {
 		{path: "/ai-battle", view: AIBattleView},
 	];
 
-	 // マッチング処理を明示的に行う
   const currentPath = location.pathname.replace(/\/$/, '');
-//   console.log("Current path:", currentPath);
 
   let match = null;
   let params = {};
@@ -65,8 +43,6 @@ export const router = async() => {
   for (const route of routes) {
     const pattern = new UrlPattern(route.path, { segmentNameCharset: 'a-zA-Z0-9_' });
     const result = pattern.match(currentPath);
-
-    // console.log(`Testing ${route.path} against ${currentPath}:`, result);
 
     if (result) {
       match = { route, result };
@@ -90,11 +66,4 @@ export const router = async() => {
 	body.innerHTML = await view.getBody();
 
 	await view.loadScripts();
-	if (isAuthenticated()) {
-		initStatusManager();
-	}
 };
-
-window.addEventListener('beforeunload', () => {
-	cleanupStatusManager();
-})

@@ -1,11 +1,11 @@
-import './style.css'
-import './scss/styles.scss'
-import * as bootstrap from 'bootstrap'
-
-import { navigateTo, router } from './services/router'
+import './style.css';
+import './scss/styles.scss';
+import * as bootstrap from 'bootstrap';
+import { PATH } from '@services/constants'
+import { navigateTo, router } from '@services/router';
+import Auth from '@services/Auth';
 
 window.addEventListener("popstate", router);
-
 document.addEventListener("DOMContentLoaded", () => {
 	document.body.addEventListener("click", e => {
 		const target = e.target as HTMLAnchorElement;

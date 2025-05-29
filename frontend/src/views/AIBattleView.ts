@@ -623,10 +623,7 @@ export default class AIBattleView extends AbstractView {
                     const battleData = await response.json();
                     console.log('Battle started successfully:', battleData);
 
-                    // WebSocket接続を確立
-                    // const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-                    // const wsUrl = `${wsProtocol}//${WS_PATH}/ws/ai_battle/`;
-                    const wsUrl = `wss://localhost/ws/ai_battle/?token=${token}`
+                    const wsUrl = `${WS_PATH}/ws/ai_battle/?token=${token}`
                     console.log('Connecting to WebSocket:', wsUrl);
 
                     this.ws = new WebSocket(wsUrl);
