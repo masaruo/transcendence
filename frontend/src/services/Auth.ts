@@ -5,7 +5,7 @@ import { StatusManager } from "./StatusManager";
 
 export default class Auth {
 	private static instance: Auth | null;
-	private static status_manager: StatusManager = new StatusManager();
+	private status_manager: StatusManager = new StatusManager();
 	private access_token: string | null = null;
 	private refresh_token: string | null = null;
 	private refreshTimerId: NodeJS.Timeout | null = null;
@@ -21,7 +21,7 @@ export default class Auth {
 		if (!Auth.instance) {
 			return ;
 		}
-		Auth.status_manager.disconnect();
+		Auth.instance.status_manager.disconnect()
 		Auth.instance = null;
 	}
 
@@ -37,7 +37,7 @@ export default class Auth {
 			this.access_token = res.access;
 			this.refresh_token = res.refresh;
 			await this.updateSessionStorage();
-			Auth.status_manager.connect();
+			this.status_manager.connect();
 			this.startAutoRefresh(REFRESH_INTERVAL_MINS);
 		} catch {
 			this.failedLogin();
@@ -90,7 +90,7 @@ export default class Auth {
 
 	private failedLogin(): void {
 		sessionStorage.clear();
-		Auth.status_manager.disconnect();
+		this.status_manager.disconnect();
 		window.alert('Login Failed.');
 		navigateTo('/login');
 	}

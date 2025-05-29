@@ -4,7 +4,7 @@ export class StatusManager {
     private websocket: WebSocket | null = null;
     private reconnectInterval = 5000;
     private pingInterval = 30000;
-    private pingTimer?: number;
+    private pingTimer: number | null = null;
 
     connect() {
         const access_token = sessionStorage.getItem('access');
@@ -31,10 +31,18 @@ export class StatusManager {
     }
 
     private startPing() {
+        this.stopPing();
         this.pingTimer = window.setInterval(() => {
             if (this.websocket?.readyState === WebSocket.OPEN) {
                 this.websocket.send(JSON.stringify({type: 'ping'}));
             }
         }, this.pingInterval);
+    }
+
+    private stopPing() {
+        if (this.pingTimer) {
+            clearInterval(this.pingTimer);
+            this.pingTimer = null;
+        }
     }
 }
