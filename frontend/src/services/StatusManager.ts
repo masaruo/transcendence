@@ -6,7 +6,7 @@ export class StatusManager {
 
     connect() {
         const access_token = sessionStorage.getItem('access');
-        const wsUrl = `wss://localhost/ws/status/?token=${access_token}`;
+        const wsUrl = `${WS_PATH}/status/?token=${access_token}`;
 
         this.websocket = new WebSocket(wsUrl);
 
