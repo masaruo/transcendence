@@ -159,7 +159,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = '/vol/web/static'
-MEDIA_URL = '/media/'
+MEDIA_URL = 'https://localhost:8443/media/'
 MEDIA_ROOT = '/vol/web/media'
 
 # Default primary key field type

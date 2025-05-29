@@ -6,9 +6,6 @@ services:
     user: "0:0"
     environment:
       - DEBUG=false
-      - DJANGO_SUPERUSER_USERNAME=${DJANGO_USERNAME}
-      - DJANGO_SUPERUSER_EMAIL=${DJANGO_EMAIL}
-      - DJANGO_SUPERUSER_PASSWORD=${DJANGO_PASSWORD}
     restart:
       always
     volumes:
@@ -27,7 +24,6 @@ services:
     command:
       /bin/bash -c "cd /app/app && \
       python manage.py migrate && \
-      python manage.py createsuperuser --noinput && \
       python manage.py collectstatic --noinput && \
       daphne -b 0.0.0.0 -p 8000 app.asgi:application"
 

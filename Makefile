@@ -16,4 +16,7 @@ dev: clean
 
 re: clean dev
 
+exec:
+	docker container exec -it backend-django-1 bash
+
 .PHONY: all clean dev re down
