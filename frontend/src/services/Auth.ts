@@ -4,10 +4,11 @@ import { navigateTo } from "./router";
 import { StatusManager } from "./StatusManager";
 
 export default class Auth {
-	private static instance: Auth;
+	private static instance: Auth | null;
 	private static status_manager: StatusManager = new StatusManager();
-	private access_token: string;
-	private refresh_token: string;
+	private access_token: string | null = null;
+	private refresh_token: string | null = null;
+	private refreshTimerId: NodeJS.Timeout | null = null;
 
 	static getInstance(): Auth {
 		if (!Auth.instance) {
@@ -21,7 +22,7 @@ export default class Auth {
 			return ;
 		}
 		Auth.status_manager.disconnect();
-		delete Auth.instance;
+		Auth.instance = null;
 	}
 
 	async login(email:string, password:string): Promise<void> {
@@ -44,7 +45,10 @@ export default class Auth {
 	}
 
 	async startAutoRefresh(interval_in_min: number): Promise<void> {
-		setTimeout(() => {
+		if (this.refreshTimerId !== null) {
+			clearTimeout(this.refreshTimerId);
+		}
+		this.refreshTimerId = setTimeout(() => {
 			this.refreshAccessToken();
 		}, interval_in_min * 60 * 1000);
 	}
@@ -70,6 +74,9 @@ export default class Auth {
 
 	private async updateSessionStorage(): Promise<void> {
 		sessionStorage.clear();
+		if (!this.access_token || !this.refresh_token) {
+			throw new Error("Invalid Tokens.");
+		}
 		sessionStorage.setItem('access', this.access_token);
 		sessionStorage.setItem('refresh', this.refresh_token);
 		sessionStorage.setItem('is_authenticated', 'true');
