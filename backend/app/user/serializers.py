@@ -40,7 +40,7 @@ class FriendshipSerializer(serializers.ModelSerializer):
     is_online = serializers.SerializerMethodField()
     class Meta:
         model = get_user_model()
-        fields = ['id', 'nickname', 'is_online', 'email']
+        fields = ['id', 'nickname', 'is_online', 'email', 'avatar']
         read_only_fields = fields
 
     def get_is_online(self, obj) -> bool:
