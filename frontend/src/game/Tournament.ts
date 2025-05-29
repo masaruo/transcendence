@@ -1,4 +1,5 @@
 import { navigateTo } from "@/services/router";
+import { WS_PATH } from "@/services/constants";
 
 export default class Tournament {
 	private tournamentId: string;
@@ -10,8 +11,7 @@ export default class Tournament {
 
 	connect(): void {
 		const token = sessionStorage.getItem('access');
-		// this.socket = new WebSocket(`${protocol}://localhost:8000/ws/tournament/${this.tournamentId}/?token=${token}`);
-		this.socket = new WebSocket(`wss://localhost/ws/tournament/${this.tournamentId}/?token=${token}`);
+		this.socket = new WebSocket(`${WS_PATH}/ws/tournament/${this.tournamentId}/?token=${token}`);
 
 		this.socket.onopen = () => {
 			console.log("[DEBUG] Connected to tournament WebSocket");

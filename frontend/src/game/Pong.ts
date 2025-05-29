@@ -60,10 +60,7 @@ export default class Pong {
 	}
 
 	connectWebSocket(): void {
-		// const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-
 		const token = sessionStorage.getItem('access');
-		// this.socket_ = new WebSocket(`${protocol}//localhost:8000/ws/match/${this.matchId}/?token=${token}`);
 		this.socket_ = new WebSocket(`${WS_PATH}/ws/match/${this.matchId}/?token=${token}`);
 
 		this.socket_.onopen = () => {
