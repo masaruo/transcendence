@@ -1,3 +1,5 @@
+import { WS_PATH } from "./constants";
+
 export class StatusManager {
     private websocket: WebSocket | null = null;
     private reconnectInterval = 5000;
