@@ -12,6 +12,7 @@ import time
 class TournamentViewSet(
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
     viewsets.GenericViewSet
 ):
     queryset = Tournament.objects.all()
@@ -54,14 +55,14 @@ class TournamentViewSet(
                 'id': match.id,
                 'team1': {
                     'id': match.team1.id,
-                    'player1': match.team1.player1.id,
-                    'player2': match.team1.player2.id if match.team1.player2 else None,
+                    'player1': match.team1.player1.nickname,
+                    'player2': match.team1.player2.nickname if match.team1.player2 else None,
                     'score': match.score.team1_score if hasattr(match, 'score') else 0
                 },
                 'team2': {
                     'id': match.team2.id,
-                    'player1': match.team2.player1.id,
-                    'player2': match.team2.player2.id if match.team2.player2 else None,
+                    'player1': match.team2.player1.nickname,
+                    'player2': match.team2.player2.nickname if match.team2.player2 else None,
                     'score': match.score.team2_score if hasattr(match, 'score') else 0
                 },
                 'status': match.match_status,
