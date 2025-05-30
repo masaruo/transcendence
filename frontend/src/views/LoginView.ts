@@ -16,13 +16,13 @@ export default class LoginView extends AbstractView {
 				background-size: cover;
 				background-position: center;
 				position: relative;
-				height: 85vh;
+				height: 95vh;
   			}
 			.right-side {
 				display: flex;
 				justify-content: center;
 				align-items: center;
-				height: 85vh;
+				height: 95vh;
 				background-color: #d4e0d5;
 			}
 		</style>

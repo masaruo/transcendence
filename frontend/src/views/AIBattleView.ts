@@ -78,7 +78,7 @@ export default class AIBattleView extends AbstractView {
         return `
         <style>
             .ai-battle-container {
-                height: 85vh;
+                height: 95vh;
                 width: 100%;
                 background-image: url('images/ai-battle.jpg');
                 background-size: cover;

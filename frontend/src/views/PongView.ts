@@ -71,7 +71,7 @@ export default class PongView extends AbstractView {
 				<div id='match-data'></div>
 			</div>
 			<br>
-			<div class="container d-flex justify-content-center" height="85vh">
+			<div class="container d-flex justify-content-center" height="95vh">
 				<canvas id="canvas" width="900" height="600"></canvas>
 			</div>
 			<div class="d-flex justify-content-center">

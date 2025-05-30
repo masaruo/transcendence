@@ -10,7 +10,7 @@ export default class IndexView extends AbstractView {
 		return `
 			<style>
 				.my-container{
-					height: 85vh;
+					height: 95vh;
 					width: 100%;
 					background-image: url('/images/index.jpg');
 					background-size: cover;
