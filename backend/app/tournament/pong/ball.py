@@ -28,8 +28,8 @@ class Ball(PongObj):
         self.dx = random.choice([-1, 1]) * random.uniform(x_border, 1)
         self.dy = random.choice([-1, 1]) * math.sqrt(1 - self.dx ** 2)
 
-        self.dx *= BALL_SPEED * 3
-        self.dy *= BALL_SPEED * 3
+        self.dx *= BALL_SPEED
+        self.dy *= BALL_SPEED
 
     @property
     def left(self) -> int:
