@@ -9,7 +9,7 @@ export default class TournamentCreateView extends AbstractView {
 		this.setTitle("Tournament Create");
 	}
 	async getBody(): Promise<string> {
-      console.log("Params:", this.params); // パラメータ確認
+      // console.log("Params:", this.params); // パラメータ確認
 		return `
     <style>
   		.my-container {

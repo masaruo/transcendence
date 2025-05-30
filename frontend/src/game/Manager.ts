@@ -123,7 +123,6 @@ export class Manager {
 	}
 
 	update(event: WebSocketEvent): void {
-		console.log("Received Event", event);
 		if (!event || !event.data) {
 			console.error("Unexpected data type from backend.");
 			return;

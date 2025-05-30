@@ -166,7 +166,7 @@ export default class UserView extends AbstractView {
             }
           });
         } catch (error) {
-          console.log("error:", error);
+          console.error("error:", error);
         }
       }
 }

@@ -602,7 +602,7 @@ export default class AIBattleView extends AbstractView {
                         throw new Error('Not authenticated. Please log in first.');
                     }
 
-                    console.log('Attempting to start battle...');
+                    // console.log('Attempting to start battle...');
 
                     // バックエンドにバトル開始をリクエスト
                     const response = await fetch(`${PATH}/api/ai_battle/battles/start_battle/`, {
@@ -613,7 +613,7 @@ export default class AIBattleView extends AbstractView {
                         },
                     });
 
-                    console.log('Response status:', response.status);
+                    // console.log('Response status:', response.status);
 
                     if (!response.ok) {
                         const errorData = await response.json().catch(() => ({}));
@@ -621,15 +621,15 @@ export default class AIBattleView extends AbstractView {
                     }
 
                     const battleData = await response.json();
-                    console.log('Battle started successfully:', battleData);
+                    // console.log('Battle started successfully:', battleData);
 
                     const wsUrl = `${WS_PATH}/ws/ai_battle/?token=${token}`
-                    console.log('Connecting to WebSocket:', wsUrl);
+                    // console.log('Connecting to WebSocket:', wsUrl);
 
                     this.ws = new WebSocket(wsUrl);
 
                     this.ws.onopen = () => {
-                        console.log('WebSocket connection established');
+                        // console.log('WebSocket connection established');
                         this.ws?.send(JSON.stringify({
                             type: 'start_battle',
                             battle_id: battleData.id
@@ -638,7 +638,7 @@ export default class AIBattleView extends AbstractView {
 
                     this.ws.onmessage = (event) => {
                         const data = JSON.parse(event.data);
-                        console.log('WebSocket message received:', data);
+                        // console.log('WebSocket message received:', data);
                         if (data.type === 'battle_started') {
                             // ゲーム画面を表示
                             startButton.style.display = 'none';
@@ -656,7 +656,7 @@ export default class AIBattleView extends AbstractView {
                     };
 
                     this.ws.onclose = (event) => {
-                        console.log('WebSocket connection closed:', event.code, event.reason);
+                        // console.log('WebSocket connection closed:', event.code, event.reason);
                         if (event.code !== 1000) {
                             this.showError('WebSocket connection closed unexpectedly. Please try again.');
                         }

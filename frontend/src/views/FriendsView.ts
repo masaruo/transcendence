@@ -80,7 +80,7 @@ export default class FriendsView extends AbstractView {
 							class="rounded-circle"
 							style="object-fit: cover; margin: 15px;">
 						<h5 class="card-title">${friend.nickname}</h5>
-					</div>  
+					</div>
 					<p class="card-text">
 						<a href="/user/${friend.id}/matches" class="link-dark link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
 							See History

@@ -13,9 +13,7 @@ export default class Tournament {
 		const token = sessionStorage.getItem('access');
 		this.socket = new WebSocket(`${WS_PATH}/ws/tournament/${this.tournamentId}/?token=${token}`);
 
-		this.socket.onopen = () => {
-			console.log("[DEBUG] Connected to tournament WebSocket");
-		}
+		this.socket.onopen = () => {}
 
 		this.socket.onmessage = (e) => {
 			const data = JSON.parse(e.data);
@@ -28,7 +26,7 @@ export default class Tournament {
 					navigateTo(`/tournament/${this.tournamentId}/pong/${match.id}`)
 				}
 			} else if (data.type === 'tournament_update') {
-				console.log("[DEBUG] Tournament update received:", data);
+				// console.log("[DEBUG] Tournament update received:", data);
 			}
 		}
 
@@ -37,11 +35,7 @@ export default class Tournament {
 		}
 
 		this.socket.onclose = (event) => {
-			console.log("[DEBUG] WebSocket closed:", event.code, event.reason);
+			// console.log("[DEBUG] WebSocket closed:", event.code, event.reason);
 		}
-	}
-	disconnect(): void {
-		//todo
-		return;
 	}
 }

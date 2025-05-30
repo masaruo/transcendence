@@ -79,11 +79,6 @@ class Ball(PongObj):
         else:
             return LOSER.CONTINUE
 
-        # if bl > wr or br < wl:
-        #     print(f"Ball out of bounds: {bl},{br} wall: {wl},{wr}")
-        #     return False
-        # return True
-
     def to_dict(self) -> dict[str, int | str]:
         return {
             'x': self.x,

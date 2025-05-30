@@ -130,7 +130,7 @@ export default class RegisterView extends AbstractView {
             }
           });
         } catch (error) {
-          console.log("error:", error);
+          console.error("error:", error);
         }
       }
 }

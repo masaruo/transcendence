@@ -61,7 +61,6 @@ class Manager:
 
     async def run_game_loop(self):
         try:
-            # print("Game loop started")
             while self.is_continue:
                 # DBからMatchを取得
                 self._match = await Match.objects.aget(id=self._match_id)

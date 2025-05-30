@@ -37,7 +37,7 @@ class TournamentConsumer(AsyncJsonWebsocketConsumer):
             if is_ready:
                 # メソッド呼び出し
                 success = await database_sync_to_async(lambda t: t.start_tournament())(tournament)
-                print(f"トーナメント{self.tournament_id}開始: {success}")
+                # print(f"トーナメント{self.tournament_id}開始: {success}")
 
         except Exception as e:
             import traceback
