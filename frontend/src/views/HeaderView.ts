@@ -2,20 +2,14 @@ export default class HeaderView {
 	static getHeader(): string {
 		const isAuth: boolean = sessionStorage.getItem("is_authenticated") === "true";
 		return `
-		<style>
-		.custom-navbar {
-			background-color: #3f392b !important;
-			}
-			</style>
-
-			<nav class="navbar navbar-expand-sm navbar-expand-lg bg-dark custom-navbar" data-bs-theme="dark">
-			<div class="container-fluid">
-			<div class="collapse navbar-collapse" id="navbarNav">
-			<ul class="navbar-nav nav-item-color">
-			${this.getNavItems(isAuth)}
-			</ul>
-			</div>
-			</div>
+			<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+				<div class="container-fluid">
+					<div class="collapse navbar-collapse" id="navbarNav">
+						<ul class="navbar-nav nav-item-color">
+							${this.getNavItems(isAuth)}
+						</ul>
+					</div>
+				</div>
 			</nav>
 			`;
 		}

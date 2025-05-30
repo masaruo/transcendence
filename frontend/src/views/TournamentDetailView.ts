@@ -13,14 +13,15 @@ export default class TournamentDetailView extends AbstractView {
 		return `
 		<style>
   		.my-container {
-  			height: 85vh;
+  			height: 95vh;
   			width: 100%;
   			background-image: url('/images/pongview.jpg');
   			background-size: cover;
   			background-position: center;
         display: flex;
-        justify-content: center;
+				justify-content: flex-start
         align-items: center;
+				text-align: center;
         flex-direction: column;
   		}
 			.status-container {
@@ -114,7 +115,7 @@ export default class TournamentDetailView extends AbstractView {
 
 		elem.innerHTML = `
 			<div class="card-body">
-				<h6 class="card-title">Round ${match.match_round} - Match ${match.id}</h6>
+				<h6 class="card-title">${match.match_round == 3 ? "Final Match" : "Semi-Final Match"} #${match.id}</h6>
 				<div class="row">
 					<!-- Team 1 -->
 					<div class="col-md-5">
