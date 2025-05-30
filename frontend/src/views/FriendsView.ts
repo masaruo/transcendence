@@ -82,7 +82,9 @@ export default class FriendsView extends AbstractView {
 						<h5 class="card-title">${friend.nickname}</h5>
 					</div>  
 					<p class="card-text">
-						<a href="/user/${friend.id}/matches">See History</a>
+						<a href="/user/${friend.id}/matches" class="link-dark link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
+							See History
+						</a>
 					</p>
 					<p class="card-text">online: ${friend.is_online ? 'Yes' : 'No'}</p>
 				</div>
