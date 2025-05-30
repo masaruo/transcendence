@@ -17,5 +17,4 @@ export default class LogoutView extends AbstractView {
 		sessionStorage.clear()
 		navigateTo('/');
 	}
-
 }

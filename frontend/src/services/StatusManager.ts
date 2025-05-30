@@ -4,19 +4,20 @@ export default class StatusManager {
     private websocket: WebSocket | null = null;
     private reconnectInterval = 5000;
     private pingInterval = 30000;
+    private watchTimer: number | null = null;
     private pingTimer: number | null = null;
 
     startWatching() {
         this.checkAndManageConnection();
-        this.pingTimer = window.setInterval(() => {
+        this.watchTimer = window.setInterval(() => {
             this.checkAndManageConnection();
         }, this.pingInterval);
     }
 
     stopWatching() {
-        if (this.pingTimer) {
-            clearInterval(this.pingTimer);
-            this.pingTimer = null;
+        if (this.watchTimer) {
+            clearInterval(this.watchTimer);
+            this.watchTimer = null;
         }
         this.disconnect();
     }
@@ -24,7 +25,9 @@ export default class StatusManager {
     private checkAndManageConnection() {
         const token = sessionStorage.getItem('access');
         const isAuth = sessionStorage.getItem('is_authenticated') === 'true';
-        if (token && isAuth && this.websocket && this.websocket.readyState !== WebSocket.OPEN) {
+        if (token && isAuth && !this.websocket) {
+            this.connect();
+        } else if (token && isAuth && this.websocket?.readyState !== WebSocket.OPEN) {
             this.connect();
         } else if ((!token || !isAuth) && this.websocket) {
             this.disconnect();
@@ -64,6 +67,7 @@ export default class StatusManager {
     disconnect() {
         this.stopPing();
         if (this.pingTimer) {
+            clearInterval(this.pingTimer);
             clearTimeout(this.pingTimer);
             this.pingTimer = null;
         }
