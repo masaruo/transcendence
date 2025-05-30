@@ -8,4 +8,4 @@ RUN npm install
 
 COPY . .
 
-RUN npm run build
+CMD npm run build && touch /app/build-complete && tail -f /dev/null
