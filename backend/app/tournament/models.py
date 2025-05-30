@@ -165,8 +165,15 @@ class Tournament(models.Model):
         # )
 
     def _notify_tournament_end(self):
+        tournament_group_name = f'tournament_{self.id}'
         channel_layers = get_channel_layer()
-        #todo
+        async_to_sync(channel_layers.group_send)(
+            tournament_group_name,
+            {
+                'type': 'tournament_finish',
+            }
+        )
+
 
     def is_tournament_players_ready(self) -> bool:
         required_number = self.match_size * self.match_type
