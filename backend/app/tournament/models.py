@@ -324,10 +324,16 @@ class Score(models.Model):
         return f"team1's score is {self.team1_score} and team2's is {self.team2_score} and winner is {self.winner}"
 
     def to_dict(self):
+        """
+        この関数はDB操作が発生します。\n
+        非同期中にこの関数を実行するとエラーが発生します。\n
+        その場合、sync_to_asyncで囲んで非同期化してください。
+        """
+
         return {
             'team1_score': self.team1_score,
             'team2_score': self.team2_score,
-            'winner': self.winner if self.winner else None
+            'winner': self.winner.to_dict() if self.winner else None
         }
 
     def add_score(self, team_type: TeamType) -> None:

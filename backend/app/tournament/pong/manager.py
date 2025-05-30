@@ -121,7 +121,6 @@ class Manager:
         for ball in balls:
             loser = ball.check_to_continue_with_wall(wall=self.wall)
             if loser in [LOSER.LEFT, LOSER.RIGHT]:
-                logging.info(loser)
                 self._losers.append(loser)
             for paddle in paddles:
                 ball.check_with_paddle(paddle=paddle)
@@ -154,7 +153,6 @@ class Manager:
 
         for loser in self._losers:
             if loser == LOSER.LEFT:
-                logging.info("LEFT")
                 score.add_score(team_type=TeamType.TEAM1)
             elif loser == LOSER.RIGHT:
                 score.add_score(team_type=TeamType.TEAM2)
@@ -183,7 +181,7 @@ class Manager:
     async def send_match_status(self):
         score, _ = await Score.objects.aget_or_create(match=self._match)
         match_dict = await sync_to_async(self._match.to_dict)()
-        score_dict = score.to_dict()
+        score_dict = await sync_to_async(score.to_dict)()
         await self.channel_layer.group_send(
             self._group_name,
             {
