@@ -31,10 +31,17 @@ services:
     build:
       context: ../frontend
       dockerfile: Dockerfile
+    restart:
+      always
     networks:
       - backend
     volumes:
       - dist_volumes:/app/dist
+    healthcheck:
+      test: ["CMD", "test", "-f", "/app/build-complete"]
+      interval: 5s
+      timeout: 30s
+      retries: 10
 
   nginx:
     build:
@@ -52,8 +59,11 @@ services:
     networks:
       - backend
     depends_on:
-      - django
-      - node
+      django:
+        condition: service_started
+      node:
+        condition: service_healthy
+
 
   db:
     image: postgres:15
