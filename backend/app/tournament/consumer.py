@@ -13,8 +13,8 @@ class TournamentConsumer(AsyncJsonWebsocketConsumer):
         self.tournament_id = self.scope['url_route']['kwargs']['tournament_id']
         self.tournament_group_name = f"tournament_{self.tournament_id}"
 
-        tounament = database_sync_to_async(Tournament.objects.get)(id=self.tournament_id)
-        if tounament.status == MatchStatusType.FINISHED:
+        tournament = await database_sync_to_async(Tournament.objects.get)(id=self.tournament_id)
+        if tournament.status == MatchStatusType.FINISHED:
             await self.close()
             return
 
