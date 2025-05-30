@@ -74,7 +74,7 @@ class MatchConsumer(AsyncJsonWebsocketConsumer):
         self._is_finished : bool = False
 
         self.manager.connected_count += 1
-        if self.manager.is_ready():
+        if await sync_to_async(self.manager.is_ready)():
             await self.manager.init()
             self.manager.start()
 

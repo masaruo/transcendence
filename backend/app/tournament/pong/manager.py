@@ -45,6 +45,8 @@ class Manager:
         self.connected_count : int = 0
 
     def start(self):
+        if not self.task:
+            return
         self.task = asyncio.create_task(self.run_game_loop())
         self.task.add_done_callback(lambda _:
             asyncio.create_task(
@@ -126,7 +128,7 @@ class Manager:
                 ball.check_with_paddle(paddle=paddle)
 
     def is_ready(self) -> bool:
-        return self.connected_count == 2
+        return self.connected_count >= Match.objects.get(id=self._match_id).get_required_people()
 
     async def init(self):
         await self.channel_layer.group_send(
@@ -152,10 +154,10 @@ class Manager:
         score, _ = await Score.objects.aget_or_create(match=self._match)
 
         for loser in self._losers:
-            if loser == LOSER.LEFT:
-                score.add_score(team_type=TeamType.TEAM1)
-            elif loser == LOSER.RIGHT:
+            if loser == LOSER.LEFT: # TEAM1の負け
                 score.add_score(team_type=TeamType.TEAM2)
+            elif loser == LOSER.RIGHT: # TEAM2の負け
+                score.add_score(team_type=TeamType.TEAM1)
             if score.check_finish():
                 self.is_continue = False
                 await sync_to_async(score.set_winner)()
