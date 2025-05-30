@@ -45,7 +45,7 @@ class Manager:
         self.connected_count : int = 0
 
     def start(self):
-        if not self.task:
+        if self.task:
             return
         self.task = asyncio.create_task(self.run_game_loop())
         self.task.add_done_callback(lambda _:
