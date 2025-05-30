@@ -7,9 +7,9 @@ export default class StatusManager {
     private pingTimer: number | null = null;
 
     startWatching() {
-        this.checkAndManagerConnection();
+        this.checkAndManageConnection();
         this.pingTimer = window.setInterval(() => {
-            this.checkAndManagerConnection();
+            this.checkAndManageConnection();
         }, this.pingInterval);
     }
 
@@ -21,10 +21,10 @@ export default class StatusManager {
         this.disconnect();
     }
 
-    private checkAndManagerConnection() {
+    private checkAndManageConnection() {
         const token = sessionStorage.getItem('access');
         const isAuth = sessionStorage.getItem('is_authenticated') === 'true';
-        if (token && isAuth) {
+        if (token && isAuth && this.websocket && this.websocket.readyState !== WebSocket.OPEN) {
             this.connect();
         } else if ((!token || !isAuth) && this.websocket) {
             this.disconnect();
