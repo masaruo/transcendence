@@ -4,7 +4,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import Q
 from channels.layers import channel_layers, get_channel_layer
-from asgiref.sync import async_to_sync
+from asgiref.sync import async_to_sync, sync_to_async
 
 from django.conf import settings
 
@@ -243,6 +243,12 @@ class Match(models.Model):
         return f"Match #{self.id}: {self.team1} vs {self.team2}"
 
     def to_dict(self):
+        """
+        この関数はDB操作が発生します。\n
+        非同期中にこの関数を実行するとエラーが発生します。\n
+        その場合、sync_to_asyncで囲んで非同期化してください。
+        """
+
         team1Ids = self.team1.to_dict()['playerIds']
         team2Ids = self.team2.to_dict()['playerIds']
         ids = team1Ids + team2Ids
@@ -258,37 +264,19 @@ class Match(models.Model):
     def get_match_type(self):
         return self.tournament.match_type
 
-    def add_score(self, team_type: TeamType) -> None:
-        score, created = Score.objects.get_or_create(match=self)
-        #todo　レースコンディション?
-        if team_type == TeamType.TEAM1:
-            score.team1_score += 1
-        elif team_type == TeamType.TEAM2:
-            score.team2_score += 1
-        score.save()
-    
-    def check_finish(self) -> bool:
-        score, created = Score.objects.get_or_create(match=self)
-        flag : bool = False
-
-        if score.team1_score >= WIN_SCORE or score.team2_score >= WIN_SCORE:
-            score.set_winner()
-            score.save()
-            self.finish_match()
-            flag = True
-
-        score.save()
-        return flag
-
     #* calling next round of the tournament
     def finish_match(self) -> None:
+        """
+        この関数はDB操作が発生します。\n
+        非同期中にこの関数を実行するとエラーが発生します。\n
+        その場合、sync_to_asyncで囲んで非同期化してください。
+        """
+
         self.match_status = MatchStatusType.FINISHED
-        self.save()
 
         # self.tournament._notify_match_end(self)
         if Match.objects.is_round_complete(self.tournament):
             self.tournament.update_tournament_status()
-        self.save()
 
 class TeamManager(models.Manager):
     def get_user_teams(self, user):
@@ -325,7 +313,6 @@ class TournamentPlayer(models.Model):
     final_round = models.IntegerField(choices=RoundType.choices)
     #todo final_round logic not correct
 
-
 class Score(models.Model):
     match = models.ForeignKey(to='Match', on_delete=models.CASCADE)
     team1_score = models.IntegerField(default=0)
@@ -342,11 +329,26 @@ class Score(models.Model):
             'winner': self.winner if self.winner else None
         }
 
+    def add_score(self, team_type: TeamType) -> None:
+        #todo　レースコンディション?
+        if team_type == TeamType.TEAM1:
+            self.team1_score += 1
+        elif team_type == TeamType.TEAM2:
+            self.team2_score += 1
+
+    def check_finish(self) -> bool:
+        return self.team1_score >= WIN_SCORE or self.team2_score >= WIN_SCORE
+
     def set_winner(self) -> None:
+        """
+        この関数はDB操作が発生します。\n
+        非同期中にこの関数を実行するとエラーが発生します。\n
+        その場合、sync_to_asyncで囲んで非同期化してください。
+        """
+
         if self.team1_score > self.team2_score:
             self.winner = self.match.team1
         elif self.team2_score > self.team1_score:
             self.winner = self.match.team2
         else:
             self.winner = None
-
