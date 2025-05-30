@@ -102,7 +102,8 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("redis", 6379)]
+            "hosts": [("redis", 6379)],
+            "symmetric_encryption_keys": [os.environ.get('REDIS_KEY', SECRET_KEY)]
         }
     }
 }
@@ -234,17 +235,42 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "ROTATE_REFRESH_TOKEN": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "ALGORITHM": "HS256",
+    "SIGNING_KEY": os.environ.get("JWT_SECRET_KEY", SECRET_KEY),
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
 }
 
-# #! securities!
-# SECURE_SSL_REDIRECT = not DEBUG
+# HTTPS
+SECURE_SSL_REDIRECT = not DEBUG
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-# SECURE_BROWSER_XSS_FILTER = not DEBUG
-# SECURE_CONTENT_TYPE_NOSNIFF = not DEBUG
+# XSS
+SECURE_BROWSER_XSS_FILTER = not DEBUG
+SECURE_CONTENT_TYPE_NOSNIFF = not DEBUG
 
-# #! CSRF
-# CSRF_COOKIE_HTTPONLY = not DEBUG
-
+# CSRF
+CSRF_COOKIE_HTTPONLY = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SAMESITE = 'Lax'
 CSRF_TRUSTED_ORIGINS = ['https://localhost:8443', 'http://localhost:8080', 'https://127.0.0.1:8443', 'http://127.0.0.1:8080']
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
+
+# Session Security
+SESSION_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_HTTPONLY = not DEBUG
+SESSION_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_AGE = 3600
+
+# Clickjacking
+X_FRAME_OPTIONS = 'DENY'
+
+# Content Security Policy
+SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
+
+# File Uploads
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 1000
+ALLOWED_IMAGE_EXTENSIONS = ['jpg', 'jpeg']
+MAX_UPLOAD_SIZE = 5242880
