@@ -76,7 +76,7 @@ export default class TournamentListView extends AbstractView {
 			  <div class="card-body">
 					<p>- create date: ${createdDate}</p>
 					<p>- match type : ${tournament.match_type === 1 ? 'Single' : 'Double'}</p>
-					<p>- size       : ${tournament.size}</p>
+					<p>- player size: ${tournament.match_size}</p>
 					<div class="players-container">
 					<p>- players    :</p>
 					  ${playersHTML}
