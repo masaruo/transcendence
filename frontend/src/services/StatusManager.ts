@@ -67,10 +67,6 @@ export default class StatusManager {
 
     disconnect() {
         this.stopPing();
-        if (this.pingTimer) {
-            clearInterval(this.pingTimer);
-            this.pingTimer = null;
-        }
         if (this.reconnectTimer) {
             clearTimeout(this.reconnectTimer);
             this.reconnectTimer = null;
