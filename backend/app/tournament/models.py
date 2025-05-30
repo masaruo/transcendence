@@ -264,6 +264,15 @@ class Match(models.Model):
 
     def get_match_type(self):
         return self.tournament.match_type
+    
+    def get_required_people(self) -> int:
+        match_type : MatchModeType = self.get_match_type()
+        if match_type == MatchModeType.SINGLES:
+            return 2
+        elif match_type == MatchModeType.DOUBLES:
+            return 4
+        else:
+            return 1
 
     #* calling next round of the tournament
     def finish_match(self) -> None:
@@ -274,9 +283,10 @@ class Match(models.Model):
         """
 
         self.match_status = MatchStatusType.FINISHED
+        self.save() # のちにDBにアクセスするためsave必須
 
         # self.tournament._notify_match_end(self)
-        if Match.objects.is_round_complete(self.tournament):
+        if Match.objects.is_round_complete(self.tournament): # ここでMatchのDBにアクセス
             self.tournament.update_tournament_status()
 
 class TeamManager(models.Manager):
