@@ -79,10 +79,11 @@ export default class PongView extends AbstractView {
 				</div>
 			</div>
 			<br>
-			<a href=${parent_path}
-				class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
+			<div class="btn btn-link d-flex justify-content-center">
+			<a href=${parent_path}>
 					Back to the tournament page
 			</a>
+			<div>
 		`
 	}
 	async loadScripts(): Promise<void> {

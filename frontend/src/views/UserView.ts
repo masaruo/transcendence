@@ -114,9 +114,11 @@ export default class UserView extends AbstractView {
                     </div>
                     <button id="updateButton" class="btn btn-outline-secondary">Submit</button>
                   </div>
+                  <div class="btn btn-info">
                   <a href="/" class="link-dark link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
                     Back to Home
                   </a>
+                  </div>
                 </div>
               </div>
             </div>
