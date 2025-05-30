@@ -1,7 +1,11 @@
-FROM node:16.20
-
-COPY . /app
+FROM node:18.20
 
 WORKDIR /app
 
-RUN npm install && npm run build
+COPY package*.json ./
+
+RUN npm install
+
+COPY . .
+
+RUN npm run build
