@@ -1,4 +1,4 @@
-all: up
+all: clean up
 
 up:
 	make -C ./frontend
