@@ -159,7 +159,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = '/vol/web/static'
-MEDIA_URL = '/media/'
+MEDIA_URL = 'https://localhost:8443/media/'
 MEDIA_ROOT = '/vol/web/media'
 
 # Default primary key field type
@@ -187,8 +187,8 @@ SPECTACULAR_SETTINGS = {
 CORS_ALLOW_ALL_ORIGINS = False
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "https://localhost:3000",
+    "http://localhost:8080",
+    "https://localhost:8443",
     "http://localhost",
     "https://localhost",
 ]
@@ -231,25 +231,20 @@ os.makedirs(os.path.join(MEDIA_ROOT, 'uploads', 'avatar'), exist_ok=True)
 
 # JWT settings
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=300),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ROTATE_REFRESH_TOKEN": True,
 }
 
 # #! securities!
 # SECURE_SSL_REDIRECT = not DEBUG
-# SESSION_COOKIE_SECURE = not DEBUG
-# CSRF_COOKIE_SECURE = not DEBUG
-# SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0
-# SECURE_HSTS_PRELOAD = not DEBUG
-# SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
 
-# #! XSS
 # SECURE_BROWSER_XSS_FILTER = not DEBUG
 # SECURE_CONTENT_TYPE_NOSNIFF = not DEBUG
 
 # #! CSRF
 # CSRF_COOKIE_HTTPONLY = not DEBUG
 
-CSRF_TRUSTED_ORIGINS = ['https://localhost', 'https://127.0.0.1']
+CSRF_TRUSTED_ORIGINS = ['https://localhost:8443', 'http://localhost:8080', 'https://127.0.0.1:8443', 'http://127.0.0.1:8080']
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True

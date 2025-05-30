@@ -28,7 +28,6 @@ urlpatterns = [
     path('api/ai_battle/', include('ai_battle.urls')),
 ]
 
-
 if settings.DEBUG:
     urlpatterns += static(
         settings.MEDIA_URL,

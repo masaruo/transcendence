@@ -76,7 +76,9 @@ class Tournament(models.Model):
             'id': self.id,
             'status': self.status,
             'match_type': self.match_type,
+            'match_size': self.match_size,
             'players': player_list,
+            'created_at': self.created_at,
         }
 
     def add_player(self, player, round=RoundType.PRELIMINARY) -> 'TournamentPlayer':
@@ -178,7 +180,6 @@ class Tournament(models.Model):
 
     #todo refactor
     def update_tournament_status(self) -> None:
-        # breakpoint()
         prev_round = Match.objects.get_current_round(tournament=self)
 
         if prev_round == RoundType.FINAL:
@@ -314,7 +315,7 @@ class TournamentPlayer(models.Model):
     #todo final_round logic not correct
 
 class Score(models.Model):
-    match = models.ForeignKey(to='Match', on_delete=models.CASCADE)
+    match = models.OneToOneField(to='Match', on_delete=models.CASCADE)
     team1_score = models.IntegerField(default=0)
     team2_score = models.IntegerField(default=0)
     winner = models.ForeignKey(to='Team', on_delete=models.DO_NOTHING, blank=True, null=True)
@@ -330,7 +331,6 @@ class Score(models.Model):
         }
 
     def add_score(self, team_type: TeamType) -> None:
-        #todo　レースコンディション?
         if team_type == TeamType.TEAM1:
             self.team1_score += 1
         elif team_type == TeamType.TEAM2:
