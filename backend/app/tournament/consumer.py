@@ -6,6 +6,7 @@ from tournament.models import Match, MatchModeType, Tournament
 from tournament.pong.manager import Manager
 from tournament.pong.paddle import Paddle
 from asgiref.sync import sync_to_async
+import logging
 
 class TournamentConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
@@ -70,10 +71,15 @@ class MatchConsumer(AsyncJsonWebsocketConsumer):
             self.channel_name
         )
 
-        await self.manager.init()
-        await self.manager.start()
+        self._is_finished : bool = False
+
+        self.manager.connected_count += 1
+        if self.manager.is_ready():
+            await self.manager.init()
+            self.manager.start()
 
     async def disconnect(self, code):
+        self.manager.finish()
         await self.channel_layer.group_discard(
             self.match_group_name,
             self.channel_name
@@ -126,11 +132,11 @@ class MatchConsumer(AsyncJsonWebsocketConsumer):
         return None
 
     async def match_finished(self, event):
+        if self._is_finished:
+            return
+        self._is_finished = True
+        logging.info("finish match")
         try:
-            self.manager.finish()
-            await self.send_json({
-                'type': 'match_finished',
-            })
             await asyncio.sleep(0.5)
             await self.close(1000)
         except Exception as e:

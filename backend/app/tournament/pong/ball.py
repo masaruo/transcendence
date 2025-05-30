@@ -4,6 +4,7 @@ from .wall import Wall
 from .constants import SCREEN_HEIGHT, SCREEN_WITDH, BALL_RADIUS, BALL_SPEED
 import random
 from enum import Enum
+import math
 
 class LOSER(Enum):
     CONTINUE = 0
@@ -16,17 +17,19 @@ class Ball(PongObj):
         self.y: int = y
         self.radius: int = radius
         self.color: str = color
-        self.dx: int = self.getRandomDx()#todo game speed
-        self.dy: int = self.getRandomDy()#todo game speed
+        self.dx: int
+        self.dy: int
 
-    @staticmethod
-    def getRandomDx() -> int:
-        direction:int = random.choice(seq=[-1, 1])
-        return direction * BALL_SPEED
+        self.set_delta_randomly() #todo game speed
 
-    @staticmethod
-    def getRandomDy() -> int:
-        return int(random.uniform(a=-3, b=3))
+    def set_delta_randomly(self):
+        x_border: float = 0.5
+
+        self.dx = random.choice([-1, 1]) * random.uniform(x_border, 1)
+        self.dy = random.choice([-1, 1]) * math.sqrt(1 - self.dx ** 2)
+
+        self.dx *= BALL_SPEED * 3
+        self.dy *= BALL_SPEED * 3
 
     @property
     def left(self) -> int:
@@ -92,23 +95,14 @@ class Ball(PongObj):
     def reset(self) -> None:
         self.x = SCREEN_WITDH // 2
         self.y = SCREEN_HEIGHT // 2
-        self.dx = self.getRandomDx()
-        self.dy = self.getRandomDy()
+        self.set_delta_randomly()
 
     def update(self) -> None:
         self.x += self.dx
         self.y += self.dy
 
     def reverseDx(self) -> None:
-        abs_dx: int = abs(self.dx)
-        if self.dx < 0:
-            self.dx = abs_dx
-        else:
-            self.dx = abs_dx * -1
+        self.dx *= -1
 
     def reverseDy(self) -> None:
-        abs_dy: int = abs(self.dy)
-        if self.dy < 0:
-            self.dy = abs_dy
-        else:
-            self.dy = abs_dy * -1
+        self.dy *= -1
