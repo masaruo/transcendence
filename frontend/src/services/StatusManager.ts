@@ -6,6 +6,7 @@ export default class StatusManager {
     private pingInterval = 30000;
     private watchTimer: number | null = null;
     private pingTimer: number | null = null;
+    private reconnectTimer: number | null = null;
 
     startWatching() {
         this.checkAndManageConnection();
@@ -59,7 +60,7 @@ export default class StatusManager {
             const auth = sessionStorage.getItem('is_authenticated');
 
             if (token && auth) {
-                this.pingTimer = window.setTimeout(() => this.connect(), this.reconnectInterval);
+                this.reconnectTimer = window.setTimeout(() => this.connect(), this.reconnectInterval);
             }
         };
     }
@@ -68,8 +69,11 @@ export default class StatusManager {
         this.stopPing();
         if (this.pingTimer) {
             clearInterval(this.pingTimer);
-            clearTimeout(this.pingTimer);
             this.pingTimer = null;
+        }
+        if (this.reconnectTimer) {
+            clearTimeout(this.reconnectTimer);
+            this.reconnectTimer = null;
         }
         if (this.websocket) {
             this.websocket.close();
