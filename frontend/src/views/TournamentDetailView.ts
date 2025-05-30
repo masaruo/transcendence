@@ -122,19 +122,11 @@ export default class TournamentDetailView extends AbstractView {
 							<h3 class="team-status">${isTeam1Winner ? 'WIN' : 'LOSE'}</h3>
 							<div class="score-display">Score: ${match.team1.score}</div>
 							<div class="player-item">
-								<img src="${match.team1.players?.[0]?.avatar}"
-									alt="${match.team1.players?.[0]?.nickname || 'Player 1'}"
-									width="50" height="50" class="rounded-circle"
-									style="object-fit: cover; margin: 10px;">
-								<span>Player ${match.team1.player1} ${match.team1.players?.[0]?.nickname ? `(${match.team1.players[0].nickname})` : ''}</span>
+								<span>Player: ${match.team1.player1}</span>
 							</div>
 							${match.team1.player2 ? `
 							<div class="player-item">
-								<img src="${match.team1.players?.[1]?.avatar}"
-									alt="${match.team1.players?.[1]?.nickname || 'Player 2'}"
-									width="50" height="50" class="rounded-circle"
-									style="object-fit: cover; margin: 10px;">
-								<span>Player ${match.team1.player2} ${match.team1.players?.[1]?.nickname ? `(${match.team1.players[1].nickname})` : ''}</span>
+								<span>Player: ${match.team1.player2}</span>
 							</div>
 							` : ''}
 						</div>
@@ -151,19 +143,11 @@ export default class TournamentDetailView extends AbstractView {
 							<h3 class="team-status">${isTeam2Winner ? 'WIN' : 'LOSE'}</h3>
 							<div class="score-display">Score: ${match.team2.score}</div>
 							<div class="player-item">
-								<img src="${match.team2.players?.[0]?.avatar}"
-									alt="${match.team2.players?.[0]?.nickname || 'Player 1'}"
-									width="50" height="50" class="rounded-circle"
-									style="object-fit: cover; margin: 10px;">
-								<span>Player ${match.team2.player1} ${match.team2.players?.[0]?.nickname ? `(${match.team2.players[0].nickname})` : ''}</span>
+								<span>Player: ${match.team2.player1}</span>
 							</div>
 							${match.team2.player2 ? `
 							<div class="player-item">
-								<img src="${match.team2.players?.[1]?.avatar}"
-									alt="${match.team2.players?.[1]?.nickname || 'Player 2'}"
-									width="50" height="50" class="rounded-circle"
-									style="object-fit: cover; margin: 10px;">
-								<span>Player ${match.team2.player2} ${match.team2.players?.[1]?.nickname ? `(${match.team2.players[1].nickname})` : ''}</span>
+								<span>Player: ${match.team2.player2}</span>
 							</div>
 							` : ''}
 						</div>
