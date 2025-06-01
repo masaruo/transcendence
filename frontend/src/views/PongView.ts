@@ -49,10 +49,7 @@ export default class PongView extends AbstractView {
 					vertical-align: middle;
 				}
 				.match-state-container {
-					font-family: "Bodoni Moda", serif;
-					font-optical-sizing: auto;
-					font-weight: 700;
-					font-style: normal;
+					font-weight: bold;
 				}
 				.match-header {
 					display: flex;

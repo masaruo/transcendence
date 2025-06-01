@@ -12,14 +12,13 @@ export default class RegisterView extends AbstractView {
     async getBody(): Promise<string> {
         return `
         <style>
-          .register-page-container {
-            height: 100dvh;
+          .my-container {
             display: flex;
             justify-content: center;
             align-items: center;
             background-color: #b7bff2;
           }
-          .register-page-container h2{
+          .my-container h2{
            font-family: "Bodoni Moda", serif;
            font-optical-sizing: auto;
            font-weight: 700;
@@ -28,7 +27,7 @@ export default class RegisterView extends AbstractView {
           }
         </style>
 
-        <div class="register-page-container d-flex justify-content-center flex-column align-items-center">
+        <div class="my-container d-flex justify-content-center flex-column align-items-center">
           <div class="text-center mt-5 mb-3">
             <h2>Create Account</h2>
           </div>
@@ -52,15 +51,12 @@ export default class RegisterView extends AbstractView {
                     <div class="col-8">
                       <input type="text" id="nicknameInput" placeholder="Enter your nickname" class="form-control" required>
                     </div>
-                  </div>
-                  <div class="row g-5 align-items-center mb-3">
                     <div class="col-4">
                       <label for="emailInput" class="form-label">Email</label>
                     </div>
                     <div class="col-8">
                       <input type="email" id="emailInput" placeholder="Enter your email" class="form-control" required>
                     </div>
-                  <div class="row g-5 align-items-center mb-3">
                     <div class="col-4">
                       <label for="passwordInput" class="form-label">Password</label>
                     </div>
@@ -68,12 +64,12 @@ export default class RegisterView extends AbstractView {
                       <input type="password" id="passwordInput" placeholder="Create a password" class="form-control" required>
                     </div>
                   </div>
-                </div>
-                <button id="registerButton" class="btn btn-primary">Create Account</button>
-                <div class="text-center mt-3">
-                  <a href="/login" class="link-dark link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
-                    Already have an account? Login
-                  </a>
+                  <button id="registerButton" class="btn btn-primary">Create Account</button>
+                  <div class="text-center mt-3">
+                    <a href="/login" class="link-dark link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
+                      Already have an account? Login
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>

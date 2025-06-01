@@ -2,6 +2,13 @@ export default class HeaderView {
 	static getHeader(): string {
 		const isAuth: boolean = sessionStorage.getItem("is_authenticated") === "true";
 		return `
+			<style>
+				.navbar {
+         font-family: "Onest", sans-serif;
+         font-optical-sizing: auto;
+         font-style: normal;
+				}
+			</style>
 			<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 				<div class="container-fluid">
 					<button class="navbar-toggler" type="button" data-bs-toggle="collapse"

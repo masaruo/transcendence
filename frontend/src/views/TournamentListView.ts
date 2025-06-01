@@ -33,8 +33,6 @@ export default class TournamentListView extends AbstractView {
 				justify-content: center;
 			}
 			.my-container {
-				height: 100dvh;
-				width: 100%;
 				background-color:#8fb1ec;
 			}
 		</style>

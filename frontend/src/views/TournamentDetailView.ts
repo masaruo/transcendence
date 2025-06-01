@@ -13,8 +13,6 @@ export default class TournamentDetailView extends AbstractView {
 		return `
 		<style>
   		.my-container {
-  			height: 100dvh;
-  			width: 100%;
   			background-image: url('/images/pongview.jpg');
   			background-size: cover;
   			background-position: center;

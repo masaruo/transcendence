@@ -27,7 +27,7 @@ export default class LoginView extends AbstractView {
 			}
 		</style>
 
-		<div class="container-fluid">
+		<div class="container-fluid my-container">
 			<div class="row">
 				<div class="col-md-6 left-side">
 				</div>

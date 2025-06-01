@@ -10,14 +10,12 @@ export default class IndexView extends AbstractView {
 		return `
 			<style>
 				.my-container{
-					height: 100dvh;
-					width: 100%;
 					background-image: url('/images/index.jpg');
 					background-size: cover;
 					background-position: center;
 					font-family: "Bodoni Moda", serif;
      			font-optical-sizing: auto;
-     			font-weight: 900;
+     			font-weight: bold;
      			font-style: normal;
 					color: #19254f;
 				}
