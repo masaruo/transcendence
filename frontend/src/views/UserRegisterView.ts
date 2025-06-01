@@ -13,7 +13,7 @@ export default class RegisterView extends AbstractView {
         return `
         <style>
           .register-page-container {
-            height: 95vh;
+            height: 100dvh;
             display: flex;
             justify-content: center;
             align-items: center;

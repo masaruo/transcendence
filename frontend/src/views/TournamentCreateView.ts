@@ -13,7 +13,7 @@ export default class TournamentCreateView extends AbstractView {
 		return `
     <style>
   		.my-container {
-  			height: 95vh;
+  			height: 100dvh;
   			width: 100%;
   			background-image: url('/images/pongview.jpg');
   			background-size: cover;

@@ -32,9 +32,14 @@ export default class TournamentListView extends AbstractView {
 				flex-wrap: wrap;
 				justify-content: center;
 			}
+			.my-container {
+				height: 100dvh;
+				width: 100%;
+				background-color:#8fb1ec;
+			}
 		</style>
 
-		<div class="container-fluid my-container p-lg-5" style="background-color:#8fb1ec;">
+		<div class="container-fluid my-container p-lg-5">
 			<button id="create-tournament" class="btn btn-primary btn-lg">Create New Tournament</button>
 			<hr>
 			<h1 class="title">List of current tournaments</h1>

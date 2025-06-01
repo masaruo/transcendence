@@ -24,7 +24,7 @@ export default class UserView extends AbstractView {
             return `
             <style>
               .my-page-container {
-                height: 95vh;
+                height: 100dvh;
                 display: flex;
                 justify-content: center;
                 align-items: center;
