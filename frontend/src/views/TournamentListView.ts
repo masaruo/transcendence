@@ -35,6 +35,13 @@ export default class TournamentListView extends AbstractView {
 			.my-container {
 				background-color:#8fb1ec;
 			}
+			.my-label {
+				font-weight: bold;
+				color: #20245b;
+			}
+			.card-row {
+				margin-bottom: 10px;
+			}
 		</style>
 
 		<div class="container-fluid my-container p-lg-5">
@@ -77,11 +84,20 @@ export default class TournamentListView extends AbstractView {
 					<h5>Tournament #${tournament.id}</h5>
 			  </div>
 			  <div class="card-body">
-					<p>- create date: ${createdDate}</p>
-					<p>- match type : ${tournament.match_type === 1 ? 'Single' : 'Double'}</p>
-					<p>- player size: ${tournament.match_size}</p>
+					<div class="card-row">
+						<span class="my-label"> ◉ create date: </span>
+						<span>${createdDate}</span>
+					</div>
+					<div class="card-row">
+						<span class="my-label"> ◉ match type: </span>
+						<span>${tournament.match_type === 1 ? 'Single' : 'Double'}</span>
+					</div>
+					<div class="card-row">
+						<span class="my-label"> ◉ player size: </span>
+						<span>${tournament.match_size}</span>
+					</div>
 					<div class="players-container">
-					<p>- players    :</p>
+					<span class="my-label"> ◉ players :</span>
 					  ${playersHTML}
 					</div>
 					<div class="d-grid gap-2">
