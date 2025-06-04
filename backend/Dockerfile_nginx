@@ -1,4 +1,4 @@
-FROM nginx:latest
+FROM nginx:1.27.5-bookworm
 
 COPY ./nginx/certs/cert.pem /etc/nginx/certs/cert.pem
 COPY ./nginx/certs/key.pem /etc/nginx/certs/key.pem
