@@ -64,7 +64,6 @@ services:
       node:
         condition: service_healthy
 
-
   db:
     image: postgres:15
     restart: always
