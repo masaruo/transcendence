@@ -73,15 +73,14 @@ class MatchConsumer(AsyncJsonWebsocketConsumer):
         self.paddle = await sync_to_async(self.assign_paddle)()
         self.match_group_name = f'match_{self.match_id}'
         self.manager = await Manager.get_instance(self.match_id)
-
         self._is_finished : bool = False
-        await self.game_initialization()
 
         await self.channel_layer.group_add(
             self.match_group_name,
             self.channel_name
         )
 
+        await self.game_initialization()
         self.manager.connected_user_id.add(self.user.id)
         if (await self.manager.is_ready()):
             self.manager.start()
@@ -113,8 +112,8 @@ class MatchConsumer(AsyncJsonWebsocketConsumer):
                 'type': 'game_initialization',
                 'data': self.manager.to_dict()
             })
-        except Exception as e:
-            print(f'Error sending message: {e}')
+        except Exception:
+            logging.exception('Error sending message')
 
     async def game_update(self, state: dict[str, str]) -> None:
         try:

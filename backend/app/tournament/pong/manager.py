@@ -63,6 +63,7 @@ class Manager:
     async def run_game_loop(self):
         try:
             while self.is_continue:
+                logging.info("here")
                 start_time : float = time.time()
                 # DBからMatchを取得
                 self._match = await Match.objects.aget(id=self._match_id)
@@ -131,6 +132,8 @@ class Manager:
                 ball.check_with_paddle(paddle=paddle)
 
     async def is_ready(self) -> bool:
+        logging.info(self.connected_user_id)
+        logging.info(len(self.connected_user_id))
         return len(self.connected_user_id) == (await Match.objects.aget(id=self._match_id)).match_size
 
     def get_paddle(self, side: Paddle.SIDE) -> Paddle | None:
