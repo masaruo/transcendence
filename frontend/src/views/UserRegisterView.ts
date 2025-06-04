@@ -12,23 +12,26 @@ export default class RegisterView extends AbstractView {
     async getBody(): Promise<string> {
         return `
         <style>
-          .register-page-container {
-            height: 85vh;
+          .my-container {
             display: flex;
             justify-content: center;
             align-items: center;
             background-color: #b7bff2;
           }
-          .register-page-container h2{
+          .my-container h2{
            font-family: "Bodoni Moda", serif;
            font-optical-sizing: auto;
            font-weight: 700;
            font-style: normal;
            color: #110167;
           }
+          .my-label {
+            font-weight: bold;
+            color: #20245b;
+          }
         </style>
 
-        <div class="register-page-container d-flex justify-content-center flex-column align-items-center">
+        <div class="my-container d-flex justify-content-center flex-column align-items-center">
           <div class="text-center mt-5 mb-3">
             <h2>Create Account</h2>
           </div>
@@ -37,43 +40,40 @@ export default class RegisterView extends AbstractView {
               <div class="col-md-8">
                 <div class="p-3 py-5">
                   <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h6 class="text-right">Register new user</h6>
+                    <h4 class="text-right">Register new user</h4>
                   </div>
                   <div class="row g-5 align-items-center mb-3">
                     <div class="col-4">
-                      <label for="avatarInput" class="form-label">Profile Image</label>
+                      <label for="avatarInput" class="form-label my-label">◉ Profile Image</label>
                     </div>
                     <div class="col-8">
                       <input type="file" class="form-control" id="avatarInput" accept="image/*">
                     </div>
                     <div class="col-4">
-                      <label for="nicknameInput" class="form-label">Nickname</label>
+                      <label for="nicknameInput" class="form-label my-label">◉ Nickname</label>
                     </div>
                     <div class="col-8">
                       <input type="text" id="nicknameInput" placeholder="Enter your nickname" class="form-control" required>
                     </div>
-                  </div>
-                  <div class="row g-5 align-items-center mb-3">
                     <div class="col-4">
-                      <label for="emailInput" class="form-label">Email</label>
+                      <label for="emailInput" class="form-label my-label">◉ Email</label>
                     </div>
                     <div class="col-8">
                       <input type="email" id="emailInput" placeholder="Enter your email" class="form-control" required>
                     </div>
-                  <div class="row g-5 align-items-center mb-3">
                     <div class="col-4">
-                      <label for="passwordInput" class="form-label">Password</label>
+                      <label for="passwordInput" class="form-label my-label">◉ Password</label>
                     </div>
                     <div class="col-8">
                       <input type="password" id="passwordInput" placeholder="Create a password" class="form-control" required>
                     </div>
                   </div>
-                </div>
-                <button id="registerButton" class="btn btn-primary">Create Account</button>
-                <div class="text-center mt-3">
-                  <a href="/login" class="link-dark link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
-                    Already have an account? Login
-                  </a>
+                  <button id="registerButton" class="btn btn-primary">Create Account</button>
+                  <div class="text-center mt-3">
+                    <a href="/login" class="link-dark link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
+                      Already have an account? Login
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
@@ -130,7 +130,7 @@ export default class RegisterView extends AbstractView {
             }
           });
         } catch (error) {
-          console.log("error:", error);
+          console.error("error:", error);
         }
       }
 }

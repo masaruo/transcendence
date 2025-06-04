@@ -1,6 +1,7 @@
 import AbstractView from "./AbstractView"
 import { PATH } from "@/services/constants";
 import Fetch from "../classes/JsonFetch";
+import { navigateTo } from "@/services/router";
 
 export default class FriendsView extends AbstractView {
 	constructor (params: Record<string, string>){
@@ -12,17 +13,16 @@ export default class FriendsView extends AbstractView {
 		return `
 		<style>
 		.my-container {
-			height: 85vh;
-			width: 100%;
 			background-image: url('/images/friends.jpg');
 			background-size: cover;
 			background-position: center;
 		}
-		.my-container h2 {
+		.my-container h1 {
 			font-family: "Bodoni Moda", serif;
       font-optical-sizing: auto;
-      font-weight: 700;
+      font-weight: bold;
       font-style: normal;
+			color:	#a52f56;
 		}
 		.card {
 			width: 18rem;
@@ -33,6 +33,10 @@ export default class FriendsView extends AbstractView {
 			display: flex;
       flex-wrap: wrap;
       justify-content: center;
+		}
+		.friend-header {
+			display: flex;
+			align-items: center;
 		}
 		</style>
 
@@ -55,7 +59,7 @@ export default class FriendsView extends AbstractView {
 			</form>
 
       <div class="text-center mt-5 mb-3">
-        <h2>Your Friends</h2>
+        <h1>Your Friends</h1>
       </div>
 			<div id="friends-list" class="friends-grid"></div>
 		</div>
@@ -80,14 +84,20 @@ export default class FriendsView extends AbstractView {
 							class="rounded-circle"
 							style="object-fit: cover; margin: 15px;">
 						<h5 class="card-title">${friend.nickname}</h5>
-					</div>  
-					<p class="card-text">
-						<a href="/user/${friend.id}/matches">See History</a>
+					</div>
+					<p class="card-text"
+						style="color: ${friend.is_online ? "#6fcf97" : "#6c757d" }">
+						${friend.is_online ? '🟢 ONLINE' : '⚫️ OFFLINE'}
 					</p>
-					<p class="card-text">online: ${friend.is_online ? 'Yes' : 'No'}</p>
+          <button id="historyButton_${friend.id}" class="btn btn-outline-secondary">See History</button>
 				</div>
 				`; // Display id, nickname, and is_online
 				friendsList.appendChild(friendItem);
+				const historyButton = friendItem.querySelector('button');
+				if (!historyButton) throw Error("History button not found");
+				historyButton.addEventListener('click', () => {
+				  navigateTo(`/user/${friend.id}/matches`);
+				});
 			});
 		} catch (error) {
 			friendsList.textContent = 'Failed to load friends.';

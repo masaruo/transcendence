@@ -13,14 +13,13 @@ export default class TournamentDetailView extends AbstractView {
 		return `
 		<style>
   		.my-container {
-  			height: 85vh;
-  			width: 100%;
   			background-image: url('/images/pongview.jpg');
   			background-size: cover;
   			background-position: center;
         display: flex;
-        justify-content: center;
+				justify-content: flex-start
         align-items: center;
+				text-align: center;
         flex-direction: column;
   		}
 			.status-container {
@@ -37,27 +36,39 @@ export default class TournamentDetailView extends AbstractView {
         color: #ffffff;
   		}
   		.my-container h4 {
-  			font-family: "Bodoni Moda", serif;
-        font-optical-sizing: auto;
-        font-style: normal;
         color: #ffffff;
   		}
 			.team-info {
 				padding: 1rem;
 			}
 			.team-info.winner {
-				border: 2px solid #28a745;
-				background-color: #f8fff9;
+				border: 5px solid #f45d3b;
+				border-radius: 10px;
+				background-image: url('/images/winner.jpg');
+				background-size: cover;
+				background-position: center;
 			}
 			.team-info.winner h3 {
-				color: #28a745;
+				color: #f45d3b;
+				font-weight: bold;
 			}
 			.team-info.loser {
-				border: 2px solid #dc3545;
-				background-color: #fff8f8;
+				border: 5px solid #0d436a;
+				border-radius: 10px;
+				background-image: url('/images/loser.jpg');
+				background-size: cover;
+				background-position: center;
 			}
 			.team-info.loser h3{
-				color:  #dc3545;
+				color:  #0d436a;
+				font-weight: bold;
+			}
+			.team-info.incomplete {
+				border: 5px solid #cf2701;
+				color: #cf2701;
+				border-radius: 10px;
+				background-size: cover;
+				background-position: center;
 			}
 			.score-display {
 				font-weight: bold;
@@ -67,10 +78,18 @@ export default class TournamentDetailView extends AbstractView {
 			.player-item {
 				display: flex;
 				align-items: center;
+				justify-content: center;
 				margin-bottom: 5px;
 			}
 			.match-list	{
 				width: 100%;
+				display: flex;
+				justify-content: center;
+				flex-direction: column;
+				align-items: center;
+			}
+			.card {
+				width: 900px;
 			}
 		</style>
 
@@ -114,27 +133,23 @@ export default class TournamentDetailView extends AbstractView {
 
 		elem.innerHTML = `
 			<div class="card-body">
-				<h6 class="card-title">Round ${match.match_round} - Match ${match.id}</h6>
+				<h3 class="card-title">${match.match_round == 3 ? "Final Match" : "Semi-Final Match"} #${match.id}</h3>
+				<!-- Match Status -->
+				<div class="mt-2 text-center">
+					<small class="text-muted">Status: ${this.getMatchStatusText(match.status)}</small>
+				</div>
 				<div class="row">
 					<!-- Team 1 -->
 					<div class="col-md-5">
-						<div class="team-info ${isTeam1Winner ? 'winner' : 'loser'}">
-							<h3 class="team-status">${isTeam1Winner ? 'WIN' : 'LOSE'}</h3>
+						<div class="team-info ${match.status == 3 ? (isTeam1Winner ? 'winner' : 'loser') : 'incomplete'}">
+							<h3 class="team-status">${match.status == 3 ? (isTeam1Winner ? 'WIN' : 'LOSE') : 'INCOMPLETED'}</h3>
 							<div class="score-display">Score: ${match.team1.score}</div>
 							<div class="player-item">
-								<img src="${match.team1.players?.[0]?.avatar}"
-									alt="${match.team1.players?.[0]?.nickname || 'Player 1'}"
-									width="50" height="50" class="rounded-circle"
-									style="object-fit: cover; margin: 10px;">
-								<span>Player ${match.team1.player1} ${match.team1.players?.[0]?.nickname ? `(${match.team1.players[0].nickname})` : ''}</span>
+								<span>Player: ${match.team1.player1}</span>
 							</div>
 							${match.team1.player2 ? `
 							<div class="player-item">
-								<img src="${match.team1.players?.[1]?.avatar}"
-									alt="${match.team1.players?.[1]?.nickname || 'Player 2'}"
-									width="50" height="50" class="rounded-circle"
-									style="object-fit: cover; margin: 10px;">
-								<span>Player ${match.team1.player2} ${match.team1.players?.[1]?.nickname ? `(${match.team1.players[1].nickname})` : ''}</span>
+								<span>Player: ${match.team1.player2}</span>
 							</div>
 							` : ''}
 						</div>
@@ -147,32 +162,21 @@ export default class TournamentDetailView extends AbstractView {
 
 					<!-- Team 2 -->
 					<div class="col-md-5">
-						<div class="team-info ${isTeam2Winner ? 'winner' : 'loser'}">
-							<h3 class="team-status">${isTeam2Winner ? 'WIN' : 'LOSE'}</h3>
+						<div class="team-info ${match.status == 3 ?
+							(isTeam2Winner ? 'winner' : 'loser') : 'incomplete'}">
+							<h3 class="team-status">${match.status == 3 ?
+								(isTeam2Winner ? 'WIN' : 'LOSE') : 'INCOMPLETED'}</h3>
 							<div class="score-display">Score: ${match.team2.score}</div>
 							<div class="player-item">
-								<img src="${match.team2.players?.[0]?.avatar}"
-									alt="${match.team2.players?.[0]?.nickname || 'Player 1'}"
-									width="50" height="50" class="rounded-circle"
-									style="object-fit: cover; margin: 10px;">
-								<span>Player ${match.team2.player1} ${match.team2.players?.[0]?.nickname ? `(${match.team2.players[0].nickname})` : ''}</span>
+								<span>Player: ${match.team2.player1}</span>
 							</div>
 							${match.team2.player2 ? `
 							<div class="player-item">
-								<img src="${match.team2.players?.[1]?.avatar}"
-									alt="${match.team2.players?.[1]?.nickname || 'Player 2'}"
-									width="50" height="50" class="rounded-circle"
-									style="object-fit: cover; margin: 10px;">
-								<span>Player ${match.team2.player2} ${match.team2.players?.[1]?.nickname ? `(${match.team2.players[1].nickname})` : ''}</span>
+								<span>Player: ${match.team2.player2}</span>
 							</div>
 							` : ''}
 						</div>
 					</div>
-				</div>
-
-				<!-- Match Status -->
-				<div class="mt-2 text-center">
-					<small class="text-muted">Status: ${this.getMatchStatusText(match.status)}</small>
 				</div>
 			</div>
 		`;

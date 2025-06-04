@@ -49,10 +49,7 @@ export default class PongView extends AbstractView {
 					vertical-align: middle;
 				}
 				.match-state-container {
-					font-family: "Bodoni Moda", serif;
-					font-optical-sizing: auto;
-					font-weight: 700;
-					font-style: normal;
+					font-weight: bold;
 				}
 				.match-header {
 					display: flex;
@@ -71,7 +68,7 @@ export default class PongView extends AbstractView {
 				<div id='match-data'></div>
 			</div>
 			<br>
-			<div class="container d-flex justify-content-center" height="85vh">
+			<div class="container d-flex justify-content-center" height="95vh">
 				<canvas id="canvas" width="900" height="600"></canvas>
 			</div>
 			<div class="d-flex justify-content-center">
@@ -79,7 +76,11 @@ export default class PongView extends AbstractView {
 				</div>
 			</div>
 			<br>
-			<a href=${parent_path}>Back to the tournament page</a>
+			<div class="btn btn-link d-flex justify-content-center">
+			<a href=${parent_path}>
+					Back to the tournament page
+			</a>
+			<div>
 		`
 	}
 	async loadScripts(): Promise<void> {

@@ -27,6 +27,22 @@ services:
       python manage.py collectstatic --noinput && \
       daphne -b 0.0.0.0 -p 8000 app.asgi:application"
 
+  node:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    restart:
+      always
+    networks:
+      - backend
+    volumes:
+      - dist_volumes:/app/dist
+    healthcheck:
+      test: ["CMD", "test", "-f", "/app/build-complete"]
+      interval: 5s
+      timeout: 30s
+      retries: 10
+
   nginx:
     build:
       context: .
@@ -39,10 +55,15 @@ services:
     volumes:
       - static_volumes:/vol/web/static
       - media_volumes:/vol/web/media
+      - dist_volumes:/usr/share/nginx/html
     networks:
       - backend
     depends_on:
-      - django
+      django:
+        condition: service_started
+      node:
+        condition: service_healthy
+
 
   db:
     image: postgres:15
@@ -82,6 +103,8 @@ volumes:
     name: transcendence_static_volume
   media_volumes:
     name: transcendence_media_volume
+  dist_volumes:
+    name: transcendence_dist_volume
 
 networks:
   backend:

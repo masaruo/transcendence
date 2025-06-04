@@ -2,7 +2,7 @@ import asyncio
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from channels.db import database_sync_to_async
 import json
-from tournament.models import Match, MatchModeType, Tournament
+from tournament.models import Match, MatchModeType, Tournament, MatchStatusType
 from tournament.pong.manager import Manager
 from tournament.pong.paddle import Paddle
 from asgiref.sync import sync_to_async
@@ -13,12 +13,17 @@ class TournamentConsumer(AsyncJsonWebsocketConsumer):
         self.tournament_id = self.scope['url_route']['kwargs']['tournament_id']
         self.tournament_group_name = f"tournament_{self.tournament_id}"
 
+        tournament = await database_sync_to_async(Tournament.objects.get)(id=self.tournament_id)
+        if tournament.status == MatchStatusType.FINISHED:
+            await self.close()
+            return
+
         await self.channel_layer.group_add(self.tournament_group_name, self.channel_name)
         await self.accept()
 
         await self.check_tournament_ready()
 
-    async def disconnect(self, close_code):
+    async def disconnect(self, code):
         await self.channel_layer.group_discard(self.tournament_group_name, self.channel_name)
 
     async def check_tournament_ready(self):
@@ -32,7 +37,7 @@ class TournamentConsumer(AsyncJsonWebsocketConsumer):
             if is_ready:
                 # メソッド呼び出し
                 success = await database_sync_to_async(lambda t: t.start_tournament())(tournament)
-                print(f"トーナメント{self.tournament_id}開始: {success}")
+                # print(f"トーナメント{self.tournament_id}開始: {success}")
 
         except Exception as e:
             import traceback
@@ -50,6 +55,9 @@ class TournamentConsumer(AsyncJsonWebsocketConsumer):
             'type': 'match_start',
             'match': event['match']
         }))
+
+    async def tournament_finish(self, event):
+        await self.disconnect(1000)
 
 
 class MatchConsumer(AsyncJsonWebsocketConsumer):

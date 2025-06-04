@@ -63,23 +63,14 @@ export default class Pong {
 		const token = sessionStorage.getItem('access');
 		this.socket_ = new WebSocket(`${WS_PATH}/ws/match/${this.matchId}/?token=${token}`);
 
-		this.socket_.onopen = () => {
-			console.log("WebSocket接続成功", new Date().toISOString());
-			//todo 試合スコアやプレイヤー名の表示
-		  }
+		this.socket_.onopen = () => {}
 
 		this.socket_.onmessage = (event) => {
-			// console.log("received data: ", event.data);
 			const parsedData = JSON.parse(event.data);
 			this.handleEvent(parsedData)
-			//todo 試合状況の表示
 		}
 
 		this.socket_.onclose = () => {
-			//todo 試合終了のお知らせ
-			// setTimeout(() => this.connectWebSocket(), 3000);
-			console.log("websocket on close");
-
 			setTimeout(() => {
 				if (sessionStorage.getItem('navigatingToNextMatch') === 'true') {
 					;
@@ -97,13 +88,11 @@ export default class Pong {
 	}
 
 	handleEvent(event: WebSocketEvent): void {
-		// console.log("Gamets.Received Event= ", event)
 		switch (event.type) {
 			case 'game_initialization':
 				if (event.data) {
 					this.manager = new Manager(this.renderer, this.scene);
 					this.manager.update(event);
-					// this.state_ = new State(parsedData.data);
 				} else {
 					console.error("Event data is undefined.");
 				}
@@ -183,6 +172,8 @@ export default class Pong {
 			<h1 class="score-separator">-</h1>
 			<h1 class="score team2-score">${score_info.team2_score}</h1>
 			</div>
+			${match_info.status == 3 ?
+				`<h1 style="color: #cf2701;text-align: center;">FINISHED!</h1>` : ""}
 		`;
 
 		// チーム情報

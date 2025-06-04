@@ -46,7 +46,7 @@ class Manager:
         self.connected_user_id : set[int] = set()
 
     def start(self):
-        if not self.task:
+        if self.task:
             return
         self.task = asyncio.create_task(self.run_game_loop())
         self.task.add_done_callback(lambda _:
@@ -62,7 +62,6 @@ class Manager:
 
     async def run_game_loop(self):
         try:
-            # print("Game loop started")
             while self.is_continue:
                 start_time : float = time.time()
                 # DBからMatchを取得
@@ -149,10 +148,10 @@ class Manager:
         score, _ = await Score.objects.aget_or_create(match=self._match)
 
         for loser in self._losers:
-            if loser == LOSER.LEFT:
-                score.add_score(team_type=TeamType.TEAM1)
-            elif loser == LOSER.RIGHT:
+            if loser == LOSER.LEFT: # TEAM1の負け
                 score.add_score(team_type=TeamType.TEAM2)
+            elif loser == LOSER.RIGHT: # TEAM2の負け
+                score.add_score(team_type=TeamType.TEAM1)
             if score.check_finish():
                 self.is_continue = False
                 await sync_to_async(score.set_winner)()

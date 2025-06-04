@@ -4,6 +4,14 @@
 	background-color: black;
 }
 
+.my-container {
+	height: 100dvh;
+	width: 100%;
+	font-family: "Onest", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+}
+
 /* #app {
 	background-color: red;
 } */

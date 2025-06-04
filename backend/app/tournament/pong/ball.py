@@ -28,8 +28,8 @@ class Ball(PongObj):
         self.dx = random.choice([-1, 1]) * random.uniform(x_border, 1)
         self.dy = random.choice([-1, 1]) * math.sqrt(1 - self.dx ** 2)
 
-        self.dx *= BALL_SPEED * 3
-        self.dy *= BALL_SPEED * 3
+        self.dx *= BALL_SPEED
+        self.dy *= BALL_SPEED
 
     @property
     def left(self) -> int:
@@ -78,11 +78,6 @@ class Ball(PongObj):
             return LOSER.LEFT
         else:
             return LOSER.CONTINUE
-
-        # if bl > wr or br < wl:
-        #     print(f"Ball out of bounds: {bl},{br} wall: {wl},{wr}")
-        #     return False
-        # return True
 
     def to_dict(self) -> dict[str, int | str]:
         return {

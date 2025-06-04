@@ -23,25 +23,31 @@ export default class UserView extends AbstractView {
             this.me = await fetcher.fetch_with_auth();
             return `
             <style>
-              .my-page-container {
-                height: 85vh;
+              .my-container {
                 display: flex;
                 justify-content: center;
                 align-items: center;
                 background-color: #b7bff2;
               }
-              .my-page-container h2{
+              .my-container h1{
                font-family: "Bodoni Moda", serif;
                font-optical-sizing: auto;
                font-weight: 700;
                font-style: normal;
                color: #110167;
               }
+              .my-btn {
+                margin: 5px;
+              }
+              .my-label {
+                font-weight: bold;
+                color: #20245b;
+              }
             </style>
 
-            <div class="my-page-container d-flex justify-content-center flex-column align-items-center">
+            <div class="my-container d-flex justify-content-center flex-column align-items-center">
               <div class="text-center mt-5 mb-3">
-                <h2>Your Profile</h2>
+                <h1>Your Profile</h1>
               </div>
               <div class="container rounded bg-white mt-5 mb-5">
                 <div class="row">
@@ -51,7 +57,7 @@ export default class UserView extends AbstractView {
                       <br>
                       <div class="row w-100">
                         <div class="col-5 text-start">
-                          <span>id: </span>
+                          <span class="my-label">◉ id: </span>
                         </div>
                         <div class="col-7 text-start">
                           <span class="font-weight-bold">${this.me.id}</span>
@@ -59,7 +65,7 @@ export default class UserView extends AbstractView {
                       </div>
                       <div class="row w-100">
                         <div class="col-5 text-start">
-                          <span>nick name: </span>
+                          <span class="my-label">◉ nick name: </span>
                           </div>
                         <div class="col-7 text-start">
                           <span class="font-weight-bold">${this.me.nickname}</span>
@@ -67,7 +73,7 @@ export default class UserView extends AbstractView {
                       </div>
                       <div class="row w-100">
                         <div class="col-5 text-start">
-                          <div>e-mail: </div>
+                          <span class="my-label">◉ e-mail: </span>
                         </div>
                         <div class="col-7 text-start">
                           <span class="font-weight-bold">${this.me.email}</span>
@@ -78,45 +84,38 @@ export default class UserView extends AbstractView {
                   <div class="col-md-6">
                     <div class="p-3 py-5">
                       <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h6 class="text-right">Edit your profile</h6>
+                        <h5 class="text-right">Edit your profile</h5>
                       </div>
                       <div class="row g-5 align-items-center mb-3">
                         <div class="col-4">
-                          <label for="fileInput" class="form-label">image</label>
+                          <label for="fileInput" class="form-label my-label">◉ image</label>
                         </div>
                         <div class="col-8">
                           <input type="file" class="form-control" id="avatarInput">
                         </div>
                         <div class="col-4">
-                          <label for="nicknameInput" class="form-label">nick name</label>
+                          <label for="nicknameInput" class="form-label my-label">◉ nick name</label>
                         </div>
                         <div class="col-8">
                           <input type="text" id="nicknameInput" placeholder="new nickname" class="form-control">
                         </div>
-                      </div>
-                      <div class="row g-5 align-items-center mb-3">
                         <div class="col-4">
-                          <label for="emailInput" class="form-label">e-mail</label>
+                          <label for="emailInput" class="form-label my-label">◉ e-mail</label>
                         </div>
                         <div class="col-8">
                           <input type="email" id="emailInput" placeholder="new e-mail" class="form-control">
                         </div>
-                      <div class="row g-5 align-items-center mb-3">
                         <div class="col-4">
-                          <label for="passwordInput" class="form-label">password</label>
+                          <label for="passwordInput" class="form-label my-label">◉ password</label>
                         </div>
                         <div class="col-8">
                           <input type="password" id="passwordInput" placeholder="new password" class="form-control">
                         </div>
                       </div>
-                      <div class="row g-5 align-items-center mb-3">
-                      </div>
+                      <button id="updateButton" class="btn btn-outline-secondary my-btn">Submit</button>
+                      <button id="homeButton" class="btn btn-outline-secondary my-btn">Back to Home</button>
                     </div>
-                    <button id="updateButton" class="btn btn-outline-secondary">Submit</button>
                   </div>
-                  <a href="/" class="link-dark link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
-                    Back to Home
-                  </a>
                 </div>
               </div>
             </div>
@@ -163,8 +162,16 @@ export default class UserView extends AbstractView {
               console.error("error updating profile");
             }
           });
+          
+          const back_to_home = document.getElementById('homeButton');
+
+          if (!back_to_home){ throw Error("back_to_home not found");}
+          back_to_home.addEventListener('click', async (event) => {
+            navigateTo('/');
+          });
+
         } catch (error) {
-          console.log("error:", error);
+          console.error("error:", error);
         }
       }
 }

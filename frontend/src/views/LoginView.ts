@@ -12,22 +12,22 @@ export default class LoginView extends AbstractView {
 		return `
 		<style>
 			.left-side {
-				background-image: url('/images/login-pingpong.jpg');
+				background-image: url('/images/login.jpg');
 				background-size: cover;
 				background-position: center;
 				position: relative;
-				height: 85vh;
+				height: 100dvh;
   			}
 			.right-side {
 				display: flex;
 				justify-content: center;
 				align-items: center;
-				height: 85vh;
+				height: 100dvh;
 				background-color: #d4e0d5;
 			}
 		</style>
 
-		<div class="container-fluid">
+		<div class="container-fluid my-container">
 			<div class="row">
 				<div class="col-md-6 left-side">
 				</div>

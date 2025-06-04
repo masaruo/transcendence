@@ -1,4 +1,5 @@
 import HeaderView from "./HeaderView";
+import { Collapse } from 'bootstrap';
 
 export default abstract class AbstractView {
 	protected params: Record<string, string>;
@@ -19,6 +20,11 @@ export default abstract class AbstractView {
 	}
 
 	async loadScripts(): Promise<void> {
-
+		document.querySelectorAll('[data-bs-toggle="collapse"]').forEach((toggleEl) => {
+	    const targetSelector = toggleEl.getAttribute('data-bs-target');
+	    if (targetSelector) {
+	      const collapseTarget = document.querySelector(targetSelector);
+	    }
+		});
 	}
 }
