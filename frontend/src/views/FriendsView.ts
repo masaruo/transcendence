@@ -89,7 +89,7 @@ export default class FriendsView extends AbstractView {
 						style="color: ${friend.is_online ? "#6fcf97" : "#6c757d" }">
 						${friend.is_online ? '🟢 ONLINE' : '⚫️ OFFLINE'}
 					</p>
-          <button id="historyButton" class="btn btn-outline-secondary">See History</button>
+          <button id="historyButton_${friend.id}" class="btn btn-outline-secondary">See History</button>
 				</div>
 				`; // Display id, nickname, and is_online
 				friendsList.appendChild(friendItem);
