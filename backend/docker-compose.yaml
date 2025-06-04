@@ -45,8 +45,8 @@ services:
 
   nginx:
     build:
-      context: .
-      dockerfile: Dockerfile_nginx
+      context: ./nginx
+      dockerfile: Dockerfile
     user: "0:0"
     restart: always
     ports:
