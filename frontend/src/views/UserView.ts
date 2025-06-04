@@ -39,6 +39,10 @@ export default class UserView extends AbstractView {
               .my-btn {
                 margin: 5px;
               }
+              .my-label {
+                font-weight: bold;
+                color: #20245b;
+              }
             </style>
 
             <div class="my-container d-flex justify-content-center flex-column align-items-center">
@@ -53,7 +57,7 @@ export default class UserView extends AbstractView {
                       <br>
                       <div class="row w-100">
                         <div class="col-5 text-start">
-                          <span>id: </span>
+                          <span class="my-label">◉ id: </span>
                         </div>
                         <div class="col-7 text-start">
                           <span class="font-weight-bold">${this.me.id}</span>
@@ -61,7 +65,7 @@ export default class UserView extends AbstractView {
                       </div>
                       <div class="row w-100">
                         <div class="col-5 text-start">
-                          <span>nick name: </span>
+                          <span class="my-label">◉ nick name: </span>
                           </div>
                         <div class="col-7 text-start">
                           <span class="font-weight-bold">${this.me.nickname}</span>
@@ -69,7 +73,7 @@ export default class UserView extends AbstractView {
                       </div>
                       <div class="row w-100">
                         <div class="col-5 text-start">
-                          <span>e-mail: </span>
+                          <span class="my-label">◉ e-mail: </span>
                         </div>
                         <div class="col-7 text-start">
                           <span class="font-weight-bold">${this.me.email}</span>
@@ -84,25 +88,25 @@ export default class UserView extends AbstractView {
                       </div>
                       <div class="row g-5 align-items-center mb-3">
                         <div class="col-4">
-                          <label for="fileInput" class="form-label">image</label>
+                          <label for="fileInput" class="form-label my-label">◉ image</label>
                         </div>
                         <div class="col-8">
                           <input type="file" class="form-control" id="avatarInput">
                         </div>
                         <div class="col-4">
-                          <label for="nicknameInput" class="form-label">nick name</label>
+                          <label for="nicknameInput" class="form-label my-label">◉ nick name</label>
                         </div>
                         <div class="col-8">
                           <input type="text" id="nicknameInput" placeholder="new nickname" class="form-control">
                         </div>
                         <div class="col-4">
-                          <label for="emailInput" class="form-label">e-mail</label>
+                          <label for="emailInput" class="form-label my-label">◉ e-mail</label>
                         </div>
                         <div class="col-8">
                           <input type="email" id="emailInput" placeholder="new e-mail" class="form-control">
                         </div>
                         <div class="col-4">
-                          <label for="passwordInput" class="form-label">password</label>
+                          <label for="passwordInput" class="form-label my-label">◉ password</label>
                         </div>
                         <div class="col-8">
                           <input type="password" id="passwordInput" placeholder="new password" class="form-control">
