@@ -1,6 +1,6 @@
 import './style.css';
 import './scss/styles.scss';
-import * as bootstrap from 'bootstrap';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { navigateTo, router } from '@services/router';
 import StatusManager from '@services/StatusManager';
 
