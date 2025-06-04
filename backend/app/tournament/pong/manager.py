@@ -10,6 +10,7 @@ from channels.layers import get_channel_layer
 from channels.db import database_sync_to_async
 import logging
 from asgiref.sync import sync_to_async
+import time
 
 class Manager:
     _instances: dict[str, 'Manager'] = {}
@@ -42,9 +43,11 @@ class Manager:
         self._need_update_score : bool = True # 最初に0 - 0のスコアを送信
         self._match : Match = None # 毎フレーム更新する
         self._losers : list[LOSER] = []
-        self.connected_count : int = 0
+        self.connected_user_id : set[int] = set()
 
     def start(self):
+        if not self.task:
+            return
         self.task = asyncio.create_task(self.run_game_loop())
         self.task.add_done_callback(lambda _:
             asyncio.create_task(
@@ -61,6 +64,7 @@ class Manager:
         try:
             # print("Game loop started")
             while self.is_continue:
+                start_time : float = time.time()
                 # DBからMatchを取得
                 self._match = await Match.objects.aget(id=self._match_id)
                 # オブジェクトの位置更新
@@ -75,7 +79,9 @@ class Manager:
                     await self.send_match_status()
                     self._need_update_score = False
                 # 1 / 60 秒待つ
-                await asyncio.sleep(1/60)
+                wait_time : float = 1/60 - (time.time() - start_time)
+                if wait_time > 0:
+                    await asyncio.sleep(wait_time)
 
         except asyncio.CancelledError:
             logging.info("Game loop cancelled")
@@ -125,17 +131,8 @@ class Manager:
             for paddle in paddles:
                 ball.check_with_paddle(paddle=paddle)
 
-    def is_ready(self) -> bool:
-        return self.connected_count == 2
-
-    async def init(self):
-        await self.channel_layer.group_send(
-            self._group_name,
-            {
-                'type': 'game_initialization',
-                'data': self.to_dict()
-            }
-        )
+    async def is_ready(self) -> bool:
+        return len(self.connected_user_id) == (await Match.objects.aget(id=self._match_id)).match_size
 
     def get_paddle(self, side: Paddle.SIDE) -> Paddle | None:
         for obj in self.objs:

@@ -66,25 +66,23 @@ class MatchConsumer(AsyncJsonWebsocketConsumer):
         self.match_group_name = f'match_{self.match_id}'
         self.manager = await Manager.get_instance(self.match_id)
 
+        self._is_finished : bool = False
+        await self.game_initialization()
+
         await self.channel_layer.group_add(
             self.match_group_name,
             self.channel_name
         )
 
-        self._is_finished : bool = False
-
-        self.manager.connected_count += 1
-        if self.manager.is_ready():
-            await self.manager.init()
+        self.manager.connected_user_id.add(self.user.id)
+        if (await self.manager.is_ready()):
             self.manager.start()
 
     async def disconnect(self, code):
-        self.manager.finish()
         await self.channel_layer.group_discard(
             self.match_group_name,
             self.channel_name
         )
-        Manager.remove_instance(match_id=self.match_id)
 
     async def receive_json(self, content: dict[str, str]) -> None:
         message_type: str = content.get('type')
@@ -101,9 +99,12 @@ class MatchConsumer(AsyncJsonWebsocketConsumer):
         elif (direction == 'ArrowDown'):
             paddle.moveDown()
 
-    async def game_initialization(self, state: dict[str, str]) -> None:
+    async def game_initialization(self) -> None:
         try:
-            await self.send_json(content=state)
+            await self.send_json(content={
+                'type': 'game_initialization',
+                'data': self.manager.to_dict()
+            })
         except Exception as e:
             print(f'Error sending message: {e}')
 
@@ -135,6 +136,7 @@ class MatchConsumer(AsyncJsonWebsocketConsumer):
         if self._is_finished:
             return
         self._is_finished = True
+        Manager.remove_instance(match_id=self.match_id)
         logging.info("finish match")
         try:
             await asyncio.sleep(0.5)
