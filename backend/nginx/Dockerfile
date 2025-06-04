@@ -7,6 +7,7 @@ COPY ./certs/key.pem /etc/nginx/certs/key.pem
 
 
 COPY ./conf.d/nginx.conf /etc/nginx/templates/conf.d/default.conf.template
-COPY ./includes /etc/nginx/includes
+COPY ./includes/proxy_backend.conf /etc/nginx/templates/includes/proxy_backend.conf.template
+COPY ./includes/cors.conf /etc/nginx/templates/includes/cors.conf.template
 
 USER root
