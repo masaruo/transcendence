@@ -172,6 +172,8 @@ export default class Pong {
 			<h1 class="score-separator">-</h1>
 			<h1 class="score team2-score">${score_info.team2_score}</h1>
 			</div>
+			${match_info.status == 3 ?
+				`<h1 style="color: #cf2701;text-align: center;">FINISHED!</h1>` : ""}
 		`;
 
 		// チーム情報

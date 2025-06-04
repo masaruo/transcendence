@@ -13,20 +13,25 @@ export default class TournamentCreateView extends AbstractView {
 		return `
     <style>
   		.my-container {
-  			height: 95vh;
-  			width: 100%;
   			background-image: url('/images/pongview.jpg');
   			background-size: cover;
   			background-position: center;
-        display: flex;
         justify-content: center;
-        align-items: center;
-        flex-direction: column;
   		}
+      .settings-form,
+      .radio-options,
+  		.my-container
+      .form-group {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
   		.my-container h2 {
   			font-family: "Bodoni Moda", serif;
         font-optical-sizing: auto;
-        font-weight: 700;
+        font-weight: bold;
         font-style: normal;
         color: #ffffff;
   		}
@@ -36,7 +41,6 @@ export default class TournamentCreateView extends AbstractView {
         border-radius: 15px;
         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
         max-width: 900px;
-        width: 100%;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -47,10 +51,9 @@ export default class TournamentCreateView extends AbstractView {
         margin-bottom: 1rem;
       }
       .radio-options {
-        display: flex;
         gap: 3rem;
-        justify-content: center;
         margin-bottom: 1rem;
+        flex-direction: row;
       }
       .submit-btn {
         margin 2px;

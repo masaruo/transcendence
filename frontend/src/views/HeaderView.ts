@@ -2,12 +2,29 @@ export default class HeaderView {
 	static getHeader(): string {
 		const isAuth: boolean = sessionStorage.getItem("is_authenticated") === "true";
 		return `
+			<style>
+				.navbar {
+         font-family: "Onest", sans-serif;
+         font-optical-sizing: auto;
+         font-style: normal;
+				}
+			</style>
 			<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 				<div class="container-fluid">
+					<button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+						data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"
+					>
+      			<span class="navbar-toggler-icon"></span>
+    			</button>
 					<div class="collapse navbar-collapse" id="navbarNav">
-						<ul class="navbar-nav nav-item-color">
+						<ul class="navbar-nav me-auto mb-2 mb-lg-0">
 							${this.getNavItems(isAuth)}
 						</ul>
+						<div class="btn btn-outline-light">
+              <a href="/logout" class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
+							Log out
+              </a>
+            </div>
 					</div>
 				</div>
 			</nav>
@@ -32,9 +49,6 @@ export default class HeaderView {
 				</li>
 				<li class="nav-item">
 				<a class="nav-link active nav__link" aria-current="page" href="/ai-battle" data-link>AI-Battle</a>
-				</li>
-				<li class="nav-item ml-auto">
-					<a class="nav-link active nav__link" aria-current="page" href="/logout" data-link>Logout</a>
 				</li>
 			`
 		} else {
