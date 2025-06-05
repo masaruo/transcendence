@@ -69,20 +69,28 @@ class MatchConsumer(AsyncJsonWebsocketConsumer):
         await self.accept()
 
         self.match_id = self.scope['url_route']['kwargs']['match_id']
+        match = await Match.objects.aget(id=self.match_id)
 
-        self.paddle = await sync_to_async(self.assign_paddle)()
+        self.paddle = await sync_to_async(self.assign_paddle)(match)
         self.match_group_name = f'match_{self.match_id}'
         self.manager = await Manager.get_instance(self.match_id)
         self._is_finished : bool = False
+
+        await self.game_initialization()
 
         await self.channel_layer.group_add(
             self.match_group_name,
             self.channel_name
         )
 
-        await self.game_initialization()
+        if await sync_to_async(lambda: match.match_status)() == MatchStatusType.FINISHED:
+            await self.manager.send_match_status()
+            await self.match_finished(None)
+            return
+
         self.manager.connected_user_id.add(self.user.id)
-        if (await self.manager.is_ready()):
+        self.manager.request_send_score()
+        if (await self.manager.is_ready()) and not self.manager.task:
             self.manager.start()
 
     async def disconnect(self, code):
@@ -121,9 +129,8 @@ class MatchConsumer(AsyncJsonWebsocketConsumer):
         except Exception as e:
             print(f'Error sending message: {e}')
 
-    def assign_paddle(self):
+    def assign_paddle(self, match : Match) -> Paddle.SIDE | None:
         """同期的にマッチを取得してパドルを割り当てる"""
-        match = Match.objects.get(id=self.match_id)
 
         # 同期的なコンテキストの中で関連オブジェクトにアクセス
         if match.team1.player1 and match.team1.player1.id == self.user.id:

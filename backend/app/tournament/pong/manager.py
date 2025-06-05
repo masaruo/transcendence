@@ -61,10 +61,10 @@ class Manager:
         )
 
     async def run_game_loop(self):
+        send_tasks = []
         try:
             while self.is_continue:
-                logging.info("here")
-                start_time : float = time.time()
+                start_time : float = time.perf_counter()
                 # DBからMatchを取得
                 self._match = await Match.objects.aget(id=self._match_id)
                 # オブジェクトの位置更新
@@ -72,14 +72,13 @@ class Manager:
                 # 試合状況更新
                 await self.update_score()
                 await self._match.asave()
-                # オブジェクトの位置情報送信
-                await self.send_objects_status()
-                # 試合状況送信
-                if self._need_update_score:
-                    await self.send_match_status()
-                    self._need_update_score = False
+                # 試合状況を非同期で送信
+                send_tasks.append(asyncio.create_task(self.send_info(self._need_update_score)))
+                send_tasks = [x for x in send_tasks if not x.done()]
+                self._need_update_score = False
                 # 1 / 60 秒待つ
-                wait_time : float = 1/60 - (time.time() - start_time)
+                now = time.perf_counter()
+                wait_time : float = 1/60 - (max(0, now - start_time))
                 if wait_time > 0:
                     await asyncio.sleep(wait_time)
 
@@ -93,6 +92,18 @@ class Manager:
         finally:
             logging.info("Game loop ended")
             # 最終的なクリーンアップ処理
+            for task in send_tasks:
+                await task
+
+    def request_send_score(self):
+        self._need_update_score = True
+
+    async def send_info(self, need_update_score: bool):
+        # オブジェクトの位置情報送信
+        await self.send_objects_status()
+        # 試合状況送信
+        if need_update_score:
+            await self.send_match_status()
 
     def update(self):
         for obj in self.objs:
@@ -132,9 +143,8 @@ class Manager:
                 ball.check_with_paddle(paddle=paddle)
 
     async def is_ready(self) -> bool:
-        logging.info(self.connected_user_id)
-        logging.info(len(self.connected_user_id))
-        return len(self.connected_user_id) == (await Match.objects.aget(id=self._match_id)).match_size
+        my_match = await Match.objects.aget(id=self._match_id)
+        return len(self.connected_user_id) == await sync_to_async(my_match.get_required_people)()
 
     def get_paddle(self, side: Paddle.SIDE) -> Paddle | None:
         for obj in self.objs:
@@ -178,6 +188,8 @@ class Manager:
         )
 
     async def send_match_status(self):
+        if not self._match:
+            self._match = await Match.objects.aget(id=self._match_id)
         score, _ = await Score.objects.aget_or_create(match=self._match)
         match_dict = await sync_to_async(self._match.to_dict)()
         score_dict = await sync_to_async(score.to_dict)()
