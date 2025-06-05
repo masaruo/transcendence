@@ -20,11 +20,14 @@ export default class HeaderView {
 						<ul class="navbar-nav me-auto mb-2 mb-lg-0">
 							${this.getNavItems(isAuth)}
 						</ul>
-						<div class="btn btn-outline-light">
-              <a href="/logout" class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
-							Log out
-              </a>
-            </div>
+						${isAuth ?
+							`
+								<div class="btn btn-outline-light">
+		              <a href="/logout" class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
+									Log out
+		              </a>
+		            </div>
+							` : ""}
 					</div>
 				</div>
 			</nav>

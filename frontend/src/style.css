@@ -5,7 +5,7 @@
 }
 
 .my-container {
-	height: 100dvh;
+	min-height: 100dvh;
 	width: 100%;
 	font-family: "Onest", sans-serif;
   font-optical-sizing: auto;
