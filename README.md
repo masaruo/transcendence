@@ -1,7 +1,7 @@
 ## Access Point
 `https://localhost:8443`
 
-##　基本コマンド
+## 基本コマンド
 * `make` production環境 (docker compose up --build -d)
 * `make dev` 開発環境 (docker compose up --build)
 * `make down` docker compose down --remote-oprhans
@@ -11,7 +11,7 @@
 * `make createsuperuser` アドミ権限のユーザーを作成
 * `make nginx` && `make django` それぞれのコンテナ内に移動
 
-##　初回やること
+## 初回やること
 * `.env`を`./backend`に移す
 * `./backend/nginx/certs`の`gen-certificate.sh`を実行
 - 作成した`cert.pem`を[クロームに登録](chrome://certificate-manager/localcerts/usercerts)
