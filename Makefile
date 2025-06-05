@@ -42,4 +42,4 @@ db:
 log:
 	$(COMPOSE) exec nginx tail -f /var/log/modsecurity/modsec_audit.log
 
-.PHONY: all up down dev clean fclean manage makemigrations createsuperuser django nginx db
+.PHONY: all up down dev clean fclean manage makemigrations createsuperuser django nginx db log
