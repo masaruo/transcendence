@@ -1,12 +1,13 @@
 ### WAF
-using modsecurity (https://github.com/coreruleset/modsecurity-crs-docker)
+using [modsecurity with docker](https://github.com/coreruleset/modsecurity-crs-docker)
+[core-rule-set or aka CRS](https://github.com/coreruleset/coreruleset)
 
-https://dev.to/henri_sekeladi/install-nginx-with-modsecurity-3-owasp-crs-on-ubuntu-2204-5d6l
+[some nice article](https://dev.to/henri_sekeladi/install-nginx-with-modsecurity-3-owasp-crs-on-ubuntu-2204-5d6l)
 
-sudo tail -f /var/log/modsec_audit.log
-sudo tail -f /var/log/nginx/error.log
+easy command to check whether modsecurity is active by typing `https://<address>/as.php?s=/bin/bash`. if it is active, access should be rejected.
 
-https://<address>/as.php?s=/bin/bash
+### setting files
+in nginx, modsecurity's conf files are located at `/etc/nginx/modsecurity.d/`.
+for [core rule set or aka CRS](https://coreruleset.org/) is at `/etc/modsecurity.d/*` and rules are in `/etc/modsecurity.d/owasp-crs/rules/*.conf`
 
-### using own conf
-> 💬 What happens if I want to make changes in a different file, like /etc/nginx/conf.d/default.conf? You mount your local file, e.g. nginx/default.conf as the new template: /etc/nginx/templates/conf.d/default.conf.template. You can do this similarly with other files. Files in the templates directory will be copied and subdirectories will be preserved.
+
