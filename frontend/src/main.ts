@@ -3,8 +3,10 @@ import './scss/styles.scss';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { navigateTo, router } from '@services/router';
 import StatusManager from '@services/StatusManager';
+import Auth from '@services/Auth';
 
 const statusManager = new StatusManager();
+const auth = Auth.getInstance();
 
 window.addEventListener("popstate", router);
 document.addEventListener("DOMContentLoaded", () => {

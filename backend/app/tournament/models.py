@@ -243,7 +243,7 @@ class Match(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     match_status = models.IntegerField(choices=MatchStatusType.choices, default=MatchStatusType.WAITING)
     round = models.IntegerField(choices=RoundType.choices, default=RoundType.SEMIFINAL)
-    match_size = models.IntegerField(choices=MatchSizeType.choices, default=MatchSizeType.FOUR)
+    # match_size = models.IntegerField(choices=MatchSizeType.choices, default=MatchSizeType.FOUR)
 
     objects = MatchManager()
 
@@ -271,7 +271,7 @@ class Match(models.Model):
 
     def get_match_type(self):
         return self.tournament.match_type
-    
+
     def get_required_people(self) -> int:
         match_type : MatchModeType = self.get_match_type()
         if match_type == MatchModeType.SINGLES:
