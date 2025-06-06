@@ -1,19 +1,45 @@
+BACKEND := ./backend
+COMPOSE := docker compose -f $(BACKEND)/docker-compose.yaml
+DEV_COMPOSE := $(BACKEND)/docker-compose.debug.yaml
+
 all: up
 
 up:
-	make -C ./backend
+	$(COMPOSE) up --build -d
+
+down:
+	$(COMPOSE) down --remove-orphans
+
+dev: down
+	$(COMPOSE) -f $(DEV_COMPOSE) up --build
 
 clean:
-	make clean -C ./backend
+	$(COMPOSE) down --rmi all
 
-down: clean
+fclean:
+	@echo "データベースの初期化を行います"
+	$(COMPOSE) down --rmi all --volumes
 
-dev: clean
-	make dev -C ./backend
+manage:
+	@echo "usage make manage CMD=<your_command>"
+	$(COMPOSE) exec django python /app/app/manage.py $(CMD)
 
-re: clean dev
+makemigrations:
+	$(COMPOSE) exec django python /app/app/manage.py makemigrations
 
-exec:
-	docker container exec -it backend-django-1 bash
+createsuperuser:
+	$(COMPOSE) exec django python /app/app/manage.py createsuperuser
 
-.PHONY: all clean dev re down
+django:
+	$(COMPOSE) exec django bash
+
+nginx:
+	$(COMPOSE) exec nginx bash
+
+db:
+	$(COMPOSE) exec db bash
+
+log:
+	$(COMPOSE) exec nginx tail -f /var/log/modsecurity/modsec_audit.log
+
+.PHONY: all up down dev clean fclean manage makemigrations createsuperuser django nginx db log

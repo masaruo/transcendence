@@ -45,8 +45,8 @@ services:
 
   nginx:
     build:
-      context: .
-      dockerfile: Dockerfile_nginx
+      context: ./nginx
+      dockerfile: Dockerfile
     user: "0:0"
     restart: always
     ports:
@@ -63,7 +63,6 @@ services:
         condition: service_started
       node:
         condition: service_healthy
-
 
   db:
     image: postgres:15
