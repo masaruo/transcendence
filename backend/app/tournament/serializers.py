@@ -49,7 +49,8 @@ class MatchSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Match
-        fields = ['id', 'tournament', 'team1', 'team2', 'created_at', 'match_status', 'round', 'team1_score', 'team2_score', 'winner']
+        fields = ['id', 'tournament', 'team1', 'team2', 'created_at', 'match_status', 'round', 'match_size',
+                 'team1_score', 'team2_score', 'winner']
 
     def get_team1_score(self, obj):
         try:

@@ -24,7 +24,7 @@ export const router = async() => {
 		{path: "/user/register", view: UserRegisterView},
 		{path: "/user/:user_id/matches", view: MatchHistoryView},
 		{path: "/login", view: LoginView },
-		{path: "/logout", view: LogoutView},
+    {path: "/logout", view: LogoutView},
 		{path: "/friends", view: FriendsView},
 		{path: "/tournament", view: TournamentListView},
 		{path: "/tournament/create", view: TournamentCreateView},

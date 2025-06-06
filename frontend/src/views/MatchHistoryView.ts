@@ -137,7 +137,8 @@ export default class MatchHistoryView extends AbstractView {
 					</div>
 				</div>
 				<div class="mt-3 text-center">
-					<span class="badge bg-info">ラウンド ${match.round === 3? "FINAL" : "SEMIFINAL"}</span>
+					<span class="badge bg-info">ラウンド ${match.round}</span>
+					<span class="badge bg-secondary">${match.match_size}人マッチ</span>
 					${match.tournament ? `
 						<span class="badge bg-primary">トーナメントID: ${match.tournament.id}</span>
 					` : ''}
