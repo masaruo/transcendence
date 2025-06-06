@@ -3,7 +3,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from tournament.serializers import TournamentSerializer
-from tournament.models import Tournament, Match
+from tournament.models import MatchStatusType, Tournament, Match
 import time
 # from django.contrib.auth import get_user_model
 
@@ -15,7 +15,7 @@ class TournamentViewSet(
     mixins.RetrieveModelMixin,
     viewsets.GenericViewSet
 ):
-    queryset = Tournament.objects.all()
+    queryset = Tournament.objects.all().order_by('-id')
     serializer_class = TournamentSerializer
     permission_classes = [permissions.IsAuthenticated]
     authentication_classes = [JWTAuthentication]
@@ -32,16 +32,17 @@ class TournamentViewSet(
         user = request.user
         serializer = self.get_serializer(tournament)
 
-        if user.is_authenticated:
+        if not user.is_authenticated:
+            return Response(serializer.data, status=status.HTTP_404_NOT_FOUND)
+        elif tournament.status != MatchStatusType.WAITING:
+            return Response({'message': 'the tournament is full.'}, status=status.HTTP_200_OK)
+        else:
             tournament.add_player(user)
 
-            if tournament.is_tournament_players_ready():
-                # tournament.start_tournament()
-                tournament.is_ready_to_start = True
-                tournament.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            return Response(serializer.data, status=status.HTTP_404_NOT_FOUND)
+        if tournament.is_tournament_players_ready():
+            tournament.is_ready_to_start = True
+            tournament.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['get'])
     def status(self, request, pk=None):

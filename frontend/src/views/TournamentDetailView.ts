@@ -100,16 +100,17 @@ export default class TournamentDetailView extends AbstractView {
 		`
 	}
 	async loadScripts(): Promise<void> {
-		const tournament = new Tournament(this.params.tournament_id);
-		const matches_div = document.getElementById('match-div');
-		//todo tournamentがすでに存在するかどうかを確認して、存在する場合は弾く処理
-		tournament.connect();
-
 		const fetcher = new Fetch(`${PATH}/api/tournament/${this.params.tournament_id}/status/`)
+		const matches_div = document.getElementById('match-div');
+
 		const matches_in_json = await fetcher.fetch_with_auth();
 		if (!matches_in_json) {
 			console.error("no matches found in the tournament");
 		} else {
+			if (matches_in_json.status === 1) {
+				const tournament = new Tournament(this.params.tournament_id);
+				tournament.connect();
+			}
 			const tournament_elem = `
 				<div class="status-container">
 					<h4>Status :${this.getMatchStatusText(matches_in_json.status)}</h4>

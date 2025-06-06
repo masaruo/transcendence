@@ -117,8 +117,6 @@ export default class TournamentListView extends AbstractView {
 				try {
 					const fetcher = new Fetch(`${PATH}/api/tournament/${tournament_id}/add_player/`, "POST");
 					const response = await fetcher.fetch_with_auth()
-					// console.log(response)
-					// window.location.reload();
 					navigateTo(`/tournament/${tournament_id}`)
 				} catch (error) {
 					console.error("failed to join a tournament", error);
