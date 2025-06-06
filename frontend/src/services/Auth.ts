@@ -32,7 +32,9 @@ export default class Auth {
 				return;
 			}
 			this.access_token = res.access;
+			// sessionStorage.setItem('access', res.access);
 			this.refresh_token = res.refresh;
+			// sessionStorage.setItem('refresh', res.refresh);
 			await this.updateSessionStorage();
 			this.startAutoRefresh(REFRESH_INTERVAL_MINS);
 		} catch {
@@ -45,7 +47,7 @@ export default class Auth {
 			clearTimeout(this.refreshTimerId);
 		}
 		this.refreshTimerId = setTimeout(() => {
-			this.refreshAccessToken();
+			this.refreshAccessToken();//? awaitできないのは問題？
 		}, interval_in_min * 60 * 1000);
 	}
 
