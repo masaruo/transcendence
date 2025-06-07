@@ -46,8 +46,14 @@ export default class Auth {
 		if (this.refreshTimerId !== null) {
 			clearTimeout(this.refreshTimerId);
 		}
-		this.refreshTimerId = setTimeout(() => {
-			this.refreshAccessToken();//? awaitできないのは問題？
+		this.refreshTimerId = setTimeout(async () => {
+			try {
+				await this.refreshAccessToken();
+				this.startAutoRefresh(interval_in_min);
+			} catch(e) {
+				console.error("Token refresh failed:", e);
+				this.failedLogin();
+			}
 		}, interval_in_min * 60 * 1000);
 	}
 
@@ -67,7 +73,6 @@ export default class Auth {
 		}
 		this.access_token = res.access;
 		await this.updateSessionStorage();
-		this.startAutoRefresh(REFRESH_INTERVAL_MINS);
 	}
 
 	private async updateSessionStorage(): Promise<void> {
