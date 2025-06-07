@@ -9,7 +9,8 @@ RUN mkdir -p /var/log/modsecurity && touch /var/log/modsecurity/modsec_audit.log
 COPY ./certs/cert.pem /etc/nginx/certs/cert.pem
 COPY ./certs/key.pem /etc/nginx/certs/key.pem
 
-COPY ./conf.d/nginx.conf /etc/nginx/templates/conf.d/default.conf.template
+COPY ./conf.d/nginx.conf /etc/nginx/templates/nginx.conf.template
+COPY ./conf.d/default.conf /etc/nginx/templates/conf.d/default.conf.template
 COPY ./conf.d/proxy_backend.conf /etc/nginx/templates/includes/proxy_backend.conf.template
 COPY ./conf.d/cors.conf /etc/nginx/templates/includes/cors.conf.template
 
