@@ -8,9 +8,9 @@ export default class HeaderView {
          font-optical-sizing: auto;
          font-style: normal;
 				}
-				.link-light:hover,
-				.link-light:focus {
-					color: #000000 !important;
+				.custom-link.link-light:hover,
+				.custom-link.link-light:focus {
+					color: #000000;
 				}
 			</style>
 			<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
