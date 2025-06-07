@@ -26,6 +26,7 @@ export default class Tournament {
 					navigateTo(`/tournament/${this.tournamentId}/pong/${match.id}`)
 				}
 			}
+			// TODO: Handle 'tournament_update' event. Uncomment and implement this branch when tournament updates need to be processed.
 			// else if (data.type === 'tournament_update') {
 			// 	// console.log("[DEBUG] Tournament update received:", data);
 			// }
