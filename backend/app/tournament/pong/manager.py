@@ -202,7 +202,7 @@ class Manager:
             except asyncio.CancelledError:
                 pass
             except Exception as e:
-                print(f"task cancel error:{e}")
+                self.logger.exception(f"Task cancel error: {e}")
             self.task = None
 
     async def initialize_with_db(self):
