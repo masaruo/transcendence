@@ -8,6 +8,10 @@ export default class HeaderView {
          font-optical-sizing: auto;
          font-style: normal;
 				}
+				.custom-link.link-light:hover,
+				.custom-link.link-light:focus {
+					color: #000000;
+				}
 			</style>
 			<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 				<div class="container-fluid">
@@ -23,7 +27,9 @@ export default class HeaderView {
 						${isAuth ?
 							`
 								<div class="btn btn-outline-light">
-		              <a href="/logout" class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
+		              <a href="/logout" 
+										class="link-light link-offset-2 link-underline-opacity-25
+										custom-link">
 									Log out
 		              </a>
 		            </div>
