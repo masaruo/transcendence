@@ -141,7 +141,7 @@ class Tournament(models.Model):
             }
         )
 
-    #todo end of match (frontend too)
+    #? OK to delete
     def _notify_match_end(self, match):
         channel_layer = get_channel_layer()
         # match_group_name = f'match_{match.id}'
