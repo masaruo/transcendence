@@ -60,30 +60,31 @@ export default class Auth {
 
 		const fetcher = new Fetch(`${PATH}/api/token/refresh/`, 'POST');
 		fetcher.add_body({'refresh': refresh_token});
-		const res = await fetcher.fetch_without_auth();
-		if (!res) {
+		try {
+			const res = await fetcher.fetch_without_auth();
+			this.access_token = res.access;
+			await this.updateSessionStorage();
+			this.startAutoRefresh(REFRESH_INTERVAL_MINS);
+		} catch {
 			this.failedLogin();
-			return;
 		}
-		this.access_token = res.access;
-		await this.updateSessionStorage();
-		this.startAutoRefresh(REFRESH_INTERVAL_MINS);
 	}
 
 	private async updateSessionStorage(): Promise<void> {
 		sessionStorage.clear();
 		if (!this.access_token || !this.refresh_token) {
-			throw new Error("Invalid Tokens.");
+			this.failedLogin();
 		}
 		sessionStorage.setItem('access', this.access_token);
 		sessionStorage.setItem('refresh', this.refresh_token);
 		sessionStorage.setItem('is_authenticated', 'true');
 		const fetcher = new Fetch(`${PATH}/api/user/me/`);
-		const res_in_json = await fetcher.fetch_with_auth();
-		if (!res_in_json) {
-			throw new Error("User ID failed to fetch.");
+		try {
+			const res_in_json = await fetcher.fetch_with_auth();
+			sessionStorage.setItem('user_id', res_in_json.id);
+		} catch {
+			this.failedLogin();
 		}
-		sessionStorage.setItem('user_id', res_in_json.id);
 	}
 
 	private failedLogin(): void {
