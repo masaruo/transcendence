@@ -194,10 +194,15 @@ class Manager:
             }
         )
 
-    def finish(self):
-        if self.task is not None:
-            if not self.task.done():
+    async def finish(self):
+        if self.task is not None and not self.task.done():
+            try:
                 self.task.cancel()
+                await self.task
+            except asyncio.CancelledError:
+                pass
+            except Exception as e:
+                print(f"task cancel error:{e}")
             self.task = None
 
     async def initialize_with_db(self):

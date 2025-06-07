@@ -25,17 +25,14 @@ export default class Tournament {
 					sessionStorage.setItem('navigatingToNextMatch', 'true');
 					navigateTo(`/tournament/${this.tournamentId}/pong/${match.id}`)
 				}
-			} else if (data.type === 'tournament_update') {
-				// console.log("[DEBUG] Tournament update received:", data);
 			}
+			// else if (data.type === 'tournament_update') {
+			// 	// console.log("[DEBUG] Tournament update received:", data);
+			// }
 		}
 
 		this.socket.onerror = (error) => {
 			console.error("[DEBUG] WebSocket error:", error);
-		}
-
-		this.socket.onclose = (event) => {
-			// console.log("[DEBUG] WebSocket closed:", event.code, event.reason);
 		}
 	}
 }

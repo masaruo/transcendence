@@ -63,7 +63,7 @@ export default class PongView extends AbstractView {
 					gap: 1rem;
 				}
 			</style>
-
+			<div id="match-starting" class="hidden">Your match is starting in 5 secs...</div>
 			<div class="d-flex justify-content-center">
 				<div id='match-data'></div>
 			</div>
@@ -93,6 +93,14 @@ export default class PongView extends AbstractView {
 		if (!canvas)
 			throw Error("Failed to find canvas element.")
 		const pong = new Pong(canvas, Number(this.params.pong_id));
-		pong.start();
+
+		const starting_notice = document.getElementById('match-starting');
+		starting_notice.classList.remove('hidden');
+
+		let timeoutID = setTimeout(() => {
+			starting_notice.classList.add('hidden');
+			pong.start();
+			timeoutID = null;
+		}, 5 * 1000);
 	}
 }
