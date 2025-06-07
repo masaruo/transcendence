@@ -121,7 +121,7 @@ class Tournament(models.Model):
                 team2 = Team.objects.create(player1=players[i + 1])
                 i += 2
 
-            match = Match.objects.create(tournament=self, team1=team1, team2=team2, match_size=self.match_size)
+            match = Match.objects.create(tournament=self, team1=team1, team2=team2)
             score = Score.objects.create(match=match)
             if self.match_size == MatchSizeType.TWO:
                 match.round = RoundType.FINAL

@@ -84,7 +84,8 @@ class MatchConsumer(AsyncJsonWebsocketConsumer):
         )
 
         if await sync_to_async(lambda: match.match_status)() == MatchStatusType.FINISHED:
-            await self.manager.send_match_status()
+            status = await self.manager.get_match_status()
+            await self.manager.send_match_status(status)
             await self.match_finished(None)
             return
 
@@ -94,10 +95,11 @@ class MatchConsumer(AsyncJsonWebsocketConsumer):
             self.manager.start()
 
     async def disconnect(self, code):
-        await self.channel_layer.group_discard(
-            self.match_group_name,
-            self.channel_name
-        )
+        if self.match_group_name:
+            await self.channel_layer.group_discard(
+                self.match_group_name,
+                self.channel_name
+            )
 
     async def receive_json(self, content: dict[str, str]) -> None:
         message_type: str = content.get('type')

@@ -61,7 +61,8 @@ class Manager:
         )
 
     async def run_game_loop(self):
-        send_tasks = []
+        draw_requests = asyncio.Queue()
+        draw_task = asyncio.create_task(self.draw_loop(draw_requests))
         try:
             while self.is_continue:
                 start_time : float = time.perf_counter()
@@ -73,8 +74,16 @@ class Manager:
                 await self.update_score()
                 await self._match.asave()
                 # 試合状況を非同期で送信
-                send_tasks.append(asyncio.create_task(self.send_info(self._need_update_score)))
-                send_tasks = [x for x in send_tasks if not x.done()]
+                if self._need_update_score:
+                    match_status = await self.get_match_status()
+                else:
+                    match_status = None
+                draw_requests.put_nowait(
+                    {
+                        'object': self.to_dict(),
+                        'match': match_status
+                    }
+                )
                 self._need_update_score = False
                 # 1 / 60 秒待つ
                 now = time.perf_counter()
@@ -92,18 +101,22 @@ class Manager:
         finally:
             logging.info("Game loop ended")
             # 最終的なクリーンアップ処理
-            for task in send_tasks:
-                await task
+            draw_requests.put_nowait(None)
+            await draw_task
 
     def request_send_score(self):
         self._need_update_score = True
 
-    async def send_info(self, need_update_score: bool):
-        # オブジェクトの位置情報送信
-        await self.send_objects_status()
-        # 試合状況送信
-        if need_update_score:
-            await self.send_match_status()
+    async def draw_loop(self, requests: asyncio.Queue):
+        while True:
+            request = await requests.get()
+            if not request:
+                break
+            # オブジェクトの位置情報送信
+            await self.send_objects_status(request['object'])
+            # 試合状況送信
+            if request['match']:
+                await self.send_match_status(request['match'])
 
     def update(self):
         for obj in self.objs:
@@ -178,29 +191,34 @@ class Manager:
         else:
             await sync_to_async(self._match.finish_match)()
 
-    async def send_objects_status(self):
+    async def send_objects_status(self, info):
         await self.channel_layer.group_send(
             self._group_name,
             {
                 'type': 'game_update',
-                'data': self.to_dict()
+                'data': info
             }
         )
 
-    async def send_match_status(self):
+    async def get_match_status(self):
         if not self._match:
-            self._match = await Match.objects.aget(id=self._match_id)
-        score, _ = await Score.objects.aget_or_create(match=self._match)
-        match_dict = await sync_to_async(self._match.to_dict)()
+            match = await Match.objects.aget(id=self._match_id)
+        else:
+            match = self._match
+        score, _ = await Score.objects.aget_or_create(match=match)
+        match_dict = await sync_to_async(match.to_dict)()
         score_dict = await sync_to_async(score.to_dict)()
+        return {
+            'match': match_dict,
+            'score': score_dict,
+        }
+
+    async def send_match_status(self, info):
         await self.channel_layer.group_send(
             self._group_name,
             {
                 'type': 'status_update',
-                'data': {
-                    'match': match_dict,
-                    'score': score_dict,
-                }
+                'data': info
             }
         )
 
