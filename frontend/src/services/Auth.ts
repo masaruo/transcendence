@@ -80,6 +80,7 @@ export default class Auth {
 		sessionStorage.clear();
 		if (!this.access_token || !this.refresh_token) {
 			this.failedLogin();
+			return;
 		}
 		sessionStorage.setItem('access', this.access_token);
 		sessionStorage.setItem('refresh', this.refresh_token);
