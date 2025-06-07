@@ -97,6 +97,9 @@ export default class PongView extends AbstractView {
 		const pong = new Pong(canvas, Number(this.params.pong_id));
 
 		const starting_notice = document.getElementById('match-starting');
+		if (!starting_notice) {
+			throw Error("Failed to find 'match-starting' element.");
+		}
 
 		let timeoutID = setTimeout(() => {
 			starting_notice.classList.add('d-none');
