@@ -123,7 +123,7 @@ export default class Pong {
 			direction = 's';
 		}
 
-		if (this.socket_) {
+		if (this.socket_ && this.socket_.readyState == WebSocket.OPEN) {
 			this.socket_.send(JSON.stringify(
 				{
 					type: 'paddle_movement',
