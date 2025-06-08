@@ -95,7 +95,7 @@ class MatchConsumer(AsyncJsonWebsocketConsumer):
             self.manager.start()
 
     async def disconnect(self, code):
-        if self.match_group_name:
+        if hasattr(self, 'match_group_name'):
             await self.channel_layer.group_discard(
                 self.match_group_name,
                 self.channel_name
@@ -112,9 +112,11 @@ class MatchConsumer(AsyncJsonWebsocketConsumer):
 
         direction: str = content.get('direction')
         if (direction == 'ArrowUp'):
-            paddle.moveUp()
+            paddle.setDirection(Paddle.Direction.UP)
         elif (direction == 'ArrowDown'):
-            paddle.moveDown()
+            paddle.setDirection(Paddle.Direction.DOWN)
+        else:
+            paddle.setDirection(Paddle.Direction.NONE)
 
     async def game_initialization(self) -> None:
         try:

@@ -120,8 +120,7 @@ class Manager:
 
     def update(self):
         for obj in self.objs:
-            if isinstance(obj, Ball):
-                obj.update()
+            obj.update()
         self.check_collisions()
 
     def reset_match(self):
