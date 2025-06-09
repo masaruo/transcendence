@@ -2,17 +2,13 @@ from .APongObj import PongObj
 from enum import Enum
 from .constants import SCREEN_HEIGHT, PADDLE_HEIGHT, PADDLE_WIDTH, SCREEN_WITDH, MOVE_VALUE
 
+
 class Paddle(PongObj):
     class SIDE(Enum):
         R1 = 1
         R2 = 2
         L1 = 3
         L2 = 4
-
-    class Direction(Enum):
-        DOWN = -1
-        NONE = 0
-        UP = 1
 
     def __init__(self, side:SIDE=SIDE.R1, x:int=0, y:int=SCREEN_HEIGHT//2, width:int=PADDLE_WIDTH, height:int=PADDLE_HEIGHT, color:str="white") -> None:
         self.type: Paddle.SIDE = side
@@ -21,9 +17,6 @@ class Paddle(PongObj):
         self.height: int = height
         self.color: str = color
         self.x: int = x
-        self.speed: float = 0
-        self.direction: int = 0
-
         if self.type == self.SIDE.R1:
             self.x = SCREEN_WITDH - self.width
         elif self.type == self.SIDE.L1:
@@ -66,21 +59,14 @@ class Paddle(PongObj):
     def reset(self)-> None:
         self.y = SCREEN_HEIGHT // 2
 
-    def setDirection(self, direction: Direction):
-        self.direction = direction.value
+    def moveDown(self):
+        amt = MOVE_VALUE
+        if (self.top - amt <= 0):
+            amt = self.top
+        self.y -= amt
 
-    def update(self) -> None:
-        power = 0.14
-        resistance = 0.07
-
-        self.speed += self.direction * power
-        if self.speed > 0:
-            self.speed = min(1, max(0, self.speed - resistance))
-        elif self.speed < 0:
-            self.speed = max(-1, min(0, self.speed + resistance))
-
-        self.y += self.speed * MOVE_VALUE
-        if self.bottom > SCREEN_HEIGHT:
-            self.y = SCREEN_HEIGHT - self.height
-        elif self.top < 0:
-            self.y = 0
+    def moveUp(self):
+        amt = MOVE_VALUE
+        if (self.bottom + amt >= SCREEN_HEIGHT):
+            amt = SCREEN_HEIGHT - self.bottom
+        self.y += amt
