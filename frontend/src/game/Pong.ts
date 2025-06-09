@@ -71,15 +71,6 @@ export default class Pong {
 		}
 
 		this.socket_.onclose = () => {
-			// setTimeout(() => {
-			// 	if (sessionStorage.getItem('navigatingToNextMatch') === 'true') {
-			// 		;
-			// 	} else {
-			// 		const parent_path = location.pathname.replace(/\/pong\/.*$/, '');
-			// 		navigateTo(parent_path);
-			// 	}
-			// 	sessionStorage.removeItem('navigatingToNextMatch');
-			// }, 1500);
 			sessionStorage.removeItem('navigatingToNextMatch');
 		}
 

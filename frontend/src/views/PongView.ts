@@ -1,8 +1,7 @@
+import Fetch from "@/classes/JsonFetch";
 import AbstractView from "./AbstractView";
-// import { Pong } from "../pong/pong";
-// import Pong from "../game/Pong";
 import Pong from "@/game/Pong";
-// import Tournament from "@/game/Tournament";
+import { PATH } from "@/services/constants";
 
 export default class PongView extends AbstractView {
 	constructor (params: Record<string, string>){
@@ -86,14 +85,22 @@ export default class PongView extends AbstractView {
 		`
 	}
 	async loadScripts(): Promise<void> {
-		const keyState: {[key: string]: boolean} = {};
-
-		document.addEventListener("keydown", (e) => {keyState[e.key] = true;})
-		document.addEventListener("keyup", (e) => {keyState[e.key] = false})
-
 		const canvas = document.getElementById("canvas") as HTMLCanvasElement | null;
 		if (!canvas)
 			throw Error("Failed to find canvas element.")
+		canvas.tabIndex = 0;
+		canvas.focus();
+
+		const keyState: {[key: string]: boolean} = {};
+		const keyup = (e: KeyboardEvent) => {keyState[e.key] = false;};
+		const keydown = (e: KeyboardEvent) => {keyState[e.key] = true;};
+
+		canvas.addEventListener("keydown", keydown);
+		canvas.addEventListener("keyup", keyup);
+		canvas.addEventListener("blur", ()=> {
+			canvas.focus();
+		})
+
 		const pong = new Pong(canvas, Number(this.params.pong_id));
 
 		const starting_notice = document.getElementById('match-starting');

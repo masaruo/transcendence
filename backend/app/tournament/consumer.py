@@ -66,10 +66,20 @@ class MatchConsumer(AsyncJsonWebsocketConsumer):
         if not self.user.is_authenticated:
             await self.close()
             return
-        await self.accept()
 
         self.match_id = self.scope['url_route']['kwargs']['match_id']
 
+        try:
+            match = await database_sync_to_async(Match.objects.get)(id=self.match_id)
+            if match.match_status == MatchStatusType.FINISHED:
+                await self.close()
+                return
+        except Match.DoesNotExist:
+            logging.error(f"Match with ID {self.match_id} does not exist.")
+            await self.close()
+            return
+
+        await self.accept()
         self.paddle = await sync_to_async(self.assign_paddle)()
         self.match_group_name = f'match_{self.match_id}'
         self.manager = await Manager.get_instance(self.match_id)
@@ -87,12 +97,17 @@ class MatchConsumer(AsyncJsonWebsocketConsumer):
             self.manager.start()
 
     async def disconnect(self, code):
-        await self.manager.finish()
-        await self.channel_layer.group_discard(
-            self.match_group_name,
-            self.channel_name
-        )
-        Manager.remove_instance(match_id=self.match_id)
+        # グループからの退出
+        if hasattr(self, 'match_group_name'):
+            await self.channel_layer.group_discard(
+                self.match_group_name,
+                self.channel_name
+            )
+
+        # 1000正常終了であれば、マッチを終了処理
+        if code == 1000 and hasattr(self, 'manager') and hasattr(self, 'match_id') and self.manager:
+            await self.manager.finish()
+            Manager.remove_instance(match_id=self.match_id)
 
     async def receive_json(self, content: dict[str, str]) -> None:
         message_type: str = content.get('type')
