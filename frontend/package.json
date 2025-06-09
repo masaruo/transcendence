@@ -25,6 +25,7 @@
     "@types/axios": "^0.9.36",
     "bootstrap": "^5.3.5",
     "three": "^0.176.0",
-    "url-pattern": "^1.0.3"
+    "url-pattern": "^1.0.3",
+    "@tensorflow/tfjs": "^4.17.0"
   }
 }

@@ -1,26 +1,7 @@
 import AbstractView from "./AbstractView";
 import { PATH, WS_PATH } from "@/services/constants";
-
-interface Ball {
-    x: number;
-    y: number;
-    dx: number;
-    dy: number;
-    radius: number;
-}
-
-interface Paddle {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    dy: number;
-}
-
-interface Score {
-    user: number;
-    ai: number;
-}
+import { AIAgent } from "@/services/AIAgent";
+import { Ball, Paddle, Score } from "@/types/game";
 
 export default class AIBattleView extends AbstractView {
     private ws: WebSocket | null = null;
@@ -30,8 +11,8 @@ export default class AIBattleView extends AbstractView {
     private ball: Ball = {
         x: 0,
         y: 0,
-        dx: 5,
-        dy: 5,
+        dx: 3,
+        dy: 3,
         radius: 10
     };
     private userPaddle: Paddle = {
@@ -58,20 +39,55 @@ export default class AIBattleView extends AbstractView {
     private gameOver: boolean = false;
     private restartTimer: number | null = null;
     private readonly WINNING_SCORE = 10;
-    private readonly RESTART_DELAY = 10000; // 10 seconds
+    private readonly RESTART_DELAY = 3000; // 3 seconds
     private readonly AI_PADDLE_SPEED = 5;
     private lastAIUpdate: number = 0;
     private readonly AI_UPDATE_INTERVAL = 1000; // 1秒ごとの更新
-    private aiTargetPosition: number | null = null;
     private aiKeys: { [key: string]: boolean } = {};
     private readonly USER_UP_KEY = 'w';
     private readonly USER_DOWN_KEY = 's';
     private readonly AI_UP_KEY = 'ArrowUp';
     private readonly AI_DOWN_KEY = 'ArrowDown';
+    private aiAgent: AIAgent;
+    private lastState: any = null;
+    private lastAction: any = null;
+    private totalGames: number = 0;
+    private aiWins: number = 0;
+    private totalReward: number = 0;
+    private trainingEpisodes: number = 0;
 
     constructor(params: Record<string, string>) {
         super(params);
         this.setTitle("AI Battle");
+        this.aiAgent = new AIAgent();
+        // ローカルストレージから過去の戦績を読み込む
+        this.totalGames = parseInt(localStorage.getItem('ai_total_games') || '0');
+        this.aiWins = parseInt(localStorage.getItem('ai_wins') || '0');
+        this.totalReward = parseFloat(localStorage.getItem('ai_total_reward') || '0');
+        this.trainingEpisodes = parseInt(localStorage.getItem('ai_training_episodes') || '0');
+    }
+
+    private getWinRate(): string {
+        if (this.totalGames === 0) return '0.000%';
+        return `${((this.aiWins / this.totalGames) * 100).toFixed(3)}%`;
+    }
+
+    private getAverageReward(): string {
+        if (this.totalGames === 0) return '0.000';
+        return (this.totalReward / this.totalGames).toFixed(3);
+    }
+
+    private updateStats(aiWon: boolean, reward: number): void {
+        this.totalGames++;
+        if (aiWon) this.aiWins++;
+        this.totalReward += reward;
+        this.trainingEpisodes++;
+        
+        // ローカルストレージに保存
+        localStorage.setItem('ai_total_games', this.totalGames.toString());
+        localStorage.setItem('ai_wins', this.aiWins.toString());
+        localStorage.setItem('ai_total_reward', this.totalReward.toString());
+        localStorage.setItem('ai_training_episodes', this.trainingEpisodes.toString());
     }
 
     async getBody(): Promise<string> {
@@ -95,6 +111,15 @@ export default class AIBattleView extends AbstractView {
                 font-style: normal;
                 color: #19254f;
                 margin-bottom: 2rem;
+            }
+            .game-instructions {
+                color: #19254f;
+                text-align: center;
+                margin-bottom: 2rem;
+                font-size: 1.2rem;
+                line-height: 1.6;
+                max-width: 600px;
+                padding: 0 1rem;
             }
             .start-button {
                 background-color: #4CAF50;
@@ -137,6 +162,12 @@ export default class AIBattleView extends AbstractView {
 
         <div class="ai-battle-container">
             <h2>Battle Against AI</h2>
+            <div class="game-instructions">
+                <p>操作方法:</p>
+                <p>Wキー: パドルを上に移動</p>
+                <p>Sキー: パドルを下に移動</p>
+                <p>先に10点取った方が勝ちです！</p>
+            </div>
             <button class="start-button" id="start-battle-btn">Start Battle</button>
             <div class="error-message" id="error-message"></div>
             <div class="game-container" id="game-container">
@@ -155,7 +186,7 @@ export default class AIBattleView extends AbstractView {
 
         // ランダムな方向にボールを発射
         const angle = (Math.random() * Math.PI / 2) - Math.PI / 4; // -45度から45度の範囲
-        const speed = 10;
+        const speed = 7;
         this.ball.dx = speed * Math.cos(angle) * (Math.random() > 0.5 ? 1 : -1);
         this.ball.dy = speed * Math.sin(angle);
     }
@@ -258,32 +289,37 @@ export default class AIBattleView extends AbstractView {
 
         // 1秒ごとにAIの判断を更新
         if (currentTime - this.lastAIUpdate >= this.AI_UPDATE_INTERVAL) {
-            // 盤面の状態を取得して判断
-            this.makeAIDecision();
-            this.lastAIUpdate = currentTime;
-        }
+            // 強化学習AIからアクションを取得
+            const action = this.aiAgent.getAction(this.ball, this.aiPaddle, this.userPaddle);
 
-        // キー操作をシミュレート
-        if (this.aiTargetPosition !== null) {
-            const currentY = this.aiPaddle.y + (this.aiPaddle.height / 2);
-            const targetY = this.aiTargetPosition + (this.aiPaddle.height / 2);
-
-            // 目標位置に基づいてキー操作を決定
-            if (Math.abs(currentY - targetY) > 5) { // 5ピクセルの誤差を許容
-                if (currentY < targetY) {
-                    // 下キーを押す
-                    this.simulateKeyPress(this.AI_DOWN_KEY);
-                    this.simulateKeyRelease(this.AI_UP_KEY);
-                } else {
-                    // 上キーを押す
+            // アクションに基づいてキー操作をシミュレート
+            switch (action.type) {
+                case 'UP':
                     this.simulateKeyPress(this.AI_UP_KEY);
                     this.simulateKeyRelease(this.AI_DOWN_KEY);
-                }
-            } else {
-                // 目標位置に近づいたらキーを離す
-                this.simulateKeyRelease(this.AI_UP_KEY);
-                this.simulateKeyRelease(this.AI_DOWN_KEY);
+                    break;
+                case 'DOWN':
+                    this.simulateKeyPress(this.AI_DOWN_KEY);
+                    this.simulateKeyRelease(this.AI_UP_KEY);
+                    break;
+                case 'STAY':
+                    this.simulateKeyRelease(this.AI_UP_KEY);
+                    this.simulateKeyRelease(this.AI_DOWN_KEY);
+                    break;
             }
+
+            // 報酬の計算と学習
+            if (this.lastState && this.lastAction) {
+                const reward = this.calculateReward();
+                const currentState = this.aiAgent.normalizeState(this.ball, this.aiPaddle, this.userPaddle);
+                this.aiAgent.updateQValue(this.lastState, this.lastAction, reward, currentState);
+            }
+
+            // 現在の状態とアクションを保存
+            this.lastState = this.aiAgent.normalizeState(this.ball, this.aiPaddle, this.userPaddle);
+            this.lastAction = action;
+
+            this.lastAIUpdate = currentTime;
         }
 
         // キー操作に基づいてパドルを移動
@@ -322,34 +358,32 @@ export default class AIBattleView extends AbstractView {
         }
     }
 
-    private makeAIDecision(): void {
-        if (!this.canvas) return;
+    private calculateReward(): number {
+        let reward = 0;
 
-        // ボールの現在位置と速度を考慮
-        const ballY = this.ball.y;
-        const ballDY = this.ball.dy;
-        const ballX = this.ball.x;
-        const ballDX = this.ball.dx;
-
-        // ボールがAI側に向かって来ている場合のみ判断を更新
-        if (ballDX > 0) {
-            // ボールの予測位置を計算
-            const timeToReachPaddle = (this.aiPaddle.x - ballX) / ballDX;
-            const predictedBallY = ballY + (ballDY * timeToReachPaddle);
-
-            // パドルの中心が予測位置に来るように目標位置を設定
-            this.aiTargetPosition = predictedBallY - (this.aiPaddle.height / 2);
-
-            // 画面外に出ないように制限
-            if (this.aiTargetPosition < 0) {
-                this.aiTargetPosition = 0;
-            } else if (this.aiTargetPosition + this.aiPaddle.height > this.canvas.height) {
-                this.aiTargetPosition = this.canvas.height - this.aiPaddle.height;
-            }
-        } else {
-            // ボールがAI側に向かって来ていない場合は中央に戻る
-            this.aiTargetPosition = (this.canvas.height - this.aiPaddle.height) / 2;
+        // ボールがAI側に向かって来ている場合
+        if (this.ball.dx > 0) {
+            // パドルがボールの予測位置に近いほど報酬が高い
+            const predictedY = this.ball.y + (this.ball.dy * (this.canvas!.width - this.ball.x) / this.ball.dx);
+            const distanceToBall = Math.abs((this.aiPaddle.y + this.aiPaddle.height / 2) - predictedY);
+            reward += Math.max(0, 1 - distanceToBall / this.canvas!.height);
         }
+
+        // ボールを打ち返せた場合
+        if (this.ball.x + this.ball.radius > this.aiPaddle.x &&
+            this.ball.x - this.ball.radius < this.aiPaddle.x + this.aiPaddle.width &&
+            this.ball.y + this.ball.radius > this.aiPaddle.y &&
+            this.ball.y - this.ball.radius < this.aiPaddle.y + this.aiPaddle.height &&
+            this.ball.dx > 0) {
+            reward += 2;
+        }
+
+        // 得点を取られた場合
+        if (this.ball.x - this.ball.radius < 0) {
+            reward -= 3;
+        }
+
+        return reward;
     }
 
     private checkPaddleCollision(): void {
@@ -408,7 +442,11 @@ export default class AIBattleView extends AbstractView {
 
         // 再開までのカウントダウン
         this.ctx.font = '24px Arial';
-        this.ctx.fillText('Next game starts in 10 seconds...', this.canvas.width / 2, this.canvas.height / 2 + 50);
+        this.ctx.fillText('Next game starts in 3 seconds...', this.canvas.width / 2, this.canvas.height / 2 + 50);
+
+        // 統計を更新
+        const finalReward = this.calculateReward();
+        this.updateStats(winner === 'ai', finalReward);
     }
 
     private checkGameOver(): boolean {
@@ -445,7 +483,6 @@ export default class AIBattleView extends AbstractView {
 
         // AIの状態をリセット
         this.lastAIUpdate = Date.now();
-        this.aiTargetPosition = null;
         this.aiKeys = {};
 
         // ボールをリセット
@@ -473,6 +510,7 @@ export default class AIBattleView extends AbstractView {
         if (this.checkGameOver()) {
             const winner = this.score.user >= this.WINNING_SCORE ? 'user' : 'ai';
             this.showGameOverMessage(winner);
+            this.aiAgent.onGameEnd(winner === 'ai');
             this.scheduleRestart();
         }
     }
@@ -497,6 +535,12 @@ export default class AIBattleView extends AbstractView {
         this.ctx.font = '32px Arial';
         this.ctx.textAlign = 'center';
         this.ctx.fillText(`${this.score.user} - ${this.score.ai}`, this.canvas.width / 2, 50);
+
+        // AIの学習状況を表示
+        this.ctx.font = '20px Arial';
+        this.ctx.fillText(`AI Win Rate: ${this.getWinRate()}`, this.canvas.width / 2, 90);
+        this.ctx.fillText(`Avg Reward: ${this.getAverageReward()}`, this.canvas.width / 2, 120);
+        this.ctx.fillText(`Training Episodes: ${this.trainingEpisodes}`, this.canvas.width / 2, 150);
 
         if (!this.gameOver) {
             // パドルの位置を更新
@@ -642,6 +686,7 @@ export default class AIBattleView extends AbstractView {
                         if (data.type === 'battle_started') {
                             // ゲーム画面を表示
                             startButton.style.display = 'none';
+                            (document.querySelector('.game-instructions') as HTMLElement).style.display = 'none';
                             this.gameContainer!.style.display = 'block';
                             // ゲームの初期化
                             this.initializeGame();
