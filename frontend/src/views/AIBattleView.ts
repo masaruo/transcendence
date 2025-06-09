@@ -110,6 +110,25 @@ export default class AIBattleView extends AbstractView {
                 transform: scale(1.05);
                 background-color: #45a049;
             }
+            .control-instructions {
+                color: #19254f;
+                background-color: rgba(255, 255, 255, 0.9);
+                padding: 1.5rem;
+                border-radius: 8px;
+                margin-top: 2rem;
+                text-align: center;
+                max-width: 600px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+            .control-instructions h3 {
+                font-family: "Bodoni Moda", serif;
+                margin-bottom: 1rem;
+                color: #19254f;
+            }
+            .control-instructions p {
+                margin: 0.5rem 0;
+                font-size: 1.1rem;
+            }
             .game-container {
                 display: none;
                 width: 100%;
@@ -138,6 +157,12 @@ export default class AIBattleView extends AbstractView {
         <div class="ai-battle-container">
             <h2>Battle Against AI</h2>
             <button class="start-button" id="start-battle-btn">Start Battle</button>
+            <div class="control-instructions" id="control-instructions">
+                <h3>How to Play</h3>
+                <p>Use the <strong>W</strong> key to move your paddle up</p>
+                <p>Use the <strong>S</strong> key to move your paddle down</p>
+                <p>First player to reach 10 points wins!</p>
+            </div>
             <div class="error-message" id="error-message"></div>
             <div class="game-container" id="game-container">
                 <canvas id="gameCanvas" width="800" height="600"></canvas>
@@ -642,6 +667,7 @@ export default class AIBattleView extends AbstractView {
                         if (data.type === 'battle_started') {
                             // ゲーム画面を表示
                             startButton.style.display = 'none';
+                            document.getElementById('control-instructions')!.style.display = 'none';
                             this.gameContainer!.style.display = 'block';
                             // ゲームの初期化
                             this.initializeGame();
