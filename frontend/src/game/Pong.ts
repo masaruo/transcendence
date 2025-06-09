@@ -80,6 +80,7 @@ export default class Pong {
 
 		this.socket_.onclose = () => {
 			sessionStorage.removeItem('navigatingToNextMatch');
+			this.stop();
 		}
 
 		this.socket_.onerror = (error) => {
