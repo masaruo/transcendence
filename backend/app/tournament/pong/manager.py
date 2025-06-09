@@ -10,6 +10,7 @@ from channels.layers import get_channel_layer
 from channels.db import database_sync_to_async
 import logging
 from asgiref.sync import sync_to_async
+import time
 
 class Manager:
     _instances: dict[str, 'Manager'] = {}
@@ -42,7 +43,7 @@ class Manager:
         self._need_update_score : bool = True # 最初に0 - 0のスコアを送信
         self._match : Match = None # 毎フレーム更新する
         self._losers : list[LOSER] = []
-        self.connected_count : int = 0
+        self.connected_user_id : set[int] = set()
 
     def start(self):
         if self.task:
@@ -60,8 +61,11 @@ class Manager:
         )
 
     async def run_game_loop(self):
+        draw_requests = asyncio.Queue()
+        draw_task = asyncio.create_task(self.draw_loop(draw_requests))
         try:
             while self.is_continue:
+                start_time : float = time.perf_counter()
                 # DBからMatchを取得
                 self._match = await Match.objects.aget(id=self._match_id)
                 # オブジェクトの位置更新
@@ -69,14 +73,23 @@ class Manager:
                 # 試合状況更新
                 await self.update_score()
                 await self._match.asave()
-                # オブジェクトの位置情報送信
-                await self.send_objects_status()
-                # 試合状況送信
+                # 試合状況を非同期で送信
                 if self._need_update_score:
-                    await self.send_match_status()
-                    self._need_update_score = False
+                    match_status = await self.get_match_status()
+                else:
+                    match_status = None
+                draw_requests.put_nowait(
+                    {
+                        'object': self.to_dict(),
+                        'match': match_status
+                    }
+                )
+                self._need_update_score = False
                 # 1 / 60 秒待つ
-                await asyncio.sleep(1/60)
+                now = time.perf_counter()
+                wait_time : float = 1/60 - (max(0, now - start_time))
+                if wait_time > 0:
+                    await asyncio.sleep(wait_time)
 
         except asyncio.CancelledError:
             logging.info("Game loop cancelled")
@@ -88,11 +101,26 @@ class Manager:
         finally:
             logging.info("Game loop ended")
             # 最終的なクリーンアップ処理
+            draw_requests.put_nowait(None)
+            await draw_task
+
+    def request_send_score(self):
+        self._need_update_score = True
+
+    async def draw_loop(self, requests: asyncio.Queue):
+        while True:
+            request = await requests.get()
+            if not request:
+                break
+            # オブジェクトの位置情報送信
+            await self.send_objects_status(request['object'])
+            # 試合状況送信
+            if request['match']:
+                await self.send_match_status(request['match'])
 
     def update(self):
         for obj in self.objs:
-            if isinstance(obj, Ball):
-                obj.update()
+            obj.update()
         self.check_collisions()
 
     def reset_match(self):
@@ -126,17 +154,9 @@ class Manager:
             for paddle in paddles:
                 ball.check_with_paddle(paddle=paddle)
 
-    def is_ready(self) -> bool:
-        return self.connected_count >= Match.objects.get(id=self._match_id).get_required_people()
-
-    async def init(self):
-        await self.channel_layer.group_send(
-            self._group_name,
-            {
-                'type': 'game_initialization',
-                'data': self.to_dict()
-            }
-        )
+    async def is_ready(self) -> bool:
+        my_match = await Match.objects.aget(id=self._match_id)
+        return len(self.connected_user_id) == await sync_to_async(my_match.get_required_people)()
 
     def get_paddle(self, side: Paddle.SIDE) -> Paddle | None:
         for obj in self.objs:
@@ -170,39 +190,47 @@ class Manager:
         else:
             await sync_to_async(self._match.finish_match)()
 
-    async def send_objects_status(self):
+    async def send_objects_status(self, info):
         await self.channel_layer.group_send(
             self._group_name,
             {
                 'type': 'game_update',
-                'data': self.to_dict()
+                'data': info
             }
         )
 
-    async def send_match_status(self):
-        score, _ = await Score.objects.aget_or_create(match=self._match)
-        match_dict = await sync_to_async(self._match.to_dict)()
+    async def get_match_status(self):
+        if not self._match:
+            match = await Match.objects.aget(id=self._match_id)
+        else:
+            match = self._match
+        score, _ = await Score.objects.aget_or_create(match=match)
+        match_dict = await sync_to_async(match.to_dict)()
         score_dict = await sync_to_async(score.to_dict)()
+        return {
+            'match': match_dict,
+            'score': score_dict,
+        }
+
+    async def send_match_status(self, info):
         await self.channel_layer.group_send(
             self._group_name,
             {
                 'type': 'status_update',
-                'data': {
-                    'match': match_dict,
-                    'score': score_dict,
-                }
+                'data': info
             }
         )
 
     async def finish(self):
-        if self.task is not None and not self.task.done():
-            try:
-                self.task.cancel()
-                await self.task
-            except asyncio.CancelledError:
-                pass
-            except Exception as e:
-                self.logger.exception(f"Task cancel error: {e}")
+        if self.task:
+            if not self.task.done():
+                try:
+                    self.task.cancel()
+                    await self.task
+                except asyncio.CancelledError:
+                    pass
+                except Exception as e:
+                    self.logger.exception(f"Task cancel error: {e}")
             self.task = None
 
     async def initialize_with_db(self):
