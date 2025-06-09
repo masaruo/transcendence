@@ -93,18 +93,18 @@ export default class PongView extends AbstractView {
 		const canvas = document.getElementById("canvas") as HTMLCanvasElement | null;
 		if (!canvas)
 			throw Error("Failed to find canvas element.")
-		canvas.tabIndex = 0;
-		canvas.focus();
+		// canvas.tabIndex = 0;
+		// canvas.focus();
 
-		const keyState: {[key: string]: boolean} = {};
-		const keyup = (e: KeyboardEvent) => {keyState[e.key] = false;};
-		const keydown = (e: KeyboardEvent) => {keyState[e.key] = true;};
+		// const keyState: {[key: string]: boolean} = {};
+		// const keyup = (e: KeyboardEvent) => {keyState[e.key] = false;};
+		// const keydown = (e: KeyboardEvent) => {keyState[e.key] = true;};
 
-		canvas.addEventListener("keydown", keydown);
-		canvas.addEventListener("keyup", keyup);
-		canvas.addEventListener("blur", ()=> {
-			canvas.focus();
-		})
+		// canvas.addEventListener("keydown", keydown);
+		// canvas.addEventListener("keyup", keyup);
+		// canvas.addEventListener("blur", ()=> {
+		// 	canvas.focus();
+		// })
 
 		const pong = new Pong(canvas, Number(this.params.pong_id));
 

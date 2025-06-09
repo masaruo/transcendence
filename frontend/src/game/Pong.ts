@@ -15,6 +15,7 @@ export default class Pong {
 	private socket_: WebSocket | null = null;
 	private keyMovements: {[key: string]: boolean} = {};
 	private manager: Manager | null = null;
+	private animationId: number | null = null;
 
 	public scene: THREE.Scene;
 	public camera: THREE.OrthographicCamera;
@@ -59,6 +60,13 @@ export default class Pong {
 		this.draw();
 	}
 
+	stop(): void {
+		if (this.animationId) {
+			cancelAnimationFrame(this.animationId);
+			this.animationId = null;
+		}
+	}
+
 	connectWebSocket(): void {
 		const token = sessionStorage.getItem('access');
 		this.socket_ = new WebSocket(`${WS_PATH}/ws/match/${this.matchId}/?token=${token}`);
@@ -72,6 +80,7 @@ export default class Pong {
 
 		this.socket_.onclose = () => {
 			sessionStorage.removeItem('navigatingToNextMatch');
+			this.stop();
 		}
 
 		this.socket_.onerror = (error) => {
@@ -125,7 +134,7 @@ export default class Pong {
 	}
 
 	draw(): void {
-		requestAnimationFrame(() => this.draw());
+		this.animationId = requestAnimationFrame(() => this.draw());
 		this.check_and_notify_keymove();
 		this.renderer.render(this.scene, this.camera);
 		return;
