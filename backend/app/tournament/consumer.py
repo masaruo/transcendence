@@ -96,10 +96,6 @@ class MatchConsumer(AsyncJsonWebsocketConsumer):
             self.manager.start()
 
     async def disconnect(self, code):
-        # managerのクリーンアップ
-        if hasattr(self, 'manager') and self.manager:
-            await self.manager.finish()
-
         # グループからの退出
         if hasattr(self, 'match_group_name'):
             await self.channel_layer.group_discard(
@@ -107,8 +103,9 @@ class MatchConsumer(AsyncJsonWebsocketConsumer):
                 self.channel_name
             )
 
-    # マネージャーのインスタンス削除
-        if hasattr(self, 'match_id'):
+        # 1000正常終了であれば、マッチを終了処理
+        if code == 1000 and hasattr(self, 'manager') and hasattr(self, 'match_id') and self.manager:
+            await self.manager.finish()
             Manager.remove_instance(match_id=self.match_id)
 
     async def receive_json(self, content: dict[str, str]) -> None:
