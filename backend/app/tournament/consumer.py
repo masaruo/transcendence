@@ -44,11 +44,11 @@ class TournamentConsumer(AsyncJsonWebsocketConsumer):
             print(f"エラー: {e}")
             print(traceback.format_exc())
 
-    # async def tournament_update(self, event):
-    #     await self.send(text_data=json.dumps({
-    #         'type': 'tournament_update',
-    #         'match': event['data']
-    #     }))
+    async def tournament_update(self, event):
+        await self.send(text_data=json.dumps({
+            'type': 'tournament_update',
+            'match': event['data']
+        }))
 
     async def match_start(self, event):
         await self.send(text_data=json.dumps({
@@ -69,30 +69,37 @@ class MatchConsumer(AsyncJsonWebsocketConsumer):
         await self.accept()
 
         self.match_id = self.scope['url_route']['kwargs']['match_id']
+        match = await Match.objects.aget(id=self.match_id)
 
-        self.paddle = await sync_to_async(self.assign_paddle)()
+        self.paddle = await sync_to_async(self.assign_paddle)(match)
         self.match_group_name = f'match_{self.match_id}'
         self.manager = await Manager.get_instance(self.match_id)
+        self._is_finished : bool = False
+
+        await self.game_initialization()
 
         await self.channel_layer.group_add(
             self.match_group_name,
             self.channel_name
         )
 
-        self._is_finished : bool = False
+        if await sync_to_async(lambda: match.match_status)() == MatchStatusType.FINISHED:
+            status = await self.manager.get_match_status()
+            await self.manager.send_match_status(status)
+            await self.match_finished(None)
+            return
 
-        self.manager.connected_count += 1
-        if await sync_to_async(self.manager.is_ready)():
-            await self.manager.init()
+        self.manager.connected_user_id.add(self.user.id)
+        self.manager.request_send_score()
+        if (await self.manager.is_ready()) and not self.manager.task:
             self.manager.start()
 
     async def disconnect(self, code):
-        await self.manager.finish()
-        await self.channel_layer.group_discard(
-            self.match_group_name,
-            self.channel_name
-        )
-        Manager.remove_instance(match_id=self.match_id)
+        if hasattr(self, 'match_group_name'):
+            await self.channel_layer.group_discard(
+                self.match_group_name,
+                self.channel_name
+            )
 
     async def receive_json(self, content: dict[str, str]) -> None:
         message_type: str = content.get('type')
@@ -105,15 +112,20 @@ class MatchConsumer(AsyncJsonWebsocketConsumer):
 
         direction: str = content.get('direction')
         if (direction == 'ArrowUp'):
-            paddle.moveUp()
+            paddle.setDirection(Paddle.Direction.UP)
         elif (direction == 'ArrowDown'):
-            paddle.moveDown()
+            paddle.setDirection(Paddle.Direction.DOWN)
+        else:
+            paddle.setDirection(Paddle.Direction.NONE)
 
-    async def game_initialization(self, state: dict[str, str]) -> None:
+    async def game_initialization(self) -> None:
         try:
-            await self.send_json(content=state)
-        except Exception as e:
-            print(f'Error sending message: {e}')
+            await self.send_json(content={
+                'type': 'game_initialization',
+                'data': self.manager.to_dict()
+            })
+        except Exception:
+            logging.exception('Error sending message')
 
     async def game_update(self, state: dict[str, str]) -> None:
         try:
@@ -121,9 +133,8 @@ class MatchConsumer(AsyncJsonWebsocketConsumer):
         except Exception as e:
             print(f'Error sending message: {e}')
 
-    def assign_paddle(self):
+    def assign_paddle(self, match : Match) -> Paddle.SIDE | None:
         """同期的にマッチを取得してパドルを割り当てる"""
-        match = Match.objects.get(id=self.match_id)
 
         # 同期的なコンテキストの中で関連オブジェクトにアクセス
         if match.team1.player1 and match.team1.player1.id == self.user.id:
@@ -143,6 +154,7 @@ class MatchConsumer(AsyncJsonWebsocketConsumer):
         if self._is_finished:
             return
         self._is_finished = True
+        Manager.remove_instance(match_id=self.match_id)
         logging.info("finish match")
         try:
             await asyncio.sleep(0.5)
