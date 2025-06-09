@@ -75,10 +75,9 @@ class MatchConsumer(AsyncJsonWebsocketConsumer):
                 await self.close()
                 return
         except Match.DoesNotExist:
-            pass
-
-        await self.accept()
-
+            logging.error(f"Match with ID {self.match_id} does not exist.")
+            await self.close()
+            return
         self.paddle = await sync_to_async(self.assign_paddle)()
         self.match_group_name = f'match_{self.match_id}'
         self.manager = await Manager.get_instance(self.match_id)
