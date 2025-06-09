@@ -92,8 +92,8 @@ export default class PongView extends AbstractView {
 		canvas.focus();
 
 		const keyState: {[key: string]: boolean} = {};
-		const keyup = (e) => {keyState[e.key] = false;};
-		const keydown = (e) => {keyState[e.key] = true;};
+		const keyup = (e: KeyboardEvent) => {keyState[e.key] = false;};
+		const keydown = (e: KeyboardEvent) => {keyState[e.key] = true;};
 
 		canvas.addEventListener("keydown", keydown);
 		canvas.addEventListener("keyup", keyup)
