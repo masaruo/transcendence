@@ -24,12 +24,13 @@ class Ball(PongObj):
 
     def set_delta_randomly(self):
         x_border: float = 0.5
+        x_angle = random.choice([-1, 1]) * random.uniform(x_border, 1)
+        y_angle = random.choice([-1, 1]) * math.sqrt(1 - x_angle ** 2)
+        self.set_delta(x_angle, y_angle)
 
-        self.dx = random.choice([-1, 1]) * random.uniform(x_border, 1)
-        self.dy = random.choice([-1, 1]) * math.sqrt(1 - self.dx ** 2)
-
-        self.dx *= BALL_SPEED
-        self.dy *= BALL_SPEED
+    def set_delta(self, x_angle: float, y_angle: float):
+        self.dx = x_angle * BALL_SPEED
+        self.dy = y_angle * BALL_SPEED
 
     @property
     def left(self) -> int:
@@ -56,12 +57,16 @@ class Ball(PongObj):
         bl, br, bt, bb = self.get_bounds()
         pl, pr, pt, pb = paddle.get_bounds()
 
-        if (paddle.type == Paddle.SIDE.L1 or paddle.type == Paddle.SIDE.L2):  #if left sides
-            if(bl <= pr and bb >= pt and bt <= pb):
-                self.reverseDx()
-        else:
-            if(br >= pl and bb >= pt and bt <= pb):
-                self.reverseDx()
+        if(br >= pl and bl <= pr and bb >= pt and bt <= pb):
+            y_max = 0.85
+            y_angle = self.get_angle(paddle) * y_max
+            x_angle = math.sqrt(1 - y_angle ** 2)
+            if paddle.type == Paddle.SIDE.L1 or paddle.type == Paddle.SIDE.L2:
+                self.x = pr + self.radius
+            else:
+                x_angle *= -1
+                self.x = pl - self.radius
+            self.set_delta(x_angle=x_angle, y_angle=y_angle)
 
     def check_to_continue_with_wall(self, wall: Wall)-> 'LOSER':
         bl, br, bt, bb = self.get_bounds()
@@ -96,8 +101,13 @@ class Ball(PongObj):
         self.x += self.dx
         self.y += self.dy
 
-    def reverseDx(self) -> None:
-        self.dx *= -1
+    def get_angle(self, paddle: Paddle) -> float:
+        _, _, pt, pb = paddle.get_bounds()
+        top = pt - self.radius
+        bottom = pb + self.radius
+        origin = (top + bottom) / 2
+
+        return (self.y - origin) / (bottom - origin)
 
     def reverseDy(self) -> None:
         self.dy *= -1

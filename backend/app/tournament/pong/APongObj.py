@@ -12,3 +12,7 @@ class PongObj(ABC):
     @abstractmethod
     def reset(self) -> None:
         pass
+
+    @abstractmethod
+    def update(self) -> None:
+        pass

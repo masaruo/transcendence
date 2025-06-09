@@ -71,15 +71,16 @@ export default class Pong {
 		}
 
 		this.socket_.onclose = () => {
-			setTimeout(() => {
-				if (sessionStorage.getItem('navigatingToNextMatch') === 'true') {
-					;
-				} else {
-					const parent_path = location.pathname.replace(/\/pong\/.*$/, '');
-					navigateTo(parent_path);
-				}
-				sessionStorage.removeItem('navigatingToNextMatch');
-			}, 1500);
+			// setTimeout(() => {
+			// 	if (sessionStorage.getItem('navigatingToNextMatch') === 'true') {
+			// 		;
+			// 	} else {
+			// 		const parent_path = location.pathname.replace(/\/pong\/.*$/, '');
+			// 		navigateTo(parent_path);
+			// 	}
+			// 	sessionStorage.removeItem('navigatingToNextMatch');
+			// }, 1500);
+			sessionStorage.removeItem('navigatingToNextMatch');
 		}
 
 		this.socket_.onerror = (error) => {
@@ -111,7 +112,7 @@ export default class Pong {
 	}
 
 	check_and_notify_keymove(): void {
-		let direction: string | null = null;
+		let direction: string = '';
 		if (this.keyMovements['ArrowUp']) {
 			direction = 'ArrowUp';
 		} else if (this.keyMovements['ArrowDown']) {
@@ -122,7 +123,7 @@ export default class Pong {
 			direction = 's';
 		}
 
-		if (direction != null && this.socket_) {
+		if (this.socket_ && this.socket_.readyState == WebSocket.OPEN) {
 			this.socket_.send(JSON.stringify(
 				{
 					type: 'paddle_movement',
