@@ -69,6 +69,11 @@ export default class PongView extends AbstractView {
 				<div id='match-data'></div>
 			</div>
 			<br>
+			<div class="d-flex justify-content-center mb-3">
+				<div class="alert alert-info" role="alert">
+					<h5>Controls: Use '↑' and '↓' keys to move your paddle up and down</h5>
+				</div>
+			</div>
 			<div class="container d-flex justify-content-center" height="95vh">
 				<canvas id="canvas" width="900" height="600"></canvas>
 			</div>
