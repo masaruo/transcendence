@@ -70,6 +70,11 @@ class MatchConsumer(AsyncJsonWebsocketConsumer):
 
         self.match_id = self.scope['url_route']['kwargs']['match_id']
 
+        match = database_sync_to_async(Match.objects.get)(id=self.match_id)
+        if match.match_status == MatchStatusType.FINISHED:
+            await self.close()
+            return
+
         self.paddle = await sync_to_async(self.assign_paddle)()
         self.match_group_name = f'match_{self.match_id}'
         self.manager = await Manager.get_instance(self.match_id)
