@@ -19,6 +19,8 @@ export default class Pong {
 	public scene: THREE.Scene;
 	public camera: THREE.OrthographicCamera;
 
+	private direction : string = '';
+
 	constructor(canvas: HTMLCanvasElement, matchId: number) {
 		if (!canvas) {
 			throw Error('failed to get canvas element.');
@@ -123,7 +125,10 @@ export default class Pong {
 			direction = 's';
 		}
 
-		if (this.socket_ && this.socket_.readyState == WebSocket.OPEN) {
+		if (this.direction === direction)
+			return;
+
+		if (this.socket_ && this.socket_.readyState === WebSocket.OPEN) {
 			this.socket_.send(JSON.stringify(
 				{
 					type: 'paddle_movement',
@@ -131,10 +136,12 @@ export default class Pong {
 				}
 			))
 		}
+		this.direction = direction;
 	}
 
 	draw(): void {
-		requestAnimationFrame(() => this.draw());
+		if (this.socket_.readyState !== WebSocket.CLOSING && this.socket_.readyState !== WebSocket.CLOSED)
+			requestAnimationFrame(() => this.draw());
 		this.check_and_notify_keymove();
 		this.renderer.render(this.scene, this.camera);
 		return;

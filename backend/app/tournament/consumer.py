@@ -44,11 +44,11 @@ class TournamentConsumer(AsyncJsonWebsocketConsumer):
             print(f"エラー: {e}")
             print(traceback.format_exc())
 
-    async def tournament_update(self, event):
-        await self.send(text_data=json.dumps({
-            'type': 'tournament_update',
-            'match': event['data']
-        }))
+    # async def tournament_update(self, event):
+    #     await self.send(text_data=json.dumps({
+    #         'type': 'tournament_update',
+    #         'match': event['data']
+    #     }))
 
     async def match_start(self, event):
         await self.send(text_data=json.dumps({

@@ -85,9 +85,9 @@ class Manager:
                     }
                 )
                 self._need_update_score = False
-                # 1 / 60 秒待つ
+                # 1 / 30 秒待つ
                 now = time.perf_counter()
-                wait_time : float = 1/60 - (max(0, now - start_time))
+                wait_time : float = 1/30 - (max(0, now - start_time))
                 if wait_time > 0:
                     await asyncio.sleep(wait_time)
 
