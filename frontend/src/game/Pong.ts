@@ -112,7 +112,7 @@ export default class Pong {
 	}
 
 	check_and_notify_keymove(): void {
-		let direction: string = '';
+		let direction: string | null = null;
 		if (this.keyMovements['ArrowUp']) {
 			direction = 'ArrowUp';
 		} else if (this.keyMovements['ArrowDown']) {
@@ -123,7 +123,7 @@ export default class Pong {
 			direction = 's';
 		}
 
-		if (this.socket_ && this.socket_.readyState == WebSocket.OPEN) {
+		if (direction != null && this.socket_) {
 			this.socket_.send(JSON.stringify(
 				{
 					type: 'paddle_movement',

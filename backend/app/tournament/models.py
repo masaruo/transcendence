@@ -106,27 +106,28 @@ class Tournament(models.Model):
         random.shuffle(players)
 
         #* refactor : team creationのリファクタ
-        i = 0
-        while i < len(players):
-            if self.match_type == MatchModeType.DOUBLES:
-                if i + 3 >= len(players):
-                    break
-                team1 = Team.objects.create(player1=players[i], player2=players[i + 1])
-                team2 = Team.objects.create(player1=players[i + 2], player2=players[i + 3])
-                i += 4
-            else:
-                if i + 1 >= len(players):
-                    break
-                team1 = Team.objects.create(player1=players[i])
-                team2 = Team.objects.create(player1=players[i + 1])
-                i += 2
-
-            match = Match.objects.create(tournament=self, team1=team1, team2=team2)
-            score = Score.objects.create(match=match)
-            if self.match_size == MatchSizeType.TWO:
-                match.round = RoundType.FINAL
-                match.save()
-            self._notify_match_start(match)
+        if self.match_type == MatchModeType.DOUBLES:
+            for i in range(0, len(players), 4):
+                if i + 3 < len(players):
+                    team1 = Team.objects.create(player1=players[i], player2=players[i + 1])
+                    team2 = Team.objects.create(player1=players[i + 2], player2=players[i + 3])
+                    match = Match.objects.create(tournament=self, team1=team1, team2=team2)
+                    score = Score.objects.create(match=match)
+                    if self.match_size == MatchSizeType.TWO:
+                        match.round = RoundType.FINAL
+                        match.save()
+                    self._notify_match_start(match)
+        else:
+            remaining_players = players.copy()
+            while len(remaining_players) >= 2:
+                team1 = Team.objects.create(player1=remaining_players.pop(0))
+                team2 = Team.objects.create(player1=remaining_players.pop(0))
+                match = Match.objects.create(tournament=self, team1=team1, team2=team2)
+                score = Score.objects.create(match=match)
+                if self.match_size == MatchSizeType.TWO:
+                    match.round = RoundType.FINAL
+                    match.save()
+                self._notify_match_start(match)
 
     def _notify_match_start(self, match):
         channel_layer = get_channel_layer()
