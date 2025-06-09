@@ -25,8 +25,12 @@ export class AIAgent {
     private totalGames = 0;
 
     constructor() {
-        // Initialize Q-table with random values
-        this.initializeQTable();
+        // Load Q-table from localStorage if available
+        this.loadQTable();
+        if (this.qTable.size === 0) {
+            // Initialize Q-table with random values if no saved data exists
+            this.initializeQTable();
+        }
     }
 
     private initializeQTable(): void {
@@ -145,6 +149,9 @@ export class AIAgent {
         }
         this.qTable.get(stateKey)![action.type] = newQ;
 
+        // Save Q-table after each update
+        this.saveQTable();
+
         // Decay exploration rate
         this.explorationRate = Math.max(
             this.minExplorationRate,
@@ -162,5 +169,60 @@ export class AIAgent {
             totalGames: this.totalGames,
             explorationRate: this.explorationRate
         };
+    }
+
+    public exportLearningData(): string {
+        const exportData = {
+            qTable: Array.from(this.qTable.entries()),
+            explorationRate: this.explorationRate,
+            totalGames: this.totalGames
+        };
+        return JSON.stringify(exportData);
+    }
+
+    public importLearningData(data: string): boolean {
+        try {
+            const importData = JSON.parse(data);
+            if (!importData.qTable || !Array.isArray(importData.qTable)) {
+                throw new Error('Invalid Q-table data');
+            }
+
+            this.qTable = new Map(importData.qTable);
+            if (typeof importData.explorationRate === 'number') {
+                this.explorationRate = importData.explorationRate;
+            }
+            if (typeof importData.totalGames === 'number') {
+                this.totalGames = importData.totalGames;
+            }
+
+            // Save the imported data to localStorage
+            this.saveQTable();
+            return true;
+        } catch (error) {
+            console.error('Failed to import learning data:', error);
+            return false;
+        }
+    }
+
+    private saveQTable(): void {
+        try {
+            const qTableData = Array.from(this.qTable.entries());
+            localStorage.setItem('ai_q_table', JSON.stringify(qTableData));
+        } catch (error) {
+            console.error('Failed to save Q-table:', error);
+        }
+    }
+
+    private loadQTable(): void {
+        try {
+            const savedData = localStorage.getItem('ai_q_table');
+            if (savedData) {
+                const qTableData = JSON.parse(savedData);
+                this.qTable = new Map(qTableData);
+            }
+        } catch (error) {
+            console.error('Failed to load Q-table:', error);
+            this.qTable = new Map();
+        }
     }
 } 

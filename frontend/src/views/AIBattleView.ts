@@ -112,14 +112,24 @@ export default class AIBattleView extends AbstractView {
                 color: #19254f;
                 margin-bottom: 2rem;
             }
-            .game-instructions {
+            .control-instructions {
                 color: #19254f;
+                background-color: rgba(255, 255, 255, 0.9);
+                padding: 1.5rem;
+                border-radius: 8px;
+                margin-top: 2rem;
                 text-align: center;
-                margin-bottom: 2rem;
-                font-size: 1.2rem;
-                line-height: 1.6;
                 max-width: 600px;
-                padding: 0 1rem;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+            .control-instructions h3 {
+                font-family: "Bodoni Moda", serif;
+                margin-bottom: 1rem;
+                color: #19254f;
+            }
+            .control-instructions p {
+                margin: 0.5rem 0;
+                font-size: 1.1rem;
             }
             .start-button {
                 background-color: #4CAF50;
@@ -158,17 +168,53 @@ export default class AIBattleView extends AbstractView {
                 border-radius: 5px;
                 display: none;
             }
+            .ai-controls {
+                margin-top: 1rem;
+                display: flex;
+                gap: 1rem;
+            }
+            .ai-controls button {
+                background-color: #2196F3;
+                color: white;
+                padding: 0.5rem 1rem;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+            .ai-controls button:hover {
+                background-color: #1976D2;
+            }
+            .ai-controls input[type="file"] {
+                display: none;
+            }
+            .ai-controls label {
+                background-color: #2196F3;
+                color: white;
+                padding: 0.5rem 1rem;
+                border-radius: 5px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+            .ai-controls label:hover {
+                background-color: #1976D2;
+            }
         </style>
 
         <div class="ai-battle-container">
             <h2>Battle Against AI</h2>
-            <div class="game-instructions">
-                <p>操作方法:</p>
-                <p>Wキー: パドルを上に移動</p>
-                <p>Sキー: パドルを下に移動</p>
-                <p>先に10点取った方が勝ちです！</p>
-            </div>
             <button class="start-button" id="start-battle-btn">Start Battle</button>
+            <div class="ai-controls">
+                <button id="export-ai-btn">Export AI Data</button>
+                <label for="import-ai-input">Import AI Data</label>
+                <input type="file" id="import-ai-input" accept=".json">
+            </div>
+            <div class="control-instructions" id="control-instructions">
+                <h3>How to Play</h3>
+                <p>Use the <strong>W</strong> key to move your paddle up</p>
+                <p>Use the <strong>S</strong> key to move your paddle down</p>
+                <p>First player to reach 10 points wins!</p>
+            </div>
             <div class="error-message" id="error-message"></div>
             <div class="game-container" id="game-container">
                 <canvas id="gameCanvas" width="800" height="600"></canvas>
@@ -633,9 +679,44 @@ export default class AIBattleView extends AbstractView {
 
     async loadScripts(): Promise<void> {
         const startButton = document.getElementById('start-battle-btn');
+        const exportButton = document.getElementById('export-ai-btn');
+        const importInput = document.getElementById('import-ai-input');
         this.gameContainer = document.getElementById('game-container');
         this.canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
         this.ctx = this.canvas?.getContext('2d');
+
+        if (exportButton) {
+            exportButton.addEventListener('click', () => {
+                const learningData = this.aiAgent.exportLearningData();
+                const blob = new Blob([learningData], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `ai-learning-data-${new Date().toISOString()}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
+        }
+
+        if (importInput) {
+            importInput.addEventListener('change', (event) => {
+                const file = (event.target as HTMLInputElement).files?.[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const data = e.target?.result as string;
+                        if (this.aiAgent.importLearningData(data)) {
+                            this.showError('AI learning data imported successfully!');
+                        } else {
+                            this.showError('Failed to import AI learning data.');
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            });
+        }
 
         if (startButton && this.gameContainer) {
             startButton.addEventListener('click', async () => {
@@ -686,7 +767,7 @@ export default class AIBattleView extends AbstractView {
                         if (data.type === 'battle_started') {
                             // ゲーム画面を表示
                             startButton.style.display = 'none';
-                            (document.querySelector('.game-instructions') as HTMLElement).style.display = 'none';
+                            document.getElementById('control-instructions')!.style.display = 'none';
                             this.gameContainer!.style.display = 'block';
                             // ゲームの初期化
                             this.initializeGame();
