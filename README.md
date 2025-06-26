@@ -13,7 +13,16 @@
 `https://localhost:8443`
 
 ### 初回やること
-* `.env`を`./backend`に移す
+* `.env`を`./backend`に移す or create some like below.
+```.env
+DB_HOST=db
+POSTGRES_DB=transcendencedb
+POSTGRES_USER=transcendence_user
+POSTGRES_PASSWORD=42Tokyo_Transcendence
+SECRET_KEY='ojeoqwur8pwquejhdshfgiusdhforu2309r852340-t7ueroisjaidfhiewrhjasd;ilJ:OJDflkewrhgielruqwaruiojefio;waejf;oisdhjafoiu;fhasdkljfh3p9428q5743t27-uq4woeihfj;ks'
+JWT_SECRET_KEY='jlfasjdflkjwlhlalkcu09eirtu09i209rsoidjflds;kcmn'
+REDIS_KEY='Joewuoidsfjksdnkfdjslfjsdj983'
+```
 * `./backend/nginx/certs`の`gen-certificate.sh`を実行
 - 作成した`cert.pem`を[クロームに登録](chrome://certificate-manager/localcerts/usercerts)
 
