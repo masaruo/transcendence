@@ -24,7 +24,7 @@ JWT_SECRET_KEY='jlfasjdflkjwlhlalkcu09eirtu09i209rsoidjflds;kcmn'
 REDIS_KEY='Joewuoidsfjksdnkfdjslfjsdj983'
 ```
 * `./backend/nginx/certs`の`gen-certificate.sh`を実行
-- 作成した`cert.pem`を[browser](chrome://certificate-manager/localcerts/usercerts)
+- 作成した`cert.pem`を[browser](chrome://certificate-manager/localcerts/usercerts)に登録（オプショナル）
 
 ### 対応したポイント
 * API (`django rest framework`)
