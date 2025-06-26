@@ -24,7 +24,7 @@ JWT_SECRET_KEY='jlfasjdflkjwlhlalkcu09eirtu09i209rsoidjflds;kcmn'
 REDIS_KEY='Joewuoidsfjksdnkfdjslfjsdj983'
 ```
 * `./backend/nginx/certs`の`gen-certificate.sh`を実行
-- 作成した`cert.pem`を[クロームに登録](chrome://certificate-manager/localcerts/usercerts)
+- 作成した`cert.pem`を[browser](chrome://certificate-manager/localcerts/usercerts)
 
 ### 対応したポイント
 * API (`django rest framework`)
@@ -37,7 +37,7 @@ REDIS_KEY='Joewuoidsfjksdnkfdjslfjsdj983'
 * JWT(`django simple jwt`)
 * 3D (`Three JS`)
 * AI player
-* nginx reverse proxy with `WAF(modsecurity)`
+* nginx reverse proxy with WAF`(modsecurity)`
 
 ### フロントエンドの画像ファイルなどの場所
 * `./frontend/public`内に配置
